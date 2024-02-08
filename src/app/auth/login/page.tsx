@@ -18,7 +18,7 @@ const login = () => {
   const loginUser = async () => {
     setLoading(true)
     try {
-      axios.post(`https://experthub.onrender.com/auth/login`, {
+      axios.post(`https://shark-app-2-k9okk.ondigitalocean.app/auth/login`, {
         email,
         password
       })
@@ -29,6 +29,8 @@ const login = () => {
           router.push(response.data.user.role === "student" ? "/applicant" : response.data.user.role === "admin" ? '/admin' : "/tutor")
         })
     } catch (e) {
+      console.log(e);
+      
       setLoading(false)
     }
   }
