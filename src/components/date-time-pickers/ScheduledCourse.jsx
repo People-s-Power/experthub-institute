@@ -31,7 +31,7 @@ function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setS
         return weekdays;
     };
     const handleDaysInputChange = (index, field, value) => {
-        const updatedDays = [...days];
+        const updatedDays = [...days.filter(day => getWeekdaysInRange(startDate, endDate).includes(day.day))];
         if (field === 'checked' && !value) {
             updatedDays[index].startTime = "";
             updatedDays[index].endTime = "";
@@ -202,7 +202,7 @@ function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setS
                 getWeekdaysInRange(startDate, endDate).length !== 0 && <>
                     <p className='font-medium mt-5'>Set your weekly hours</p>
                     {days.filter(day => getWeekdaysInRange(startDate, endDate).includes(day.day)).map((day, index) => (
-                        <div key={index} className='flex gap-2 my-2'>
+                        <div key={index} className='flex gap-2 '>
                             <input
                                 className='cursor-pointer'
                                 type="checkbox"
