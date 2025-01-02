@@ -5,7 +5,7 @@ import { useAppSelector } from "@/store/hooks";
 import { AssesmentElement, AssesmentType } from "@/types/AssesmentType";
 import apiService from "@/utils/apiService";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const SingleAssesment: React.FC = () => {
@@ -15,6 +15,9 @@ const SingleAssesment: React.FC = () => {
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [showGradeModal, setShowGradeModal] = useState(false);
   const router = useRouter()
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type"); // Access query parameter "name"
+  const [answers, setAnswers] = useState<any>([])
 
   // Fetch Assessment
   const getAssesment = async () => {
@@ -24,10 +27,17 @@ const SingleAssesment: React.FC = () => {
       );
       const fetchedAssesment = response.data.myAssesment[0];
       setAssesment(fetchedAssesment);
+      fetchedAssesment.assesment.map(() => setAnswers([...answers, { answer: "" }]))
       setSelectedAnswers(new Array(fetchedAssesment.assesment.length).fill(-1)); // Initialize answers
     } catch (error) {
       console.error("Error fetching assessment:", error);
     }
+  };
+
+  const handleInputChange = (index: number, field: string, value: string | number) => {
+    const updatedObjects = [...answers];
+    updatedObjects[index] = { ...updatedObjects[index], [field]: value };
+    setAnswers(updatedObjects);
   };
 
   // Handle Option Selection
@@ -64,6 +74,19 @@ const SingleAssesment: React.FC = () => {
     setShowGradeModal(true);
   };
 
+  const send = async () => {
+    try {
+      await apiService.post(`assessment/submit-assessment/${pathname.slice(16)}`, {
+        studentId: user.id,
+        answers
+      });
+      alert("Assesment submitted!");
+      router.back()
+    } catch (error) {
+      console.error("Error submitting", error);
+    }
+  }
+
   // Claim Certificate
   const claimCertificate = async () => {
     if (!assesment) return;
@@ -99,7 +122,22 @@ const SingleAssesment: React.FC = () => {
             {assesment?.title || "Loading..."})
           </p>
           <p>Answer all questions in order.</p>
-          {assesment?.assesment.map((question: any, questionIndex: any) => (
+          {type === 'theory' ? assesment?.assesment.map((question: any, index: any) => (<div key={index} className="bg-[#FFFFFFCC] p-4 my-3 rounded-md"
+          >
+            <div className="flex">
+              <img src="/images/icons/heroicons_list-bullet.svg" alt="" />
+              <p className="ml-2">Question {index + 1}</p>
+            </div>
+            <input
+              value={question.question}
+              disabled
+              type="text"
+              className="p-2 bg-[#D9D9D94D] my-3 w-full"
+            />
+
+            <textarea onChange={(e) => handleInputChange(index, "answer", e.target.value)} placeholder="Enter your response here" className="p-2 bg-[#D9D9D94D] my-3 w-full h-16"></textarea>
+
+          </div>)) : assesment?.assesment.map((question: any, questionIndex: any) => (
             <div
               key={questionIndex}
               className="bg-[#FFFFFFCC] p-4 my-3 rounded-md"
@@ -137,9 +175,13 @@ const SingleAssesment: React.FC = () => {
               ))}
             </div>
           ))}
-          <button onClick={handleSubmit} className="p-2 px-10 bg-[#FDC332]">
-            Submit
-          </button>
+
+          {type === 'theory' ?
+            <button onClick={() => send()} className="p-2 px-10 bg-[#FDC332]">
+              Submit
+            </button> : <button onClick={handleSubmit} className="p-2 px-10 bg-[#FDC332]">
+              Submit
+            </button>}
         </div>
         {showGradeModal && (
           <div>
@@ -174,7 +216,7 @@ const SingleAssesment: React.FC = () => {
                   </button>
                 )}
                 <button
-                  onClick={() => {router.back() }}
+                  onClick={() => { router.back() }}
                   className="p-2 px-6 bg-primary text-white rounded-md"
                 >
                   Close

@@ -24,13 +24,16 @@ const AssesmentCard = ({ assesment, getAssesment }: { assesment: any, getAssesme
         {/* <p className='text-xs my-3'>Gain the basic skills user
           needs, study the basic
           experience</p> */}
-        {pathname.includes('applicant') ? <Link href={`test/${assesment._id}`}>
+        {pathname.includes('applicant') ? <Link href={`test/${assesment._id}?type=${assesment.type}`}>
           <button className='p-2 px-6 rounded-sm bg-primary'>View</button>
         </Link> : <div className='flex justify-between'>
           <Link href={`assesment/new?page=${assesment._id}`}>
-            <button className='p-2 px-6 rounded-sm bg-primary'>Edit</button>
+            <button className='p-2 rounded-sm bg-primary'>Edit</button>
           </Link>
-          <button onClick={() => deleteAssesment()} className='p-2 px-6 rounded-sm bg-red-500 text-white'>Delete</button>
+          <button onClick={() => deleteAssesment()} className='p-2 rounded-sm bg-red-500 text-white'>Delete</button>
+          <Link href={`assesment/view?page=${assesment._id}`}>
+            <button className='p-2 rounded-sm bg-primary'>View</button>
+          </Link>
         </div>}
       </div>
     </div>
