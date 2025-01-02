@@ -380,7 +380,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                             } else {
                               router.push(`/auth/signup?enroll=${course._id}`)
                             }
-                          }} className='bg-primary p-2 my-3 rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
+                          }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
                       }
                       <div>
                         <Link className='bg-primary p-2 my-3 rounded-md px-8 hover:bg-primary/50 duration-300 ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
