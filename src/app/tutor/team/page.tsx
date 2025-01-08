@@ -61,7 +61,7 @@ const team = () => {
   ]
 
   const addTeam = async () => {
-    if (fullname && email && phone && country && state && address && password) {
+    if (fullname && email && phone && password) {
       setLoading(true)
       apiService.post(`/auth/add-team`, {
         fullname,
@@ -122,20 +122,20 @@ const team = () => {
               <input onChange={e => setName(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='e.g John' />
             </div>
             <div className='my-2 text-xs'>
-              <label className='font-medium'>Email</label>
+              <label className='font-medium'>Email (Note: SHould be teams organizations email.)</label>
               <input onChange={e => setEmail(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="email" placeholder='Sample@gmail.com' />
             </div>
             <div className='my-2 text-xs w-full'>
               <label className='font-medium'>Phone number</label>
               <input onChange={e => setPhone(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="number" placeholder='eg: 0122 222 000' />
             </div>
-            <div className='my-2 text-xs w-full'>
+            {/* <div className='my-2 text-xs w-full'>
               <label className='font-medium'>State</label>
               <select onChange={e => setState(e.target.value)} value={state} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm'>
                 <option className='hidden' value="">Select your state</option>
                 {states_in_nigeria.map(value => <option key={value} value={value}>{value}</option>)}
               </select>
-            </div>
+            </div> */}
             <div className='my-2 text-xs w-full'>
               <label className='font-medium'>Address</label>
               <input onChange={e => setAddress(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='90 Aba Road PH' />
@@ -156,7 +156,7 @@ const team = () => {
           {team.map((single: any) => <div className='my-3 p-2 border-b border-[#808080] flex' key={single._id}>
             <img className='h-14 w-14 mr-3 rounded-full my-auto' src={single.profilePicture ? single.profilePicture : '/images/user.png'} alt="" />
             <div>
-              <p className='font-bold capitalize text-lg'>{single.fullname}</p>
+              <p className=' capitalize text-lg'>{single.fullname}</p>
               <p>{single.email}</p>
             </div>
           </div>)}
