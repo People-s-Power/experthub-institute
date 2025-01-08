@@ -1,3 +1,4 @@
+'use client'
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import Link from 'next/link';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -318,11 +320,16 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
   return (
     <>
       <Fade mountOnEnter unmountOnExit in={open} timeout={400}>
-        <div>
+        <div className="relative">
           {contextHolder}
-          <div onClick={() => handleClick()} className='fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-[9999]'></div>
+          {/* Backdrop with higher z-index */}
+          <div
+            onClick={() => handleClick()}
+            className='fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-[999]'
+          />
+
           <Slide in={open} mountOnEnter unmountOnExit timeout={300}>
-            <div className='fixed z-[9999] top-10 bottom-10 left-0 rounded-md right-0 lg:w-[80%] overflow-y-auto w-[95%] mx-auto  bg-[#F8F7F4]'>
+            <div className='fixed z-[1000] top-10 bottom-10 left-0 rounded-md right-0 lg:w-[80%] overflow-y-auto w-[95%] mx-auto  bg-[#F8F7F4]'>
               <div className='shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38]  p-4 lg:px-12 flex justify-between'>
                 <p className='font-medium capitalize'>{action} Details</p>
                 <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" />
@@ -364,8 +371,8 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                       </div>
                       {
                         type === "view" ? course.type === "online" ? isOn().on ? <button onClick={() => startMeeting()} className='bg-primary p-2 my-3 rounded-md px-8 w-[150px]'>{loading ? <Spin /> : "Join Live"}</button> : null : user.role !== 'student' ?
-                          <button onClick={() => router.push(`/${user.role}/${course._id}?page=${course.type}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button> :
-                          action === "Event" ? null : <button onClick={() => router.push(`/applicant/${course._id}?page=${course.type}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button>
+                          <button onClick={() => router.push(`/${action === "Course" ? course.type : "event"}}/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button> :
+                          action === "Event" ? null : <button onClick={() => router.push(`/applicant/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button>
                           : <button onClick={() => {
                             if (user.id) {
                               parseInt(course.fee) === 0 ? checkTyoe() : setIsModalOpen(true)
@@ -373,8 +380,12 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                             } else {
                               router.push(`/auth/signup?enroll=${course._id}`)
                             }
-                          }} className='bg-primary p-2 my-3 rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
+                          }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
                       }
+                      <div>
+                        <Link className='bg-primary p-2 my-3 rounded-md px-8 hover:bg-primary/50 duration-300 ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
+
+                      </div>
                     </div>
                     {course.type === "offline" && type === "view" ? <div className='text-sm'>
                       <p><span className='font-bold'>Location:</span> {course.location}</p>
@@ -394,6 +405,34 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                     {/* <p className='my-2 text-sm font-medium'>This great online course will equip you with the knowledge and basic skills
                 needed to design vector graphics using Figma.</p> */}
                     <p className='text-sm'>{course.about}</p>
+                    {
+                      course.type === "webinar" &&
+                      <div className='border border-gray py-3  px-5 rounded-lg my-3'>
+                        <p className='text-[18px] font-medium  mb-1 '>Event Details</p>
+                        <p className='text-sm '>
+                          <span>This webinar  starts from  <span className='font-medium'>{new Date(course?.startDate).toLocaleString('en-US', {
+                            day: "numeric",
+                            month: "short",
+                            weekday: "long",
+                          })} </span>to  <span className='font-medium'>{new Date(course?.endDate).toLocaleString('en-US', {
+                            day: "numeric",
+                            month: "short",
+                            weekday: "long",
+                          })}</span>
+                          </span>
+                        </p>
+                        <div className='flex mt-1 items-center text-sm   text-yellow-600 gap-3'>
+                          {isOn().msg}
+                        </div>
+                        {
+                          isOn().on && <div className=' w-full mt-5'>
+                            <video controls={false} className="w-full">
+                              <source src={course.videoUrl} type="video/mp4" />
+                            </video>
+                          </div>
+                        }
+                      </div>
+                    }
                     {
                       course.type === "online" &&
                       <div className='border border-gray py-3  px-5 rounded-lg my-3'>
@@ -435,7 +474,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                     </div>}
 
                     {course.benefits && <div className='my-3'>
-                      <p className='font-bold text-lg'>In this course you'll learn how to</p>
+                      <p className='font-bold text-lg'> In this course you'll learn how to</p>
                       <ol className='list-decimal grid grid-cols-2'>
                         {course.benefits.map((single, index) => <li key={index} className='ml-4'>{single}</li>)}
                       </ol>
@@ -475,24 +514,33 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
         joinMeeting && <ZoomMeeting setJoinMeeting={setJoinMeeting} joinMeeting={joinMeeting} closeDetail={handleClick} course={course} />
       } */}
 
-      <PaymentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} wallet={() => payWithWallet()} card={() => handleFlutterPayment({
-        callback: (response) => {
-          checkTyoe()
-          setIsModalOpen(false)
-          console.log(response)
-          closePaymentModal() // this will close the modal programmatically
-        },
-        onClose: () => {
-          console.log("closed")
-        },
-      })} />
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        wallet={() => payWithWallet()}
+        card={() => handleFlutterPayment({
+          callback: (response) => {
+            checkTyoe()
+            setIsModalOpen(false)
+            closePaymentModal()
+          },
+          onClose: () => { },
+        })}
+      />
 
-
-      <div className='fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2' id="meetingSDKElement" />
-
+      {/* Zoom SDK Container with proper z-index and positioning */}
+      {init && (
+        <div className="fixed inset-0 z-[1001] bg-white">
+          <div
+            id="meetingSDKElement"
+            className="w-full h-full"
+          />
+        </div>
+      )}
     </>
 
   );
 };
 
 export default CourseDetails;
+

@@ -61,6 +61,8 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
   const [room, setRoom] = useState(course?.room || "")
   const [loading, setLoading] = useState(false)
   const [students, setStudents] = useState<{ label: string, value: string }[]>([])
+  const [myStudents, setMyStudents] = useState<{ id: string, fullname: string }[]>([])
+
   const [scholarship, setScholarship] = useState([])
   const [audience, setAudience] = useState([])
 
@@ -70,8 +72,9 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
         console.log(response.data.students)
         const formattedStudents = response.data.students.map((option: UserType) => ({ value: option.studentId, label: option.fullname }))
         console.log((formattedStudents));
-
-        setStudents(formattedStudents)
+        setStudents([{ label: "My Students", value: "students" }, ...formattedStudents])
+      }).catch(e => {
+        console.log(e);
       })
 
 
@@ -458,6 +461,18 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
 
       setLoading(true);
 
+      const streamlinedAudience = Array.from(
+        new Set(
+          audience.flatMap((data: any) => {
+            if (data.value === "students") {
+              return myStudents.map(data2 => data2.id);
+            }
+            return data.value;
+          })
+        )
+      );
+      console.log(streamlinedAudience);
+
       apiService
         .post(`courses/add-course/${user.id}`, {
           asset: image,
@@ -486,7 +501,7 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
             unit: timeframe,
           },
           scholarship: getScholarship(),
-          audience: audience.map((data: any) => data.value),
+          audience: streamlinedAudience,
         })
         .then(function (response) {
           api.open({
@@ -524,11 +539,25 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
 
       })
   }
+
+  const getMyStudents = () => {
+    apiService.get(`user/tutorstudents/${user.id}`)
+      .then(function (response) {
+        console.log(response.data.students, "turtor students");
+        setMyStudents(response.data.students)
+      }).catch(e => {
+        console.log(e);
+      })
+  }
+
+
+
   useEffect(() => {
     getStudents()
     getCategories()
     getLiveCourses()
     getUser()
+    getMyStudents()
   }, [])
 
 
@@ -762,7 +791,7 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
                         </div>}
                       </div>
                       <div className='w-full'>
-                        <label className='text-sm font-medium my-1'>Target Audience</label>
+                        <label className='text-sm font-medium my-1'>Set Privacy</label>
                         <Select
                           isMulti
                           options={students}
@@ -770,7 +799,7 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
                           className="basic-multi-select !border-[1px] !border-[#d3d3d3] [&>div]:!border-black [&>div]:!shadow-none outline-none ring-0  outline-0 rounded-md bg-transparent"
                           classNamePrefix="select"
                           placeholder="Everybody on the platform"
-                          onChange={(e: any) => { setAudience(e) }}
+                          onChange={(e: any) => { console.log(e, "valies for audience"); setAudience(e) }}
                         />
                       </div>
                       {type === 'online' ? <>
@@ -831,7 +860,8 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
                       {(type === 'online' && !instant) &&
 
                         <SheduledCourse conflict={conflict} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
-                      }                      {
+                      }
+                      {
                         type === 'video' && <>
                           {
                             videos.map((video, index) => <div key={index}>

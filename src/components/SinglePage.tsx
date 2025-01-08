@@ -175,7 +175,7 @@ const SinglePage = ({ repo, pathname, page }: { repo: CourseType, pathname: any,
           case 'event':
             return <div className='p-6 lg:w-[60%] mx-auto'>
               {repo.thumbnail && <ImageViewer control={true} image={repo.thumbnail} />}
-              <h1 className='font-bold text-2xl my-2'>{repo?.title}</h1>
+              <h1 className='font-bold text-2xl mt-2'>{repo?.title}</h1>
               <p>{repo?.about}</p>
               {
                 repo.room && <>
@@ -183,21 +183,32 @@ const SinglePage = ({ repo, pathname, page }: { repo: CourseType, pathname: any,
                   <p> <span className='font-bold'>Room:</span> {repo?.room}</p>
                 </>
               }
-            </div>;
+
+              {
+                repo.type === "webinar" && <div className='w-full flex flex-col mt-3'>
+                  <h3 className='font-medium text-lg my-2'>Webinar Details</h3>
+                  <video controls className="w-full">
+                    <source src={repo.videoUrl} type="video/mp4" />
+                  </video>
+                </div>
+              }
+            </div>
           default:
             return <div></div>;
         }
       })()}
 
-      {resources.length >= 1 && <div className='p-4'>
-        <p className='text-xl font-medium'>Related Learning Resources</p>
-        <div className='flex flex-wrap justify-between'>
-          {
-            resources.map((material: ResourceType) => <ResourcesCard material={material} getAll={() => getAssigned()} />)
-          }
+      {
+        resources.length >= 1 && <div className='p-4'>
+          <p className='text-xl font-medium'>Related Learning Resources</p>
+          <div className='flex flex-wrap justify-between'>
+            {
+              resources.map((material: ResourceType) => <ResourcesCard material={material} getAll={() => getAssigned()} />)
+            }
+          </div>
         </div>
-      </div>}
-    </div>
+      }
+    </div >
   );
 };
 

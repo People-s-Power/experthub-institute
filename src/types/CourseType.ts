@@ -17,6 +17,49 @@ export interface CourseType {
   videos: any[];
   [key: string]: any;
 }
+export interface CourseTypeSingle {
+  _id: string
+  title: string
+  thumbnail: {
+    type: string
+    url: string
+  }
+  category: string
+  meetingId: string
+  meetingPassword: string
+  zakToken: string
+  about: string
+  author: string
+  authorId: string
+  duration: number
+  mode: 'online' | 'offline'
+  type: string
+  startDate: string
+  endDate: string
+  startTime: string
+  endTime: string
+  fee: number
+  strikedFee: number
+  target: number
+  videoUrl: string
+  days: {
+    checked: boolean
+    day: string
+    startTime: string
+    endTime: string
+  }[]
+  enrolledStudents: string[]
+  location: string
+  room: string
+  benefits: string[]
+
+}
+
+export interface EventTypeSingle extends Omit<CourseTypeSingle, 'type'> {
+  type: 'event'
+}
+
+
 
 export interface CategoryType {
   _id: string;

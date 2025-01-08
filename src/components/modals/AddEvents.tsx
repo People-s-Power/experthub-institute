@@ -9,21 +9,35 @@ import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import SelectCourseDate from '../date-time-pickers/SelectCourseDate'
+import Video from '../icons/video';
+import Bin from '../icons/bin';
+import Play from '../icons/play';
+import Pause from '../icons/pause';
+import Replace from '../icons/replace';
+import { AxiosProgressEvent } from 'axios';
+import ScheduledCourse from '../date-time-pickers/ScheduledCourse';
+import { useRouter } from 'next/navigation';
 
 dayjs.extend(isBetween)
 dayjs.extend(advancedFormat)
 
+
+interface Layout {
+  title: string,
+  videoUrl: string,
+  video: File | null
+}
 const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolean, handleClick: any, course: CourseType | null, setShowPremium?: Dispatch<SetStateAction<boolean>> }) => {
   const user = useAppSelector((state) => state.value);
   const uploadRef = useRef<HTMLInputElement>(null)
   const [api, contextHolder] = notification.useNotification();
-
+  const router = useRouter()
   const [active, setActive] = useState(0)
   const [about, setAbout] = useState(course?.about || "")
-  const [startDate, setStartDate] = useState(course?.startDate || dayjs().format('YYYY-MM-DD'))
-  const [endDate, setEndDate] = useState(course?.endDate.toString() || dayjs().format('YYYY-MM-DD'))
-  const [startTime, setStartTime] = useState(course?.startTime || dayjs().format('HH:mm'))
-  const [endTime, setEndTime] = useState(course?.endTime || "")
+  const [startDate, setStartDate] = useState(course?.startDate || undefined)
+  const [endDate, setEndDate] = useState(course?.endDate || undefined)
+  const [startTime, setStartTime] = useState(course?.startTime || undefined)
+  const [endTime, setEndTime] = useState(course?.endTime || undefined)
   const [striked, setStriked] = useState<number>(course?.strikedFee || 0)
   const [fee, setFee] = useState<number>(course?.fee || 0)
   const [duration, setDuration] = useState<number>(course?.duration || 0)
@@ -44,6 +58,55 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
   const [students, setStudents] = useState([])
   const [mode, setMode] = useState("")
 
+
+  let layout = {
+    title: "",
+    videoUrl: "",
+    video: null
+  }
+
+  const [days, setDays] = useState(course?.days || [{
+    day: "Monday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  },
+  {
+    day: "Tuesday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  },
+  {
+    day: "Wednesday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  },
+  {
+    day: "Thursday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  },
+  {
+    day: "Friday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  },
+  {
+    day: "Saturday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  }])
+  const [video, setVideo] = useState<Layout>(layout)
+  const [play, setPlay] = useState<boolean>(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploading, setUploading] = useState(false)
+
+
   const getStudents = () => {
     apiService.get('user/students')
       .then(function (response) {
@@ -51,8 +114,39 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
         // console.log(response.data)
       })
   }
+  const handlePlayClick = () => {
+    const video = document.querySelector(`video.video`) as HTMLVideoElement;
+
+    if (video) {
+      if (video.paused) {
+        video.play();
+        setPlay(true)
+      } else {
+        video.pause();
+        setPlay(false)
+      }
+    }
+  };
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      let updatedVideo = video;
+
+      const videoUrl = URL.createObjectURL(files[0]);
+      updatedVideo = { ...updatedVideo, video: files[0], videoUrl };
 
 
+      const videoElement = document.createElement("video");
+      videoElement.src = videoUrl;
+      videoElement.addEventListener("loadedmetadata", () => {
+        const durationInMinutes = Math.round(videoElement.duration / 60); // Duration in minutes
+        setDuration(durationInMinutes);
+      });
+
+      setVideo(updatedVideo);
+    }
+
+  };
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const files = e.target.files
@@ -120,8 +214,40 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
     const arrayOfIds = scholarship.map((object: any) => object.value)
     return arrayOfIds
   }
+  const uploadVideo = async () => {
+    try {
+      const { video: videoFIle, videoUrl } = video
 
-  const add = () => {
+      if (videoUrl.includes(`res.cloudinary.com`)) return;
+      if (!videoFIle) return;
+      const { data } = await apiService.get('courses/cloudinary/signed-url');
+      console.log(data);
+
+      const formData = new FormData();
+      formData.append('file', videoFIle);
+      formData.append('api_key', data.apiKey);
+      formData.append('timestamp', data.timestamp);
+      formData.append('signature', data.signature);
+
+      const { data: dataCloud } = await apiService.post(`https://api.cloudinary.com/v1_1/${data.cloudname}/video/upload`, formData, {
+        onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+          setUploadProgress(percentCompleted);
+        }
+      });
+      console.log(dataCloud);
+
+      setVideo({
+        ...video,
+        videoUrl: dataCloud.secure_url
+      });
+    } catch (e) {
+      console.error(e, `\n from uploader`);
+      throw e
+    }
+  };
+
+  const add = async () => {
     // console.log(getScholarship())
 
     if (type === `online` && conflict) {
@@ -130,11 +256,35 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
         message: "You have chosen a disabled time please check",
       });
     }
-    if (title && about && duration && category && image && mode && type === "offline" ? startDate && endDate && startTime && endTime && room && location : startDate && endDate && startTime && endTime) {
+    if (title && about && ((type === "offline" || type === "online") && duration) && category && image && mode && type === "offline" ? startDate && endDate && startTime && endTime && room && location : type === "online" ? startDate && endDate && startTime && endTime : startDate && endDate && days.filter((day: any) => day.checked && day.startTime).length !== 0) {
+      if (type === 'webinar') {
+
+        if (!video.video) {
+          return api.open({
+            message: `You must upload a video file to create this event`,
+          });
+        }
+        setUploading(true);
+        try {
+          await uploadVideo();
+        } catch (e) {
+          console.error(e);
+          setUploading(false);
+          return api.open({
+            message: `Something went wrong during video upload`,
+          });
+        }
+
+        setUploading(false);
+      }
       setLoading(true)
 
-      const startDateTime = dayjs.utc(`${startDate}T${startTime}:00`);
-      const endDateTime = dayjs.utc(`${endDate}T${endTime}:00`);
+
+      const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
+      const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD");
+
+      const startDateTime = dayjs.utc(`${formattedStartDate}T${startTime || "00:00"}:00`);
+      const endDateTime = dayjs.utc(`${formattedEndDate}T${endTime || "00:00"}:00`);
       const startDateJS = startDateTime.toDate();
       const endDateJS = endDateTime.toDate();
       apiService.post(`events/add-event/${user.id}`,
@@ -155,7 +305,9 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
           strikedFee: striked.toString(),
           room,
           location,
-          scholarship: getScholarship()
+          scholarship: getScholarship(),
+          videoUrl: video.videoUrl,
+          days
         }
       )
         .then(function (response) {
@@ -164,7 +316,9 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
             message: "Events Created Successfully!"
           });
           setLoading(false)
+          router.refresh()
           handleClick()
+
         }).catch(error => {
           api.open({
             message: error.response.data.message
@@ -182,17 +336,17 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
   useEffect(() => {
     if (type === 'online' && startTime) {
       const [hours, minutes] = startTime.split(':');
-      const startDateIn = new Date(new Date(startDate).setHours(parseInt(hours), parseInt(minutes)));
+      const startDateIn = new Date(new Date(startDate || "").setHours(parseInt(hours), parseInt(minutes)));
       const endDateIn = new Date()
       endDateIn.setTime(startDateIn.getTime() + ((duration || 1) * 60000))
       const endTime = dayjs(endDateIn).format('HH:mm')
       setEndTime(endTime);
       setEndDate(dayjs(endDateIn).format('YYYY-MM-DD'));
 
-    } else if (type !== "offline") {
+    } else if (type !== "offline" && type !== "webinar") {
       setDuration(0);
     }
-    if (duration > 40 && type !== "offline") {
+    if (duration > 40 && type !== "offline" && type !== "webinar") {
       setDuration(40);
     }
   }, [type, startTime, duration]);
@@ -306,6 +460,8 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
                           <select onChange={handleTypeChange} value={type} className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent'>
                             <option value="online">Online</option>
                             <option value="offline">Offline</option>
+                            <option value="webinar">Webinar</option>
+
                           </select>
                         </div>
                       </div>
@@ -387,6 +543,62 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
                           </div>
                         </div>
                       </>}
+
+                      {
+                        type === 'webinar' && <div className=' mt-4'>
+                          {/* <div className='my-1'>
+                            <label className='text-sm font-medium my-1'>Sub Title</label>
+                            <input onChange={e => handleInputChange(index, 'title', e.target.value)} value={video.title} type="text" className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent' />
+                          </div> */}
+                          <input
+                            onChange={handleVideoChange}
+                            type="file"
+                            name="identification"
+                            accept="video/*"
+                            id={`video`}
+                            hidden
+                            multiple={false}
+                          />
+                          <label className='flex cursor-pointer h-full   ' htmlFor={`video`} >
+
+                            {
+                              video.videoUrl === "" ? <div className='w-fit flex items-center bg-primary hover:bg-opacity-70 duration-300 rounded-md px-5 py-2 gap-2 '>
+                                <span className=' text-[20px]'><Video /></span>
+                                <span className='text-sm'>Add your Recorded webinar </span>
+                              </div> : <div className='relative w-full group border overflow-hidden border-[#d9d9d9]  h-full'>
+
+                                <video key={video.videoUrl} className={`rounded-lg w-full video`} width="250" >
+                                  <source src={video.videoUrl} type="video/mp4" />
+                                </video>
+                                <div className='absolute inset-0 bg-[rgb(0,0,0,0.3)] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100 flex justify-center gap-2 items-center'>
+                                  <button className='text-primary text-[70px] transform scale-75 group-hover:scale-100 transition-transform duration-300' onClick={(e) => { e.stopPropagation(); e.preventDefault(); handlePlayClick() }}>
+                                    {play ? <Pause /> : <Play />}
+                                  </button>
+
+                                </div>
+                                <div className='absolute  bottom-1 w-full transform translate-y-full  group-hover:translate-y-0 transition-transform duration-300'>
+                                  <div className='px-3 py-1.5 flex items-center gap-3'>
+                                    <label title='Change Video' htmlFor={`video`} className='cursor-pointer text-white hover:text-gray text-[18px]'><Replace /></label>
+                                    <button className='text-white hover:text-red-400 text-[18px]' title='remove video' onClick={(e) => { e.stopPropagation(); e.preventDefault(); setVideo(layout) }}><Bin /></button>
+                                  </div>
+                                </div>
+
+                              </div>
+                            }
+
+
+                            {/* <p className='text-sm'>{video.videoUrl === "" ?  : video.videoUrl.slice(0, 20)}</p> */}
+                          </label>
+
+                          <div className='flex flex-col mt-6 gap-2'>
+                            <p className='font-medium'>Webinar Schedule</p>
+                            <ScheduledCourse conflict={conflict} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
+                          </div>
+
+
+
+                        </div>
+                      }
                     </div>
                   case 2:
                     return <div>
@@ -414,6 +626,18 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
                     return null
                 }
               })()}
+
+              {
+                (type === `webinar` && uploading) && <div className='flex  flex-col mb-5 '>
+                  <h3>Video Upload</h3>
+                  <div className='mt-3'>
+                    <div className='w-full bg-gray p-0.5 rounded-md'>
+                      <div style={{ width: `${uploadProgress}%` }} className='bg-primary h-2 rounded-md'></div>
+                    </div>
+
+                  </div>
+                </div>
+              }
               <div>
                 <p className='text-sm my-4'>By uploading you agree that this event is a product of you
                   and not being forged<input className='ml-2' type="checkbox" /></p>
