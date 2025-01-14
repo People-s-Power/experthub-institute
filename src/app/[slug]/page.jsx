@@ -108,7 +108,7 @@ const Single = () => {
           </div>)}
         </div>}
       </div>}
-      <div className='flex p-3 justify-between'>
+      <div className='flex p-3 justify-between   '>
         <Link href={'/'}>
           <button className='p-3 bg-[#D9D9D94D]'>Cancel</button>
         </Link>
