@@ -56,7 +56,8 @@ const Login = ({ type }: { type?: string }) => {
                   ? "/admin"
                   : response.data.user.role === "tutor"
                     ? "/tutor"
-                    : ''
+                    : response.data.user.role === 'team_member'
+                      ? '/tutor' : ''
             );
           }
 

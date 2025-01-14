@@ -116,6 +116,14 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             <p className='font-bold capitalize'>{user.fullName}</p>
           </div>
           <div className='flex gap-8 justify-between'>
+            {user.role === 'admin' || user.role === 'tutor' ? <Link href={'/tutor/team'}>
+              <div className='text-center flex items-center flex-col gap-2'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
+                  <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
+                </svg>
+                <p className='sm:hidden text-[15px]'>Add Team</p>
+              </div>
+            </Link> : null}
             <a className='text-center flex items-center flex-col gap-2' href={`https://www.experthubllc.com/feeds?tid=${user.accessToken}`}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-house" viewBox="0 0 16 16">
                 <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />

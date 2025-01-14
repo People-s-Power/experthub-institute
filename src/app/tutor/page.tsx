@@ -86,7 +86,6 @@ const tutor = () => {
   }
 
 
-
   useEffect(() => {
     getCourses()
     getGraduates()
