@@ -33,6 +33,6 @@ export default async function Page({ params }: PageProps) {
         )
     }
 
-    return <CourseDetail data={data} type={params.slug === 'courses' ? 'course' : 'event'} />
+    return <CourseDetail data={data} type={params.slug === 'courses' ? 'course' : 'event'}  />
 }
 

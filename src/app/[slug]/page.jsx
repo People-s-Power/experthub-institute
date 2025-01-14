@@ -53,7 +53,7 @@ const Single = () => {
     await apiService.get(`/user/profile/${user}`)
       .then(function (response) {
         setUserDeets(response.data.user)
-        // console.log(response.data)
+        // console.log(response.data)m
       })
   }
 
