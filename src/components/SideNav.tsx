@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { notification } from "antd";
+import { Dropdown, MenuProps, notification } from "antd";
 import apiService from "@/utils/apiService";
 import { useAppSelector } from '@/store/hooks';
 
@@ -14,6 +14,7 @@ const SideNav = () => {
   const [nav, setNav] = useState<any[]>([]);
   const router = useRouter();
   const user = useAppSelector((state) => state.value);
+  const [team, setTeam] = useState([])
 
   const TutorNavigation = [
     {
@@ -461,6 +462,13 @@ const SideNav = () => {
     // },
   ];
 
+  const getTeam = () => {
+    apiService.get(`/user/team/${user.id}`)
+      .then(function (response) {
+        console.log(response.data.teamMembers)
+        setTeam(response.data.teamMembers)
+      })
+  }
 
   const calenderNav = [
     {
@@ -486,6 +494,7 @@ const SideNav = () => {
   ]
 
   useEffect(() => {
+    getTeam()
     pathname.includes("applicant")
       ? setNav(ApplicantNavigation)
       : pathname.includes("admin")
@@ -493,20 +502,27 @@ const SideNav = () => {
         : setNav(TutorNavigation);
   }, []);
 
-  const logout = async () => {
-    localStorage.removeItem("tid");
-    api.open({
-      message: "Logged out Successfully!",
-    });
-    window.location.href = "/auth/login";
-  };
+  // const logout = async () => {
+  //   localStorage.removeItem("tid");
+  //   api.open({
+  //     message: "Logged out Successfully!",
+  //   });
+  //   window.location.href = "/auth/login";
+  // };
+
+
+  const items: MenuProps['items'] = team.map((single: any, index) => ({
+    label: <p>{single.ownerId.fullname}</p>, // Replace 'single.name' with the appropriate property
+    key: index, // Replace 'single.id' with the unique key for each item
+  }));
+
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
       <Link href={"/#courses"} className="font-bold text-lg text-[#DC9F08]">EXPERTHUB INSTITUTE</Link>
       <div className="flex-1 flex flex-col h-full my-6 overflow-auto">
         <ol className="text-sm font-medium flex-1">
-          {nav?.map((item, idx) => ( 
+          {nav?.map((item, idx) => (
             <li key={idx} className="my-3">
               <Link
                 href={item.href}
@@ -580,7 +596,14 @@ const SideNav = () => {
               </a>
             </li>
           )}
-
+          <div className="mt-10">
+            <Dropdown menu={{ items }} trigger={["click"]}>
+              <div className="flex">
+                <img className='h-10 w-10 rounded-full my-auto' src={user.profilePicture ? user.profilePicture : '/images/user.png'} alt="" />
+                <p className="ml-4 my-auto">{user.fullName}</p>
+              </div>
+            </Dropdown>
+          </div>
           {/* <li className="my-3">
             <Link
               href={"#"}
@@ -612,6 +635,8 @@ const SideNav = () => {
             </Link>
           </li> */}
         </ol>
+
+
       </div>
     </aside>
   );
