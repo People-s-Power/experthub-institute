@@ -126,7 +126,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                 <div>
                     {data.thumbnail && (
                         <Image
-                            src={data.thumbnail.url}
+                            src={data.thumbnail.url || data.thumbnail as unknown as string}
                             alt={data.title}
                             width={500}
                             height={500}

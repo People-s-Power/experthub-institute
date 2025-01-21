@@ -53,7 +53,7 @@ const Single = () => {
     await apiService.get(`/user/profile/${user}`)
       .then(function (response) {
         setUserDeets(response.data.user)
-        // console.log(response.data)
+        // console.log(response.data)m
       })
   }
 
@@ -108,7 +108,7 @@ const Single = () => {
           </div>)}
         </div>}
       </div>}
-      <div className='flex p-3 justify-between'>
+      <div className='flex p-3 justify-between   '>
         <Link href={'/'}>
           <button className='p-3 bg-[#D9D9D94D]'>Cancel</button>
         </Link>
