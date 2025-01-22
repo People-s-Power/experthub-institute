@@ -237,7 +237,7 @@ export default function Home() {
         <section id="auth" className=" bg-[#F9F7FFE5]">
           <div className="lg:w-1/2 py-10 mx-auto text-center">
             <h3 className="text-2xl font-medium">Shape the future workforce</h3>
-            <p>We invite individuals and trainers all over the word to submit applications for the initial phase of the training</p>
+            <p>We invite individuals and trainers all over the world to submit applications for the initial phase of the training</p>
           </div>
           <div className="lg:flex justify-between">
             <div className="lg:w-[49%] relative">

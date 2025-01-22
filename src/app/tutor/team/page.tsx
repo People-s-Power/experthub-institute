@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import tutor from '../page';
+import Select from 'react-select';
 
 const team = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -130,6 +131,11 @@ const team = () => {
     updatedObjects[index] = { ...updatedObjects[index], checked: value };
     setPrivileges(updatedObjects);
   };
+  const options = instructors
+    .filter((item: UserType) => !item.blocked && item.id !== user.id)
+    .map((item: UserType) => ({ value: item.id, label: item.fullname }));
+
+
   return (
     <DashboardLayout>
       <main className='flex justify-between px-6 py-4'>
@@ -137,10 +143,17 @@ const team = () => {
         <section className='w-[48%] shadow-md rounded-md p-4'>
           <div>
             <label htmlFor="">Select Tutor</label> <br />
-            <select onChange={(e) => setTutor(e.target.value)} className='border p-4 w-full mt-1'>
+            <Select
+              options={options}
+              onChange={(selectedOption) => setTutor(selectedOption?.value || '')}
+              placeholder="Add team member"
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+            {/* <select onChange={(e) => setTutor(e.target.value)} className='border p-4 w-full mt-1'>
               <option className='hidden' value="">Add team member</option>
               {instructors.map((item: UserType) => item.blocked || item.id === user.id ? null : <option value={item.id} key={item.id}>{item.fullname}</option>)}
-            </select>
+            </select> */}
             {tutor && <div className='my-4'>
               {privileges.map((single, index) => <div key={index} className='flex my-1'>
                 <input onChange={(e) => handleInputChange(index, e.target.checked)} type="checkbox" checked={single.checked} className='mr-4' />
