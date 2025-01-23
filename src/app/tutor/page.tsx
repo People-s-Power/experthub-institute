@@ -18,6 +18,17 @@ import apiService from '@/utils/apiService';
 import AddCourseInterests from '@/components/modals/AddCourseInterests';
 import GoPremuim from '@/components/modals/GoPremuium';
 import { CourseType } from '@/types/CourseType';
+import { isActionChecked } from '@/utils/checkPrivilege';
+
+// export const PrivilegeChecker = (action:string) => {
+//   const user = useAppSelector((state) => state.value);
+//   if (user.privilege) {
+//     if (!isActionChecked(action, user.privilege)) {
+//       alert("You don't have the permission for" + action)
+//       return
+//     }
+//   }
+// }
 
 const tutor = () => {
   const user = useAppSelector((state) => state.value);
@@ -31,11 +42,14 @@ const tutor = () => {
   const [graduates, setGraduates] = useState<UserType[]>([])
   const [active, setActive] = useState("")
 
+
+  // console.log(user.privilege)
+
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: (
-        <p onClick={() => setOpen(true)} >Courses</p>
+        <p onClick={() =>  setOpen(true) } >Courses</p>
       ),
     },
     {
@@ -91,6 +105,8 @@ const tutor = () => {
     getGraduates()
     getStudents()
   }, [])
+
+
   return (
     <DashboardLayout>
       {/* <section>
@@ -146,7 +162,7 @@ const tutor = () => {
           {courses.length >= 1 ? courses.slice(0, 6)
             .filter((course: CourseType) => course.category === active || active === "")
             .map((course: CourseType) => <div key={course._id} className='lg:w-[32%]'> <CoursesCard getCourse={() => getCourses()} course={course} /></div>) : <div>No Assigned course!</div>}
-          
+
         </div>
       </section>
       <AddCourse course={null} setShowPremium={setShowPremuim} open={open} handleClick={() => setOpen(!open)} />
