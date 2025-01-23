@@ -5,7 +5,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Dropdown, MenuProps, notification } from "antd";
 import apiService from "@/utils/apiService";
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setUser } from '@/store/slices/userSlice';
 
 const SideNav = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -15,6 +16,7 @@ const SideNav = () => {
   const router = useRouter();
   const user = useAppSelector((state) => state.value);
   const [team, setTeam] = useState([])
+  const dispatch = useAppDispatch();
 
   const TutorNavigation = [
     {
@@ -493,6 +495,20 @@ const SideNav = () => {
     },
   ]
 
+  const toggleUser = (data: any, privileges: any) => {
+    dispatch(
+      setUser({
+        ...data,
+        id: data._id,
+        fullName: data.fullname,
+        privileges,
+        accessToken: user.accessToken,
+      })
+    );
+
+    router.refresh()
+  }
+
   useEffect(() => {
     getTeam()
     pathname.includes("applicant")
@@ -502,19 +518,34 @@ const SideNav = () => {
         : setNav(TutorNavigation);
   }, []);
 
-  // const logout = async () => {
-  //   localStorage.removeItem("tid");
-  //   api.open({
-  //     message: "Logged out Successfully!",
-  //   });
-  //   window.location.href = "/auth/login";
-  // };
+  const logout = async () => {
+    localStorage.removeItem("tid");
+    api.open({
+      message: "Logged out Successfully!",
+    });
+    window.location.href = "/auth/login";
+  };
 
 
-  const items: MenuProps['items'] = team.map((single: any, index) => ({
-    label: <p>{single.ownerId.fullname}</p>, // Replace 'single.name' with the appropriate property
-    key: index, // Replace 'single.id' with the unique key for each item
-  }));
+  // const items: MenuProps['items'] = team
+  //   .filter((single: any) => single.ownerId._id !== user.id) // Filter out items where ownerId matches user.id
+  //   .map((single: any, index) => ({
+  //     label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>, // Safely access fullname or fallback to 'Unknown'
+  //     key: single.id || index, 
+  //   }));
+
+  const items: MenuProps['items'] = [
+    ...team
+      .filter((single: any) => single.ownerId._id !== user.id) // Exclude items where ownerId matches user.id
+      .map((single: any, index) => ({
+        label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
+        key: single.id || index,
+      })),
+    {
+      label: <p onClick={() => logout()}>Login to Default Profile</p>, // Default option to add a new member
+      key: 'default',
+    },
+  ];
 
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
