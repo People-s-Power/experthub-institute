@@ -467,7 +467,7 @@ const SideNav = () => {
   const getTeam = () => {
     apiService.get(`/user/team/${user.id}`)
       .then(function (response) {
-        // console.log(response.data.teamMembers)
+        console.log(response.data.teamMembers)
         setTeam(response.data.teamMembers)
       })
   }
@@ -536,7 +536,7 @@ const SideNav = () => {
 
   const items: MenuProps['items'] = [
     ...team
-      .filter((single: any) => single.ownerId._id !== user.id) // Exclude items where ownerId matches user.id
+      .filter((single: any) => single.ownerId?._id !== user.id) // Exclude items where ownerId matches user.id
       .map((single: any, index) => ({
         label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
         key: single.id || index,
