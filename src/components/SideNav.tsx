@@ -503,9 +503,18 @@ const SideNav = () => {
         fullName: data.fullname,
         privileges,
         accessToken: user.accessToken,
+        mainUser: user
       })
     );
+    router.refresh()
+  }
 
+  const setMain = () => {
+    dispatch(
+      setUser({
+        ...user.mainUser
+      })
+    );
     router.refresh()
   }
 
@@ -536,13 +545,13 @@ const SideNav = () => {
 
   const items: MenuProps['items'] = [
     ...team
-      .filter((single: any) => single.ownerId?._id !== user.id) 
+      .filter((single: any) => single.ownerId?._id !== user.id)
       .map((single: any, index) => ({
         label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
         key: single.id || index,
       })),
     {
-      label: <p onClick={() => logout()}>Login to Default Profile</p>, 
+      label: <p onClick={() => setMain()}>Login to Default Profile</p>,
       key: 'default',
     },
   ];
