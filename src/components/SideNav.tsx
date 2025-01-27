@@ -550,7 +550,7 @@ const SideNav = () => {
         label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
         key: single.id || index,
       })),
-    user.mainUser && {
+    user?.mainUser && {
       label: <p onClick={() => setMain()}>Login to Default Profile</p>,
       key: 'default',
     },
