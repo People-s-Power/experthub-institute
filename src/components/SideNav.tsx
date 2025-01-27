@@ -467,7 +467,7 @@ const SideNav = () => {
   const getTeam = () => {
     apiService.get(`/user/team/${user.id}`)
       .then(function (response) {
-        console.log(response.data.teamMembers)
+        // console.log(response.data.teamMembers)
         setTeam(response.data.teamMembers)
       })
   }

@@ -9,6 +9,7 @@ import SignUpComp from '@/components/SignUpComp';
 import { Modal } from 'antd';
 import apiService from '@/utils/apiService';
 import GoPremuim from '@/components/modals/GoPremuium';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const addmissions = () => {
   const [active, setActive] = useState("students")
@@ -37,7 +38,7 @@ const addmissions = () => {
     })
       .then(function (response) {
         setStudents(response.data.students)
-        console.log(response.data)
+        console.log(response.data.students)
       })
   }
 
@@ -59,7 +60,12 @@ const addmissions = () => {
           <input onChange={e => search(e.target.value)} type="text" className='pl-10 p-2 w-full rounded-md border border-[#1E1E1E8A] bg-transparent' placeholder='Search courses, trainer, test etc' />
           <img className='absolute top-2 w-6 left-2' src="/images/icons/search.svg" alt="" />
         </div>
-        <button onClick={() => setContact(true)} className='bg-primary px-4 my-auto p-2 ml-6'>Add Contact</button>
+
+        <button onClick={() => {
+          if (isActionChecked("Add Contacts", user.privileges)) {
+            setContact(true);
+          }
+        }} className='bg-primary px-4 my-auto p-2 ml-6'>Add Contact</button>
       </div>
 
       <section className='m-4'>
@@ -94,7 +100,7 @@ const addmissions = () => {
             case 'mentees':
               return <div>
                 {
-                  students.map((student: UserType, index: any) => <AdmissionCard setShowPremium={setShowPremuim} role={active} tutor={student} key={index} />)
+                  mentees.map((student: UserType, index: any) => <AdmissionCard setShowPremium={setShowPremuim} role={active} tutor={student} key={index} />)
                 }
               </div>
             case 'graduates':

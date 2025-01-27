@@ -20,15 +20,6 @@ import GoPremuim from '@/components/modals/GoPremuium';
 import { CourseType } from '@/types/CourseType';
 import { isActionChecked } from '@/utils/checkPrivilege';
 
-// export const PrivilegeChecker = (action:string) => {
-//   const user = useAppSelector((state) => state.value);
-//   if (user.privilege) {
-//     if (!isActionChecked(action, user.privilege)) {
-//       alert("You don't have the permission for" + action)
-//       return
-//     }
-//   }
-// }
 
 const tutor = () => {
   const user = useAppSelector((state) => state.value);
@@ -43,19 +34,27 @@ const tutor = () => {
   const [active, setActive] = useState("")
 
 
-  // console.log(user.privilege)
+  // console.log(user)
 
   const items: MenuProps['items'] = [
     {
       key: '1',
       label: (
-        <p onClick={() =>  setOpen(true) } >Courses</p>
+        <p onClick={() => {
+          if (isActionChecked("Create course", user.privileges)) {
+            setOpen(true);
+          }
+        }} >Courses</p>
       ),
     },
     {
       key: '2',
       label: (
-        <p onClick={() => setEvent(true)}>Events</p>
+        <p onClick={() => {
+          if (isActionChecked("Create Event", user.privileges)) {
+            setEvent(true);
+          }
+        }}>Events</p>
       ),
     },
     // {

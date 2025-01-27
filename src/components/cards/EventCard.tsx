@@ -9,6 +9,8 @@ import AddEvents from '../modals/AddEvents';
 import ImageViewer from '../ImageViewer';
 import Participants from '../Participants';
 import apiService from '@/utils/apiService';
+import { isActionChecked } from '@/utils/checkPrivilege';
+import { useAppSelector } from '@/store/hooks';
 
 const EventCard = ({ event, action }: { event: CourseType, action: any }) => {
   const [open, setOpen] = useState(false)
@@ -17,6 +19,7 @@ const EventCard = ({ event, action }: { event: CourseType, action: any }) => {
   const [view, setView] = useState(false)
   const pathname = usePathname()
   const [api, contextHolder] = notification.useNotification();
+  const user = useAppSelector((state) => state.value);
 
   const items: MenuProps['items'] = [
     {
@@ -28,13 +31,21 @@ const EventCard = ({ event, action }: { event: CourseType, action: any }) => {
     {
       key: '2',
       label: (
-        <p onClick={() => setDelete(true)}>Delete Event</p>
+        <p onClick={() => {
+          if (isActionChecked("Delete Event", user.privileges)) {
+            setDelete(true);
+          }
+        }}>Delete Event</p>
       ),
     },
     {
       key: '3',
       label: (
-        <p onClick={() => setView(true)}>View Participants</p>
+        <p onClick={() => {
+          if (isActionChecked("View Course Participant and send email reminder", user.privileges)) {
+            setView(true);
+          }
+        }}>View Participants</p>
       ),
     },
     {
@@ -79,7 +90,7 @@ const EventCard = ({ event, action }: { event: CourseType, action: any }) => {
           <div>
             <p className='text-xs my-1'>Students {event.enrolledStudents.length}</p>
             <div className='flex ml-1'>
-              {event.enrolledStudents.slice(0, 6).map(event => <img key={event._id} src={event.profilePicture  ? event.profilePicture : '/images/user.png'} className='w-5 rounded-full h-5 -ml-1' alt="" />)}
+              {event.enrolledStudents.slice(0, 6).map(event => <img key={event._id} src={event.profilePicture ? event.profilePicture : '/images/user.png'} className='w-5 rounded-full h-5 -ml-1' alt="" />)}
               {/* <img src="/images/user.png" className='w-5 h-5' alt="" />
             <img src="/images/user.png" className='w-5 h-5 -ml-2' alt="" />
             <img src="/images/user.png" className='w-5 h-5 -ml-2' alt="" /> */}

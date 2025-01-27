@@ -15,6 +15,7 @@ import apiService from '@/utils/apiService';
 import AppointmentModal from '../modals/AppointmentModal';
 import { useRouter } from 'next/navigation';
 import AddResources from '../modals/AddResources';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const CoursesCard = ({ course, getCourse }: { course: CourseType, getCourse: () => Promise<void> }) => {
   const pathname = usePathname()
@@ -55,26 +56,48 @@ const CoursesCard = ({ course, getCourse }: { course: CourseType, getCourse: () 
       {
         key: '4',
         label: (
-          <p onClick={() => { setDelete(true) }}>Delete course</p>
+          <p onClick={() => {
+            if (isActionChecked("Delete Course", user.privileges)) {
+              setDelete(true);
+            }
+          }} >Delete course</p>
           // <p onClick={() => { course.enrolledStudents.length >= 1 ? setEnrolled(true) : setDelete(true) }}>Delete course</p>
         ),
       },
       {
         key: '5',
         label: (
-          <p className={`${course.type === `online` ? `cursor-not-allowed` : ``}`} onClick={() => course.type !== `online` && setEdit(true)} >Edit course</p>
+          <p className={`${course.type === `online` ? `cursor-not-allowed` : ``}`}
+            onClick={() => {
+              if (course.type !== 'online') {
+                if (isActionChecked('Edit Course', user.privileges)) {
+                  setEdit(true);
+                } else {
+                  alert('You do not have the permission to Edit Course');
+                }
+              }
+            }}
+          >Edit course</p>
         ),
       },
       {
         key: '6',
         label: (
-          <p onClick={() => setParticipants(true)} >View Participants</p>
+          <p onClick={() => {
+            if (isActionChecked("View Course Participant and send email reminder", user.privileges)) {
+              setParticipants(true);
+            }
+          }} >View Participants</p>
         ),
       },
       {
         key: '7',
         label: (
-          <p onClick={() => setResources(true)} >Add Resources</p>
+          <p onClick={() => {
+            if (isActionChecked("Add, delete and edit additional resources", user.privileges)) {
+              setResources(true);
+            }
+          }} >Add Resources</p>
         ),
       }
     ] : [])

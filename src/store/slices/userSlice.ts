@@ -12,6 +12,7 @@ type UserState = {
     assignedCourse: string,
     profilePicture: string,
     accessToken?: string,
+    privileges?: any
   };
 };
 
