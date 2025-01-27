@@ -536,13 +536,13 @@ const SideNav = () => {
 
   const items: MenuProps['items'] = [
     ...team
-      .filter((single: any) => single.ownerId?._id !== user.id) // Exclude items where ownerId matches user.id
+      .filter((single: any) => single.ownerId?._id !== user.id) 
       .map((single: any, index) => ({
         label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
         key: single.id || index,
       })),
     {
-      label: <p onClick={() => logout()}>Login to Default Profile</p>, // Default option to add a new member
+      label: <p onClick={() => logout()}>Login to Default Profile</p>, 
       key: 'default',
     },
   ];
