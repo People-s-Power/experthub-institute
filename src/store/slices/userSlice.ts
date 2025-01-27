@@ -13,6 +13,7 @@ type UserState = {
     profilePicture: string,
     accessToken?: string,
     privileges?: any
+    mainUser?: any
   };
 };
 
