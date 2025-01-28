@@ -637,6 +637,7 @@ const SideNav = () => {
             </li>
           )}
           <div className="mt-10">
+            <p className="mb-3">Team Members</p>
             <Dropdown menu={{ items }} trigger={["click"]}>
               <div className="flex">
                 <img className='h-10 w-10 rounded-full my-auto' src={user.profilePicture ? user.profilePicture : '/images/user.png'} alt="" />

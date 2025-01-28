@@ -3,9 +3,19 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import SignUpComp from '@/components/SignUpComp';
+import { useSearchParams } from 'next/navigation';
 
 const signup = () => {
   const [role, setRole] = useState("student")
+
+  const searchParams = useSearchParams();
+  const type = searchParams.get("role");
+  useEffect(() => {
+    if (type) {
+      setRole(type)
+
+    }
+  }, [])
 
 
   return (
@@ -15,7 +25,9 @@ const signup = () => {
         <section className='rounded-md bg-white border border-[#FDC3327D] p-6 '>
           <h3 className='font-bold text-base text-center'>Sign up</h3>
           <div className='flex my-3 justify-evenly'>
-            <button onClick={() => setRole("student")} className={role === "student" ? 'bg-primary text-sm p-1 px-6 rounded-sm' : "bg-gray p-1 px-6 text-sm rounded-sm"}>Applicant</button>
+            {!type &&
+              <button onClick={() => setRole("student")} className={role === "student" ? 'bg-primary text-sm p-1 px-6 rounded-sm' : "bg-gray p-1 px-6 text-sm rounded-sm"}>Applicant</button>
+            }
             <button onClick={() => setRole("tutor")} className={role === "tutor" ? 'bg-primary p-1 px-6 text-sm rounded-sm' : "bg-gray p-1 px-6 text-sm rounded-sm"}>Trainer</button>
           </div>
 

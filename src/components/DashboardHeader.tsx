@@ -117,7 +117,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </div>
           <div className='flex gap-8 justify-between'>
 
-            <a className='text-center flex items-center flex-col gap-2' href={`https://www.experthubllc.com/feeds?tid=${user.accessToken}`}>
+            <a className='text-center flex items-center sm:my-auto flex-col gap-2' href={`https://www.experthubllc.com/feeds?tid=${user.accessToken}`}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-house" viewBox="0 0 16 16">
                 <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
               </svg>
@@ -126,7 +126,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             </a>
 
 
-            <a className='text-center flex items-center flex-col gap-2  ' href={`https://www.experthubllc.com/user?page=${user.id}&tid=${user.accessToken}`} >
+            <a className='text-center flex items-center flex-col gap-2  sm:my-auto' href={`https://www.experthubllc.com/user?page=${user.id}&tid=${user.accessToken}`} >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="size-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
               </svg>
@@ -134,7 +134,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
               <p className='sm:hidden text-[15px]'>My Business</p>
 
             </a>
-            <Link className='text-center flex items-center flex-col gap-2  ' href={user.role === 'admin' ? `admin/startup-kit` : `applicant/startup-kit`} >
+            <Link className='text-center sm:my-auto flex items-center flex-col gap-2  ' href={user.role === 'admin' ? `admin/startup-kit` : `applicant/startup-kit`} >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="size-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" />
               </svg>
@@ -142,7 +142,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
 
             </Link>
 
-            <a className='text-center flex items-center flex-col gap-2 ' href="https://project.experthubllc.com/" target='_blank'>
+            <a className='text-center sm:my-auto flex items-center flex-col gap-2 ' href="https://project.experthubllc.com/" target='_blank'>
               {/* <img src="/images/project.png" className='lg:w-5 sm:w-8 my-auto sm:h-8 mx-auto' alt="" /> */}
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi mx-autobi-journal-text" viewBox="0 0 16 16">
                 <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
@@ -151,8 +151,8 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
               </svg>
               <p className='sm:hidden text-[15px]'>Project Manager</p>
             </a>
-            {user.role === 'admin' || user.role === 'tutor' ? <Link href={'/tutor/team'}>
-              <div className='text-center flex items-center flex-col gap-2'>
+            {user.role === 'admin' || user.role === 'tutor' ? <Link className='sm:my-auto' href={'/tutor/team'}>
+              <div className='text-center flex items-center flex-col gap-2 '>
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus-lg" viewBox="0 0 16 16">
                   <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
                 </svg>
