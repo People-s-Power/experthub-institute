@@ -496,18 +496,33 @@ const SideNav = () => {
   ]
 
   const toggleUser = (data: any, privileges: any) => {
-    dispatch(
-      setUser({
-        ...data,
-        id: data._id,
-        fullName: data.fullname,
-        privileges,
-        accessToken: user.accessToken,
-        mainUser: user
-      })
-    );
-    router.refresh()
-  }
+    // Check if mainUser is already set
+    if (!user.mainUser) {
+      dispatch(
+        setUser({
+          ...data,
+          id: data._id,
+          fullName: data.fullname,
+          privileges,
+          accessToken: user.accessToken,
+          mainUser: user // Set mainUser only if it's not already defined
+        })
+      );
+    } else {
+      dispatch(
+        setUser({
+          ...data,
+          id: data._id,
+          fullName: data.fullname,
+          privileges,
+          accessToken: user.accessToken
+        })
+      );
+    }
+
+    window.location.reload();
+  };
+
 
   const setMain = () => {
     dispatch(
@@ -515,7 +530,7 @@ const SideNav = () => {
         ...user.mainUser
       })
     );
-    router.refresh()
+    window.location.reload();
   }
 
   useEffect(() => {
@@ -641,12 +656,12 @@ const SideNav = () => {
           )}
           {filteredTeam.length >= 1 && <div className="mt-10">
             <p className="mb-3">Team Members</p>
-            {filteredTeam.map((single: any) => <div className="flex my-2">
+            {filteredTeam.map((single: any) => <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
               <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
               <p className="capitalize">{single.ownerId?.fullname}</p>
             </div>)}
-            <p onClick={() => setMain()}>Login to Default Profile</p>
           </div>}
+          {user?.mainUser && <p onClick={() => setMain()}>Login to Default Profile</p>}
           {/* <li className="my-3">
             <Link
               href={"#"}

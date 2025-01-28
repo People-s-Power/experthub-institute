@@ -89,7 +89,6 @@ const tutor = () => {
 
   const getCourses = async () => {
     apiService.put(`courses/category/author`, {
-      category: user.assignedCourse,
       id: user.id
     })
       .then(function (response) {
