@@ -46,7 +46,10 @@ const team = () => {
     { value: "Edit Course", checked: false },
     { value: "Delete Course", checked: false },
     { value: "Delete Event", checked: false },
-    { value: "View Course Participant and send email reminder", checked: false }
+    { value: "View Course Participant and send email reminder", checked: false },
+    { value: "Delete team member", checked: false },
+    { value: "Edit team member", checked: false },
+    { value: "Add team member", checked: false }
   ])
 
   const addTeam = async () => {
