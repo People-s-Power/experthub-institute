@@ -534,7 +534,10 @@ const SideNav = () => {
     });
     window.location.href = "/auth/login";
   };
-
+  // filter((single: any) => single.ownerId?._id !== user.id)
+  const filteredTeam = team && team.length >= 1
+    ? team.filter((single: any) => single.ownerId?._id !== user.id)
+    : [];
 
   // const items: MenuProps['items'] = team
   //   .filter((single: any) => single.ownerId._id !== user.id) // Filter out items where ownerId matches user.id
@@ -543,18 +546,18 @@ const SideNav = () => {
   //     key: single.id || index, 
   //   }));
 
-  const items: MenuProps['items'] = [
-    ...team
-      .filter((single: any) => single.ownerId?._id !== user.id)
-      .map((single: any, index) => ({
-        label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
-        key: single.id || index,
-      })),
-    user?.mainUser && {
-      label: <p onClick={() => setMain()}>Login to Default Profile</p>,
-      key: 'default',
-    },
-  ];
+  // const items: MenuProps['items'] = [
+  //   ...team
+  //     .filter((single: any) => single.ownerId?._id !== user.id)
+  //     .map((single: any, index) => ({
+  //       label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
+  //       key: single.id || index,
+  //     })),
+  //   user?.mainUser && {
+  //     label: ,
+  //     key: 'default',
+  //   },
+  // ];
 
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
@@ -636,15 +639,14 @@ const SideNav = () => {
               </a>
             </li>
           )}
-          <div className="mt-10">
+          {filteredTeam.length >= 1 && <div className="mt-10">
             <p className="mb-3">Team Members</p>
-            <Dropdown menu={{ items }} trigger={["click"]}>
-              <div className="flex">
-                <img className='h-10 w-10 rounded-full my-auto' src={user.profilePicture ? user.profilePicture : '/images/user.png'} alt="" />
-                <p className="ml-4 my-auto">{user.fullName}</p>
-              </div>
-            </Dropdown>
-          </div>
+            {filteredTeam.map((single: any) => <div className="flex my-2">
+              <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
+              <p className="capitalize">{single.ownerId?.fullname}</p>
+            </div>)}
+            <p onClick={() => setMain()}>Login to Default Profile</p>
+          </div>}
           {/* <li className="my-3">
             <Link
               href={"#"}
