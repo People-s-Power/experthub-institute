@@ -15,6 +15,6 @@ export function isActionChecked(
   }
 
   // If no match is found or not checked, deny access
-  alert("You do not have the permission for " + action);
+  alert("You do not have the permission to " + action);
   return false;
 }
