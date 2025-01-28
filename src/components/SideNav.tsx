@@ -655,7 +655,7 @@ const SideNav = () => {
             </li>
           )}
           {filteredTeam.length >= 1 && <div className="mt-10">
-            <p className="mb-3">Team Members</p>
+            <p className="mb-3">Training Provider</p>
             {filteredTeam.map((single: any) => <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
               <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
               <p className="capitalize">{single.ownerId?.fullname}</p>
