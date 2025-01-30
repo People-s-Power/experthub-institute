@@ -38,6 +38,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDate } from '../modals/Notification';
 import Link from 'next/link';
 import AppointmentModal from '../modals/AppointmentModal';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const Message: React.FC = () => {
   const [message, setMessage] = useState<string>('');
@@ -62,6 +63,8 @@ const Message: React.FC = () => {
   const [messageToDeleteIndex, setMessageToDeleteIndex] = useState<number | null>(null);
   const chatContainerRef = useRef<any>(null);
   const lastScrollTop = useRef<number>(0); // Store the last scroll position
+
+  if (!isActionChecked('Respond to Chats', user.privileges)) return <p className='p-4'>You don't have the permission to respond to chats</p>
 
   useEffect(() => {
     // Receive chat history from server

@@ -12,6 +12,8 @@ type UserState = {
     assignedCourse: string,
     profilePicture: string,
     accessToken?: string,
+    privileges?: any
+    mainUser?: any
   };
 };
 
@@ -34,6 +36,7 @@ export const userSlice = createSlice({
 })
 
 export const { setUser } = userSlice.actions;
+
 export const { clearUser } = userSlice.actions
 // export const selectUser = (state: { cart: { value: any; }; }) => state.cart.value;
 export default userSlice.reducer;

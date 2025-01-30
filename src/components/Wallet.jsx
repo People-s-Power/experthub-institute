@@ -179,8 +179,12 @@ const Wallet = () => {
         <div>
           <p>Balance</p>
           <p className='text-3xl'>₦ {balance}</p>
-          {user.role === 'tutor' ? <button onClick={() => handleWithdrawal()} className='bg-primary text-white p-3 rounded-md px-10 my-4'>Withdraw</button> : user.role === 'student' ? <button onClick={() => openFund(true)} className='bg-primary text-white p-3 rounded-md px-10 my-4'>Fund</button> : null
-          }
+          {/* {user.role === 'tutor' ? */}
+          <button onClick={() => handleWithdrawal()} className='bg-primary text-white p-3 rounded-md px-10 my-4'>Withdraw</button>
+          {/* : user.role === 'student' ? */}
+          <button onClick={() => openFund(true)} className='bg-primary ml-4 text-white p-3 rounded-md px-10 my-4'>Fund</button>
+          {/* : null
+          } */}
         </div>
         <div className=''>
           <div className='border-b py-3 border-[#1E1E1E80]'>

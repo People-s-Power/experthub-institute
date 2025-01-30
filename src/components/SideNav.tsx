@@ -3,9 +3,10 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { notification } from "antd";
+import { Dropdown, MenuProps, notification } from "antd";
 import apiService from "@/utils/apiService";
-import { useAppSelector } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setUser } from '@/store/slices/userSlice';
 
 const SideNav = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -14,6 +15,8 @@ const SideNav = () => {
   const [nav, setNav] = useState<any[]>([]);
   const router = useRouter();
   const user = useAppSelector((state) => state.value);
+  const [team, setTeam] = useState([])
+  const dispatch = useAppDispatch();
 
   const TutorNavigation = [
     {
@@ -461,6 +464,13 @@ const SideNav = () => {
     // },
   ];
 
+  const getTeam = () => {
+    apiService.get(`/user/team/${user.id}`)
+      .then(function (response) {
+        console.log(response.data.teamMembers)
+        setTeam(response.data.teamMembers)
+      })
+  }
 
   const calenderNav = [
     {
@@ -485,7 +495,46 @@ const SideNav = () => {
     },
   ]
 
+  const toggleUser = (data: any, privileges: any) => {
+    // Check if mainUser is already set
+    if (!user.mainUser) {
+      dispatch(
+        setUser({
+          ...data,
+          id: data._id,
+          fullName: data.fullname,
+          privileges,
+          accessToken: user.accessToken,
+          mainUser: user // Set mainUser only if it's not already defined
+        })
+      );
+    } else {
+      dispatch(
+        setUser({
+          ...data,
+          id: data._id,
+          fullName: data.fullname,
+          privileges,
+          accessToken: user.accessToken
+        })
+      );
+    }
+
+    window.location.reload();
+  };
+
+
+  const setMain = () => {
+    dispatch(
+      setUser({
+        ...user.mainUser
+      })
+    );
+    window.location.reload();
+  }
+
   useEffect(() => {
+    getTeam()
     pathname.includes("applicant")
       ? setNav(ApplicantNavigation)
       : pathname.includes("admin")
@@ -500,13 +549,38 @@ const SideNav = () => {
     });
     window.location.href = "/auth/login";
   };
+  // filter((single: any) => single.ownerId?._id !== user.id)
+  const filteredTeam = team && team.length >= 1
+    ? team.filter((single: any) => single.ownerId?._id !== user.id)
+    : [];
+
+  // const items: MenuProps['items'] = team
+  //   .filter((single: any) => single.ownerId._id !== user.id) // Filter out items where ownerId matches user.id
+  //   .map((single: any, index) => ({
+  //     label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>, // Safely access fullname or fallback to 'Unknown'
+  //     key: single.id || index, 
+  //   }));
+
+  // const items: MenuProps['items'] = [
+  //   ...team
+  //     .filter((single: any) => single.ownerId?._id !== user.id)
+  //     .map((single: any, index) => ({
+  //       label: <p onClick={() => toggleUser(single.ownerId, single.privileges)}>{single.ownerId?.fullname || 'Unknown'}</p>,
+  //       key: single.id || index,
+  //     })),
+  //   user?.mainUser && {
+  //     label: ,
+  //     key: 'default',
+  //   },
+  // ];
+
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
       <Link href={"/#courses"} className="font-bold text-lg text-[#DC9F08]">EXPERTHUB INSTITUTE</Link>
       <div className="flex-1 flex flex-col h-full my-6 overflow-auto">
         <ol className="text-sm font-medium flex-1">
-          {nav?.map((item, idx) => ( 
+          {nav?.map((item, idx) => (
             <li key={idx} className="my-3">
               <Link
                 href={item.href}
@@ -580,7 +654,14 @@ const SideNav = () => {
               </a>
             </li>
           )}
-
+          {filteredTeam.length >= 1 && <div className="mt-10">
+            <p className="mb-3">Training Provider</p>
+            {filteredTeam.map((single: any) => <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
+              <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
+              <p className="capitalize">{single.ownerId?.fullname}</p>
+            </div>)}
+          </div>}
+          {user?.mainUser && <p onClick={() => setMain()}>Login to Default Profile</p>}
           {/* <li className="my-3">
             <Link
               href={"#"}
@@ -612,6 +693,8 @@ const SideNav = () => {
             </Link>
           </li> */}
         </ol>
+
+
       </div>
     </aside>
   );

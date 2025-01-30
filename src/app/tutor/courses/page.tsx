@@ -16,6 +16,7 @@ import { CourseType } from '@/types/CourseType';
 import AddEvents from '@/components/modals/AddEvents';
 import apiService from '@/utils/apiService';
 import GoPremuim from '@/components/modals/GoPremuium';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 
 const courses = () => {
@@ -67,13 +68,21 @@ const courses = () => {
     {
       key: '1',
       label: (
-        <p onClick={() => setOpen(true)} >Courses</p>
+        <p onClick={() => {
+          if (isActionChecked("Create course", user.privileges)) {
+            setOpen(true);
+          }
+        }} >Courses</p>
       ),
     },
     {
       key: '2',
       label: (
-        <p onClick={() => setEvent(true)}>Events</p>
+        <p onClick={() => {
+          if (isActionChecked("Create Event", user.privileges)) {
+            setEvent(true);
+          }
+        }}>Events</p>
       ),
     },
     // {

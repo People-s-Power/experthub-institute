@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import apiService from '@/utils/apiService';
 import AppointmentModal from '../modals/AppointmentModal';
 import { UserType } from '@/types/UserType';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 
 const AdmissionCard = ({ tutor, role, setShowPremium }: { tutor: any, role: string, setShowPremium: Dispatch<SetStateAction<boolean>> }) => {
@@ -38,19 +39,38 @@ const AdmissionCard = ({ tutor, role, setShowPremium }: { tutor: any, role: stri
   const items: MenuProps['items'] = [
     ...(role === 'students' ? [{
       label: (
-        <p onClick={() => setAssesment(true)}>Send Assessment</p>
+        <p onClick={() => {
+          if (isActionChecked("Send Assessment", user.privileges)) {
+            setAssesment(true);
+          }
+        }} >Send Assessment</p>
       ),
       key: '1',
     },
     {
       label: (
-        <p onClick={() => makeGraduate()}>Make Graduate</p>
+        <p onClick={() => {
+          if (isActionChecked("Make Graduate", user.privileges)) {
+            makeGraduate();
+          }
+        }} >Make Graduate</p>
       ),
       key: '8',
     },
     {
       label: (
-        <p onClick={() => { userProfile?.premiumPlan !== "enterprise" ? setShowPremium(true) : setEmail(true) }}>Send Email</p>
+        <p onClick={() => {
+          if (userProfile?.premiumPlan !== "enterprise") {
+            setShowPremium(true);
+            return;
+          }
+
+          if (user.privileges && isActionChecked("Send Email", user.privileges)) {
+            setEmail(true);
+          } else {
+            alert("You do not have the permission to Send Email");
+          }
+        }}>Send Email</p>
       ),
       key: '2',
     },
