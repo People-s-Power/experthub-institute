@@ -27,12 +27,12 @@ export default async function Page({ params }: PageProps) {
 
     if (!data) {
         return (
-            <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="min-h-[60vh] flex  items-center justify-center">
                 <h1 className="text-2xl font-bold">Not Found</h1>
             </div>
         )
     }
 
-    return <CourseDetail data={data} type={params.slug === 'courses' ? 'course' : 'event'}  />
+    return <CourseDetail data={data} type={params.slug === 'courses' ? 'course' : 'event'} />
 }
 
