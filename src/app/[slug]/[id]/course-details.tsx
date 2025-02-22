@@ -50,7 +50,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
             {/* Hero Section */}
 
 
-            <div className="relative gap-3   py-8 container mx-auto flex items-center px-4">
+            <div className="relative gap-3   py-8 container mx-auto flex md:flex-row flex-col items-center px-4">
                 <div className="flex flex-col flex-1 justify-center h-full max-w-4xl">
                     <motion.div
                         initial="hidden"
@@ -195,12 +195,16 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                             </div>
                                             <div className="text-right">
                                                 <p className="font-medium text-slate-900">
-
-                                                    {day.startTime ? dayjs(day.startTime, 'HH:mm').format('h:mm A') : "Check Venue"}
+                                                    {day.startTime
+                                                        ? dayjs(dayjs().format('YYYY-MM-DD') + ' ' + day.startTime).format('h:mm A')
+                                                        : "Check Venue"}
                                                 </p>
                                                 <p className="text-sm text-slate-500">
-                                                    {day.endTime ? dayjs(day.endTime, 'HH:mm').format('h:mm A') : "Check Venue"}
+                                                    {day.endTime
+                                                        ? dayjs(dayjs().format('YYYY-MM-DD') + ' ' + day.endTime).format('h:mm A')
+                                                        : "Check Venue"}
                                                 </p>
+
                                             </div>
                                         </div>
                                     ))}
