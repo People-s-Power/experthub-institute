@@ -116,7 +116,7 @@ export default function Plans() {
         },
         {
             name: "Standard",
-            price: { monthly: { amount: "8000", payment_id: "133951" }, yearly: { amount: "8000", payment_id: "133952" } },
+            price: { monthly: { amount: "8000", payment_id: "133951" }, yearly: { amount: "80000", payment_id: "133952" } },
             description: "Perfect for small businesses",
             features: [
                 { feature: "Can create up to 20 Courses and Events", available: true },
@@ -124,7 +124,9 @@ export default function Plans() {
                 { feature: "Can create Seminars, Conferences, and Workshops", available: true },
                 { feature: "Can Create Live Streaming Courses", available: true },
                 { feature: "Access to Email Sending Tools", available: true },
+                { feature: "Add Team Member", available: true },
                 { feature: "Access to Staff Support", available: false },
+
                 { feature: "Access to AI Tools for Course Creation", available: false },
             ],
             buttonLabel: "Go Premium",
@@ -141,6 +143,7 @@ export default function Plans() {
                 { feature: "Can Create Live Streaming Courses", available: true },
                 { feature: "Access to Email Sending Tools", available: true },
                 { feature: "Access to Staff Support", available: true },
+                { feature: "Add Team Member", available: true },
                 { feature: "Access to AI Tools for Course Creation", available: true },
             ],
             buttonLabel: "Go Premium",

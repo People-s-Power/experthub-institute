@@ -16,7 +16,8 @@ export async function getCourse(id: string): Promise<CourseTypeSingle | null> {
 export async function getEvent(id: string): Promise<EventTypeSingle | null> {
     try {
         const response = await apiService.get(`events/${id}`)
-        return response.data.event
+
+        return response.data.course
     } catch (e) {
         console.log(e)
         return null

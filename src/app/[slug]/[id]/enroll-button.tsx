@@ -50,6 +50,8 @@ export default function EnrollButton({ type, data, className }: EnrollButtonProp
     }
     const enrollEvent = () => {
         try {
+            setLoading(true)
+
             apiService.put(`events/enroll/${data._id}`, {
                 id: user.id
             })
@@ -66,6 +68,9 @@ export default function EnrollButton({ type, data, className }: EnrollButtonProp
                         message: err.response.data.message
                     });
                     console.log(err.response.data.message)
+                }).finally(() => {
+                    setLoading(false)
+
                 })
         } catch (e) {
             // console.log(e.response.data.message)
