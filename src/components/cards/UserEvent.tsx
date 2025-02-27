@@ -17,7 +17,7 @@ const UserEvent = ({ event, type }: { event: CourseType, type?: string }) => {
       <div>
         {/* <p className='text-primary'>Course by {event.author}</p> */}
         <div className='flex flex-wrap'> <p className='text-xl font-medium'>{event.title}</p>
-          <Link href={`/applicant/${event._id}?page=event`}><button className='bg-primary ml-3 text-sm p-1 px-3 rounded-md'>{event.type} {event.mode}</button></Link>
+          <Link href={`/applicant/${event._id}?page=event`}><button className='bg-primary ml-3 text-sm p-1 px-3 rounded-md'>{event.type} {event.type !== "webinar" && event.mode} </button></Link>
         </div>
         <p className='text-sm'>{event.about.substring(0, 100)}</p>
         <div className='flex justify-between my-1'>

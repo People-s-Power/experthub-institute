@@ -241,6 +241,8 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
         ...video,
         videoUrl: dataCloud.secure_url
       });
+
+      return dataCloud.secure_url
     } catch (e) {
       console.error(e, `\n from uploader`);
       throw e
@@ -257,6 +259,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
       });
     }
     if (title && about && ((type === "offline" || type === "online") && duration) && category && image && mode && type === "offline" ? startDate && endDate && startTime && endTime && room && location : type === "online" ? startDate && endDate && startTime && endTime : startDate && endDate && days.filter((day: any) => day.checked && day.startTime).length !== 0) {
+      let videoUrl = null
       if (type === 'webinar') {
 
         if (!video.video) {
@@ -266,7 +269,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
         }
         setUploading(true);
         try {
-          await uploadVideo();
+          videoUrl = await uploadVideo();
         } catch (e) {
           console.error(e);
           setUploading(false);
@@ -287,6 +290,8 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
       const endDateTime = dayjs.utc(`${formattedEndDate}T${endTime || "00:00"}:00`);
       const startDateJS = startDateTime.toDate();
       const endDateJS = endDateTime.toDate();
+
+
       apiService.post(`events/add-event/${user.id}`,
         {
           asset: image,
@@ -306,7 +311,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
           room,
           location,
           scholarship: getScholarship(),
-          videoUrl: video.videoUrl,
+          videoUrl,
           days
         }
       )

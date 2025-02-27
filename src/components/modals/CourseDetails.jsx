@@ -24,6 +24,7 @@ dayjs.extend(isBetween);
 dayjs.extend(isSameOrAfter)
 
 const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
+
   const user = useAppSelector((state) => state.value);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -426,7 +427,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         </div>
                         {
                           isOn().on && <div className=' w-full mt-5'>
-                            <video controls={false} className="w-full">
+                            <video controls={Boolean(course.enrolledStudents.find(userIn => userIn._id === user.id))} className="w-full">
                               <source src={course.videoUrl} type="video/mp4" />
                             </video>
                           </div>

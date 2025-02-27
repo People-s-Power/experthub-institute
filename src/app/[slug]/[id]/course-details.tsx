@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import { Calendar, Clock, MapPin, Users, Video, ChevronRight, Star } from 'lucide-react'
 import EnrollButton from './enroll-button'
 import { CourseTypeSingle, EventTypeSingle } from '@/types/CourseType'
+import { VideoPreview } from './video-preview'
 
 interface CourseDetailProps {
     data: CourseTypeSingle | EventTypeSingle
@@ -341,26 +342,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                     )}
                                 </div>
                             </motion.div>
-
-                            {data.videoUrl && (
-                                <motion.div
-                                    initial="hidden"
-                                    animate="visible"
-                                    variants={fadeIn}
-                                    className="bg-white rounded-xl p-6 shadow-sm"
-                                >
-                                    <h3 className="font-medium text-lg mb-4">Preview Video</h3>
-                                    <div className="relative aspect-video rounded-lg overflow-hidden">
-                                        <video
-                                            controls
-                                            poster={data.thumbnail?.url}
-                                            className="absolute inset-0 w-full h-full object-cover"
-                                        >
-                                            <source src={data.videoUrl} type="video/mp4" />
-                                        </video>
-                                    </div>
-                                </motion.div>
-                            )}
+                            <VideoPreview data={{ videoUrl: data.videoUrl, thumbnail: data.thumbnail }} />
                         </div>
                     </div>
                 </div>
