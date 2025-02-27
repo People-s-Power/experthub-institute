@@ -110,15 +110,14 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                 </div>
                             )}
                         </div>
-
-                        {data.author && (
+                        {data.author || data.instructorName && (
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
-                                    {data.author.charAt(0)}
+                                    {data.instructorName.charAt(0) || data.author.charAt(0)}
                                 </div>
-                                <div className="text-white">
-                                    <p className="font-medium">{data.author}</p>
-                                    <p className="text-sm text-white/60">Instructor</p>
+                                <div className="">
+                                    <p className="font-medium">{data.instructorName || data.author}</p>
+                                    <p className="text-sm text-black/60">Instructor</p>
                                 </div>
                             </div>
                         )}

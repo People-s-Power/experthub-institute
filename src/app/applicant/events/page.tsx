@@ -77,7 +77,7 @@ const Events = () => {
           switch (active) {
             case 'all':
               return <div className='flex flex-wrap justify-between mt-3'>
-                {allEvents.length > 0 ? allEvents.map((event: CourseType) => event.enrolledStudents.map(single => (single)) ? <UserEvent type="enroll" key={event._id} event={event} /> : null) : <div className=''>No recommended events!</div>}
+                {allEvents.length > 0 ? allEvents.filter((event: CourseType) => !event.enrolledStudents.some(userIn => userIn._id === user.id)).map((event: CourseType) => event.enrolledStudents.map(single => (single)) ? <UserEvent handleSwitch={() => { getAllEvents(); getMyEvents(); setActive("my") }} type="enroll" key={event._id} event={event} /> : null) : <div className=''>No recommended events!</div>}
               </div>
             case 'my':
               return <div className='flex flex-wrap justify-between mt-3'>

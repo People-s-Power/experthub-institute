@@ -167,6 +167,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
 
   const enrollEvent = () => {
     try {
+      setLoading(true)
       apiService.put(`events/enroll/${course._id}`, {
         id: user.id
       })
@@ -182,6 +183,8 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
             message: err.response.data.message
           });
           console.log(err.response.data.message)
+        }).finally(() => {
+          setLoading(false)
         })
     } catch (e) {
       // console.log(e.response.data.message)
@@ -384,7 +387,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                           }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
                       }
                       <div>
-                        <Link className='bg-primary p-2 my-3 rounded-md px-8 hover:bg-primary/50 duration-300 ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
+                        <Link className='text-primary border border-primary  inline-block p-2 my-2 rounded-md px-8 hover:bg-primary/50 hover:border-black hover:text-black duration-300 ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
 
                       </div>
                     </div>
@@ -464,14 +467,14 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                           <p className='font-medium'>{course.instructorName}</p>
                         </div>
                       </div>
-                      <button onClick={() => {
+                      {/* <button onClick={() => {
                         if (user.id) {
                           course.fee === 0 ? checkTyoe() : setIsModalOpen(true)
 
                         } else {
                           router.push(`/auth/signup?enroll=${course._id}`)
                         }
-                      }} className='bg-primary p-2 my-3 rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
+                      }} className='bg-primary p-2 my-3 rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button> */}
                     </div>}
 
                     {course.benefits && <div className='my-3'>

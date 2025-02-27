@@ -100,7 +100,14 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
     startTime: "",
     endTime: "",
     checked: false
-  }])
+  },
+  {
+    day: "Sunday",
+    startTime: "",
+    endTime: "",
+    checked: false
+  }
+  ])
   const [video, setVideo] = useState<Layout>(layout)
   const [play, setPlay] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -487,7 +494,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
                         </div>)}
                       </div>
                       <div className='my-1'>
-                        <label className='text-sm font-medium my-1'>Target</label>
+                        <label className='text-sm font-medium my-1'>Available Seats</label>
                         <input onChange={e => setTarget(e.target.value)} value={target} type="text" className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent' />
                       </div>
                       <div className='my-1'>

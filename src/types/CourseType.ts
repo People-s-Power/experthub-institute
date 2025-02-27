@@ -32,6 +32,7 @@ export interface CourseTypeSingle {
   author: string
   authorId: string
   duration: number
+  instructorName?: string
   mode: 'online' | 'offline'
   type: string
   startDate: string

@@ -4,9 +4,11 @@ import CourseDetails from '../modals/CourseDetails';
 import Link from 'next/link';
 import Share from '../Share';
 import ImageViewer from '../ImageViewer';
+import { useAppSelector } from '@/store/hooks';
 
-const UserEvent = ({ event, type }: { event: CourseType, type?: string }) => {
+const UserEvent = ({ event, type, handleSwitch }: { event: CourseType, type?: string, handleSwitch?: () => void }) => {
   const [open, setOpen] = useState(false)
+  const user = useAppSelector((state) => state.value);
 
   return (
     <div className='lg:w-[32%] my-3' key={event._id}>
@@ -17,7 +19,10 @@ const UserEvent = ({ event, type }: { event: CourseType, type?: string }) => {
       <div>
         {/* <p className='text-primary'>Course by {event.author}</p> */}
         <div className='flex flex-wrap'> <p className='text-xl font-medium'>{event.title}</p>
-          <Link href={`/applicant/${event._id}?page=event`}><button className='bg-primary ml-3 text-sm p-1 px-3 rounded-md'>{event.type} {event.type !== "webinar" && event.mode} </button></Link>
+          {
+            (user.role === "admin") ? <Link href={`/applicant/${event._id}?page=event`}><button className='bg-primary ml-3 text-sm p-1 px-3 rounded-md'>{event.type} {event.type !== "webinar" && event.mode} </button></Link> : <div className='bg-primary ml-3 text-sm p-1 px-3 rounded-md'>{event.type} {event.type !== "webinar" && event.mode} </div>
+          }
+
         </div>
         <p className='text-sm'>{event.about.substring(0, 100)}</p>
         <div className='flex justify-between my-1'>
@@ -38,7 +43,7 @@ const UserEvent = ({ event, type }: { event: CourseType, type?: string }) => {
           {type === "enroll" ? <button onClick={() => setOpen(true)} className='bg-primary p-2 w-44 text-white'>Book a seat </button> : event.type === "online" ? <button onClick={() => setOpen(true)} className='bg-primary p-2 w-44 text-white'>Join Live </button> : <button onClick={() => setOpen(true)} className='border border-[#1E1E1E] text-[#DC9F08] p-2 w-44 mx-auto'>View Details</button>}
           {/* <button onClick={() => setOpen(true)} className='bg-primary p-2 w-44 text-white'>Book a seat </button> */}
         </div>
-        <CourseDetails course={event} open={open} call={null} action={"Event"} type={type} handleClick={() => setOpen(false)} />
+        <CourseDetails course={event} open={open} call={null} action={"Event"} type={type} handleClick={() => { handleSwitch && handleSwitch(); setOpen(false); }} />
       </div>
     </div>
   );
