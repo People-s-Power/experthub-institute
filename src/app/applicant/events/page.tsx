@@ -64,9 +64,9 @@ const Events = () => {
   }, [])
   return (
     <DashboardLayout>
-      <div className='flex px-4 justify-between w-[40%] text-lg'>
-        <div onClick={() => setActive("all")} className={active === "all" ? 'border-b-2 border-primary' : 'cursor-pointer'}>Recommended for you</div>
-        <div onClick={() => setActive("my")} className={active === 'my' ? "border-b-2 border-primary" : "cursor-pointer"}>My Events</div>
+      <div className='flex px-4 gap-5 justify-between w-[40%] text-lg'>
+        <div onClick={() => setActive("all")} className={`${active === "all" ? 'border-b-2 border-primary' : 'cursor-pointer'} whitespace-nowrap`}>Recommended for you</div>
+        <div onClick={() => setActive("my")} className={`${active === "my" ? 'border-b-2 border-primary' : 'cursor-pointer'} whitespace-nowrap`}>My Events</div>
         {/* <div onClick={() => setActive("past")} className={active === 'past' ? "border-b-2 border-primary" : "cursor-pointer"}>Past Events</div> */}
         {/* <div>ALl</div> */}
 
