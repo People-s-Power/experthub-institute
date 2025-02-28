@@ -27,7 +27,7 @@ const ChatWidget = () => {
   }, [user, userProfile])
 
   useEffect(() => {
-    if (user && userProfile && !isWidgetLoaded) {
+    if (user && userProfile && !isWidgetLoaded && userProfile.premiumPlan === "enterprise") {
       const loadChatWidget = () => {
         const identifierHash = generateHash(user.id)
 
