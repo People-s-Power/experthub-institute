@@ -859,7 +859,7 @@ const AddCourse = ({ open, handleClick, course, setShowPremium }: { open: boolea
                       </> : null}
                       {(type === 'online' && !instant) &&
 
-                        <SheduledCourse conflict={conflict} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
+                        <SheduledCourse allowedEdit={false} conflict={conflict} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
                       }
                       {
                         type === 'video' && <>

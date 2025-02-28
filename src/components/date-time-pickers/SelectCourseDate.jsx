@@ -83,7 +83,11 @@ function CourseScheduler({ courses, startDate, setEndDate, setConflict, setStart
         const endTimeFormat = dayjs(time).add(duration, 'minute')
         setEndTime(time ? endTimeFormat.format('HH:mm') : null);
     };
-
+    const handleEndTimeChange = (time) => {
+        setStartTime(dayjs(time).format('HH:mm'));
+        const endTimeFormat = dayjs(time).add(duration, 'minute')
+        setEndTime(time ? endTimeFormat.format('HH:mm') : null);
+    };
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <div>
@@ -124,7 +128,9 @@ function CourseScheduler({ courses, startDate, setEndDate, setConflict, setStart
                             <TimeSelector
                                 label="Start Time"
                                 value={endTime && dayjs(endTime, 'HH:mm')}
-                                showTimePicker={false}
+                                showTimePicker={showTimePicker}
+                                onChange={handleEndTimeChange}
+                                handleClose={() => setShowTimePicker(false)}
                                 conflictTimes={conflictTimes}
                                 topGap={`5px`}
                             />

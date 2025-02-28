@@ -30,8 +30,8 @@ const DashboardLayout = ({ children }: { children: any }) => {
 
   return (
     <main className='lg:flex'>
-      {user.fullName && !pathname.includes('message') ? <ChatWidget /> : null}
-      {/* <ChatWidget /> */}
+      {/* {user.fullName && !pathname.includes('message') ? <ChatWidget /> : null} */}
+      <ChatWidget />
       {
         toggle ? <div className='lg:w-[20%]'>
           <SideNav />

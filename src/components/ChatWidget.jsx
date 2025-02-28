@@ -1,68 +1,75 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '@/store/hooks';
-import apiService from '@/utils/apiService';
-
+import { useEffect, useState } from "react"
+import { useAppSelector } from "@/store/hooks"
+import apiService from "@/utils/apiService"
 
 const ChatWidget = () => {
-  const user = useAppSelector((state) => state.value);
-  const crypto = require("crypto");
-  const [userProfile, setUser] = useState();
+  const user = useAppSelector((state) => state.value)
+  const [userProfile, setUserProfile] = useState(null)
+  const [isWidgetLoaded, setIsWidgetLoaded] = useState(false)
 
-  const key = "nj4Rk7eeLMDVGMuRWokrcLxE";
-  // const message = "some-unique-identifier";
+  const key = "nj4Rk7eeLMDVGMuRWokrcLxE"
 
-  // Generate the HMAC
-
-  const getUser = () => {
-    apiService.get(`user/profile/${user.id}`)
-      .then(function (response) {
-        setUser(response.data.user)
-      })
-  }
   useEffect(() => {
-    if (user && userProfile && userProfile.premiumPlan === "enterprise") {
-      // console.log(user)
-      const identifierHash = crypto
-        .createHmac("sha256", key)
-        .update(user?.id)
-        .digest("hex");
+    const getUser = async () => {
+      try {
+        const response = await apiService.get(`user/profile/${user.id}`)
+        setUserProfile(response.data.user)
+      } catch (error) {
+        console.error("Error fetching user profile:", error)
+      }
+    }
 
-      window.chatwootSettings = {
-        hideMessageBubble: false,
-        position: 'right', // This can be left or right
-        locale: 'en', // Language to be set
-        type: 'standard', // [standard, expanded_bubble]
-      };
+    if (user && !userProfile) {
+      getUser()
+    }
+  }, [user, userProfile])
 
-      (function (d, t) {
-        var BASE_URL = "https://app1.chatcloud.ai";
-        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
-        g.src = 'https://chatcloud.b-cdn.net' + "/packs/js/sdk.js";
-        g.defer = true;
-        g.async = true;
-        s.parentNode.insertBefore(g, s);
-        g.onload = function () {
+  useEffect(() => {
+    if (user && userProfile && !isWidgetLoaded) {
+      const loadChatWidget = () => {
+        const identifierHash = generateHash(user.id)
+
+        window.chatwootSettings = {
+          hideMessageBubble: false,
+          position: "right",
+          locale: "en",
+          type: "standard",
+        }
+
+        const script = document.createElement("script")
+        script.src = "https://chatcloud.b-cdn.net/packs/js/sdk.js"
+        script.defer = true
+        script.async = true
+        script.onload = () => {
           window.chatcloudSDK.run({
-            websiteToken: 'kRoSLfZRdV4gank5Pn7ZQwrK',
-            baseUrl: BASE_URL,
-            // identifier_hash: identifierHash,
+            websiteToken: "kRoSLfZRdV4gank5Pn7ZQwrK",
+            baseUrl: "https://app1.chatcloud.ai",
           })
           window.$chatcloud.setUser(user.id, {
             name: user.fullName,
             email: user.email,
             identifier_hash: identifierHash,
-          });
+          })
         }
-      })(document, "script");
+        document.body.appendChild(script)
+        setIsWidgetLoaded(true)
+      }
+
+      loadChatWidget()
     }
+  }, [user, userProfile, isWidgetLoaded])
 
-    getUser()
-  }, [user, userProfile])
+  // This function simulates the HMAC generation on the client-side
+  // In a production environment, this should be done server-side
+  const generateHash = (userId) => {
+    // This is a placeholder function and should be replaced with a server-side implementation
+    return `simulated-hash-for-${userId}`
+  }
 
-
-  return null;
+  return null
 }
 
-export default ChatWidget;
+export default ChatWidget
+

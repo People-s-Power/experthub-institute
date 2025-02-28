@@ -277,11 +277,11 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
       const meetingStartTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.startTime}`).tz(userTimeZone);
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.endTime}`).tz(userTimeZone);
       if (currentDate.isBetween(meetingStartTime, meetingEndTime)) {
-        return { on: true, msg: 'Meeting is ongoing' };
+        return { on: true, msg: `${type} is ongoing` };
       } else if (currentDate.isBefore(meetingStartTime)) {
-        return { on: false, msg: `Meeting has not started, will start at ${meetingStartTime.format('HH:mm')}` };
+        return { on: false, msg: `${type} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
       } else {
-        return { on: false, msg: `Meeting has ended, ended at ${meetingEndTime.format('HH:mm')}` };
+        return { on: false, msg: `${type} has ended, ended at ${meetingEndTime.format('HH:mm')}` };
       }
     }
     const todayMeeting = activeDays?.find(day => day.day === currentDate.format('dddd'));
@@ -291,18 +291,18 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${todayMeeting.endTime}`).tz(userTimeZone);
 
       if (currentDate.isBetween(meetingStartTime, meetingEndTime)) {
-        return { on: true, msg: 'Meeting is ongoing' };
+        return { on: true, msg: `${type} is ongoing` };
       } else if (currentDate.isBefore(meetingStartTime)) {
-        return { on: false, msg: `Meeting has not started, will start at ${meetingStartTime.format('HH:mm')}` };
+        return { on: false, msg: `${type} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
       }
     } else if (type === "Event") {
       const meetingStartTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.startTime}`).tz(userTimeZone);
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.endTime}`).tz(userTimeZone);
 
       if (currentDate.isBetween(meetingStartTime, meetingEndTime)) {
-        return { on: true, msg: 'Meeting is ongoing' };
+        return { on: true, msg: 'Event is ongoing' };
       } else if (currentDate.isBefore(meetingStartTime)) {
-        return { on: false, msg: `Meeting has not started, will start at ${meetingStartTime.format('HH:mm')}` };
+        return { on: false, msg: `Event has not started, will start at ${meetingStartTime.format('HH:mm')}` };
       }
     }
 
@@ -430,7 +430,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         </div>
                         {
                           isOn().on && <div className=' w-full mt-5'>
-                            <video controls={Boolean(course.enrolledStudents.find(userIn => userIn._id === user.id))} className="w-full">
+                            <video autoPlay={isOn().on} controls={Boolean(course.enrolledStudents.find(userIn => userIn._id === user.id))} className="w-full">
                               <source src={course.videoUrl} type="video/mp4" />
                             </video>
                           </div>

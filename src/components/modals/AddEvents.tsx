@@ -28,6 +28,7 @@ interface Layout {
   video: File | null
 }
 const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolean, handleClick: any, course: CourseType | null, setShowPremium?: Dispatch<SetStateAction<boolean>> }) => {
+
   const user = useAppSelector((state) => state.value);
   const uploadRef = useRef<HTMLInputElement>(null)
   const [api, contextHolder] = notification.useNotification();
@@ -40,7 +41,9 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
   const [endTime, setEndTime] = useState(course?.endTime || undefined)
   const [striked, setStriked] = useState<number>(course?.strikedFee || 0)
   const [fee, setFee] = useState<number>(course?.fee || 0)
-  const [duration, setDuration] = useState<number>(course?.duration || 0)
+  const [duration, setDuration] = useState<number>(course?.timeframe?.value || course?.duration || 0)
+  const [timeframe, setTimeframe] = useState(course?.timeframe?.unit || "days")
+
   const [category, setCategory] = useState(course?.category || "")
   const [categoryIndex, setCategoryIndex] = useState("")
   const [liveCourses, setLiveCourses] = useState([])
@@ -108,7 +111,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
     checked: false
   }
   ])
-  const [video, setVideo] = useState<Layout>(layout)
+  const [video, setVideo] = useState<Layout>(course?.videoUrl ? { ...layout, videoUrl: course.videoUrl } : layout)
   const [play, setPlay] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -202,6 +205,12 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
           scholarship: "students",
           room,
           location,
+          videoUrl: video.videoUrl,
+          days,
+          timeframe: {
+            value: duration,
+            unit: timeframe
+          },
           // videos,
           // pdf
         }
@@ -319,7 +328,11 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
           location,
           scholarship: getScholarship(),
           videoUrl,
-          days
+          days,
+          timeframe: {
+            value: duration,
+            unit: timeframe
+          },
         }
       )
         .then(function (response) {
@@ -508,17 +521,22 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
                     </div>
                   case 1:
                     return <div>
-
-                      <div className='flex justify-between mt-6 my-1'>
-                        <div className='w-full'>
-                          <label className='text-sm font-medium my-1'>Duration {
-                            type === `online` && <>
-                              - <span className='text-orange-500 leading-3 font-thin text-[12px]'>{process.env.NEXT_PUBLIC_MEETING_DURATION}min max for Online Events</span>
-                            </>
-                          }</label>
-                          <input onChange={e => { e.preventDefault(); console.log(e.target.value); setDuration(parseInt(e.target.value)) }} max={type === 'online' ? parseFloat(process.env.NEXT_PUBLIC_MEETING_DURATION as string) : undefined} value={duration} type="number" className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent' />
+                      <div className='flex justify-between'>
+                        <div className='w-[48%]'>
+                          <label className='text-sm font-medium my-1'>Event Duration</label>
+                          <input defaultChecked onChange={e => { e.preventDefault(); console.log(e.target.value); setDuration(parseInt(e.target.value)) }} max={type === 'online' ? parseFloat(process.env.NEXT_PUBLIC_MEETING_DURATION as string) : undefined} value={duration} type="number" className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent' />
+                        </div>
+                        <div className='w-[48%]'>
+                          <label className='text-sm font-medium my-1'> *</label>
+                          <select onChange={(e) => setTimeframe(e.target.value)} value={timeframe} className='border rounded-md w-full border-[#1E1E1ED9]  p-2  py-2.5 bg-transparent'>
+                            <option value="minutes">Minutes</option>
+                            <option value="days">Days</option>
+                            <option value="weeks">Weeks</option>
+                            <option value="months">Months</option>
+                          </select>
                         </div>
                       </div>
+
                       {type === 'online' ? <>
                         <SelectCourseDate setEndDate={setEndDate} setConflict={setConflict} startDate={startDate} duration={duration} startTime={startTime} endTime={endTime} setStartDate={setStartDate} setStartTime={setStartTime} setEndTime={setEndTime} courses={liveCourses} />
 
@@ -604,7 +622,7 @@ const AddEvents = ({ open, handleClick, course, setShowPremium }: { open: boolea
 
                           <div className='flex flex-col mt-6 gap-2'>
                             <p className='font-medium'>Webinar Schedule</p>
-                            <ScheduledCourse conflict={conflict} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
+                            <ScheduledCourse conflict={conflict} allowedEdit={true} setConflict={setConflict} duration={duration} courses={liveCourses} days={days} endDate={endDate} setDays={setDays} setEndDate={setEndDate} startDate={startDate} setStartDate={setStartDate} />
                           </div>
 
 

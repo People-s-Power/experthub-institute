@@ -5,7 +5,7 @@ import { BsCalendar3 } from "react-icons/bs";
 import TimeSelector from './TimePicker';
 import DateSelector from './DatePicker';
 
-function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setStartDate, duration, courses, endDate, setEndDate }) {
+function ScheduledCourse({ days, setDays, conflict, allowedEdit, setConflict, startDate, setStartDate, duration, courses, endDate, setEndDate }) {
     const [disabledDays, setDisabledDays] = useState([]);
     const [conflictTimes, setConflictTimes] = useState([]);
     const [showTimePicker, setShowTimePicker] = useState({ day: null, field: null });
@@ -115,7 +115,15 @@ function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setS
 
         setDays(updatedDays);
     };
+    const handleEndTimeChange = (index, time) => {
+        const updatedDays = [...days];
+        const endTime = time ? time.format('HH:mm') : "";
+        updatedDays[index].endTime = endTime;
 
+        updatedDays[index].endTime = endTime;
+
+        setDays(updatedDays);
+    };
 
     useEffect(() => {
         const updateEndTimes = () => {
@@ -132,9 +140,11 @@ function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setS
             });
             setDays(updatedDays);
         };
+        if (!allowedEdit) {
+            updateEndTimes();
 
-        updateEndTimes();
-    }, [duration]);
+        }
+    }, [duration, allowedEdit]);
 
 
     useEffect(() => {
@@ -227,27 +237,39 @@ function ScheduledCourse({ days, setDays, conflict, setConflict, startDate, setS
                                                 label="Start Time"
                                                 value={dayjs(day.startTime, 'HH:mm')}
                                                 showTimePicker={true}
+                                                minTime={dayjs(day.startTime, 'HH:mm')}
                                                 handleClose={() => setShowTimePicker({ day: null, field: null })}
                                                 onChange={(time) => handleStartTimeChange(index, time)}
-                                                conflictTimes={conflictTimes[day.day] || []}
+                                                conflictTimes={allowedEdit ? [] : conflictTimes[day.day]}
                                                 topGap={`-20px`}
                                             />
                                         )}
                                     </div>
 
                                     <p className='my-auto'>-</p>
-
                                     <div className='relative flex flex-col'>
                                         <button
-                                            disabled
+                                            disabled={!day.startTime || !allowedEdit}
                                             className={`border  w-[100px] text-center justify-center disabled:cursor-not-allowed  text-[13px] bg-white rounded-md px-3 py-1 flex items-center gap-3 ${conflictTimes[day.day]?.includes(day.endTime) ? 'border-red-500' : 'border-transparent'}`}
+                                            onClick={() => setShowTimePicker({ day: day.day, field: 'endTime' })}
 
                                         >
                                             {day.endTime ? dayjs(day.endTime, 'HH:mm').format('HH:mm') : <span className='italic'>HH : MM</span>}
                                             <span><FaRegClock /></span>
                                         </button>
-
+                                        {showTimePicker.day === day.day && showTimePicker.field === 'endTime' && (
+                                            <TimeSelector
+                                                label="End Time"
+                                                value={dayjs(day.endTime, 'HH:mm')}
+                                                showTimePicker={true}
+                                                handleClose={() => setShowTimePicker({ day: null, field: null })}
+                                                onChange={(time) => handleEndTimeChange(index, time)}
+                                                conflictTimes={allowedEdit ? [] : conflictTimes[day.day]}
+                                                topGap={`-20px`}
+                                            />
+                                        )}
                                     </div>
+
                                 </div>
                             )}
                         </div>
