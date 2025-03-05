@@ -16,6 +16,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import Link from 'next/link';
+import WebinarVideo from '../video-component';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -349,7 +350,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         <div className='flex ml-1'>
                           {course.enrolledStudents.slice(0, 6).map(course => <img key={course._id} src={course.profilePicture ? course.profilePicture : '/images/user.png'} className='w-5 rounded-full h-5 -ml-1' alt="" />)}
                         </div>
-                        <p className='text-xs ml-2 my-1'>{course.enrolledStudents.length}+ students already started</p>
+                        <p className='text-xs ml-2 my-1'>{course.enrolledStudents.length}+ {action === "Event" ? "participants" : "students"} already started</p>
                       </div>}
                       <div className='my-4'>
                         <p className='font-medium'>The {action} includes</p>
@@ -428,13 +429,18 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         <div className='flex mt-1 items-center text-sm   text-yellow-600 gap-3'>
                           {isOn().msg}
                         </div>
-                        {
-                          isOn().on && <div className=' w-full mt-5'>
-                            <video autoPlay={isOn().on} controls={Boolean(course.enrolledStudents.find(userIn => userIn._id === user.id))} className="w-full">
-                              <source src={course.videoUrl} type="video/mp4" />
-                            </video>
+                        {isOn().on && (
+                          <div className="w-full mt-5">
+                            <WebinarVideo
+                              videoUrl={course.videoUrl}
+                              courseId={course._id}
+                              isWebinar={course.type === "webinar"}
+                              isEnrolled={Boolean(course.enrolledStudents.find((userIn) => userIn._id === user.id))}
+                              autoPlay={isOn().on}
+                              onClose={handleClick}
+                            />
                           </div>
-                        }
+                        )}
                       </div>
                     }
                     {
