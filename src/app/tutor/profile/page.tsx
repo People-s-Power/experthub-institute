@@ -6,6 +6,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { notification } from 'antd';
 import apiService from '@/utils/apiService';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const profile = () => {
   const user = useAppSelector((state) => state.value);
@@ -23,6 +24,7 @@ const profile = () => {
   const [editing, setEditing] = useState(false)
 
   const [uploading, setUploading] = useState(false)
+  const [updating, setUpdating] = useState(false)
   const [banks, setBanks] = useState<any | []>([])
   const [bankCode, setCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
@@ -187,7 +189,7 @@ const profile = () => {
   }
 
   const updateUser = () => {
-    setLoading(true)
+    setUpdating(true)
     try {
       apiService.put(`user/updateProfile/${user.id}`, {
         phone,
@@ -199,12 +201,12 @@ const profile = () => {
       })
         .then(function (response) {
           getUser()
-          setLoading(false)
+          setUpdating(false)
           console.log(response.data)
         })
     } catch (e) {
       console.log(e)
-      setLoading(false)
+      setUpdating(false)
     }
   }
 
@@ -217,7 +219,11 @@ const profile = () => {
         {contextHolder}
         <div className='shadow-[0px_2px_4px_0px_#1E1E1E21] p-3 text-center rounded-md'>
           <p className='font-medium text-lg'>Personal Details</p>
-          <img onClick={() => uploadRef.current?.click()} src={profilePicture ? profilePicture : "/images/user.png"} className='w-10 h-10 rounded-full object-cover cursor-pointer mx-auto my-3' alt="" />
+          <img onClick={() => {
+            if (isActionChecked("Edit Profile Image", user.privileges)) {
+              uploadRef.current?.click()
+            }
+          }} src={profilePicture ? profilePicture : "/images/user.png"} className='w-10 h-10 rounded-full object-cover cursor-pointer mx-auto my-3' alt="" />
           <input
             onChange={handleImage}
             type="file"
@@ -229,7 +235,11 @@ const profile = () => {
           />
           <p className='font-medium'>{user.fullName}</p>
           <p className='text-xs'>{user.email} </p>
-          <button onClick={() => addPic()} className='bg-primary p-2 px-6 my-4 font-medium'>{editing ? 'loading...' : 'Edit profile'}</button>
+          <button onClick={() => {
+            if (isActionChecked("Edit Profile Image", user.privileges)) {
+              addPic()
+            }
+          }} className='bg-primary p-2 px-6 my-4 font-medium'>{editing ? 'loading...' : 'Edit profile'}</button>
         </div>
         <div className='p-3'>
           <div className='my-4 text-center p-3 shadow-[0px_2px_4px_0px_#1E1E1E21] rounded-md'>
@@ -255,7 +265,11 @@ const profile = () => {
             </div>
           </div>
           <div className='text-center'>
-            <button onClick={() => createRecipient()} className='bg-primary p-2 px-6 my-4 font-medium'>{load ? 'loading...' : 'Update Account'}</button>
+            <button onClick={() => {
+              if (isActionChecked("Update Bank Account", user.privileges)) {
+                createRecipient()
+              }
+            }} className='bg-primary p-2 px-6 my-4 font-medium'>{load ? 'loading...' : 'Update Account'}</button>
           </div>
         </div>
 
@@ -288,7 +302,11 @@ const profile = () => {
             <label className='text-sm font-medium my-1'>Skill Level</label>
             <input onChange={e => setSkill(e.target.value)} value={skill} className='bg-transparent border-b border-[#1E1E1E66] w-full' type="text" />
           </div>
-          <div className='text-center'><button onClick={updateUser} className='bg-primary p-2 px-6 my-4 font-medium'>{loading ? "updating..." : "Edit highlights"}</button></div>
+          <div className='text-center'><button onClick={() => {
+            if (isActionChecked("Edit Basic information", user.privileges)) {
+              updateUser()
+            }
+          }} className='bg-primary p-2 px-6 my-4 font-medium'>{updating ? "updating..." : "Edit highlights"}</button></div>
         </div>
         <div className='my-4 text-center p-3 shadow-[0px_2px_4px_0px_#1E1E1E21] rounded-md'>
           <p className='font-medium text-sm'>Upload Signature</p>
@@ -330,7 +348,11 @@ const profile = () => {
             hidden
             multiple={false}
           />
-          <button onClick={() => addSign()} className='bg-primary p-2 px-6  my-4 font-medium'>{uploading ? 'loading...' : 'Upload Signature'}</button>
+          <button onClick={() => {
+            if (isActionChecked("Edit Signature", user.privileges)) {
+              addSign()
+            }
+          }} className='bg-primary p-2 px-6  my-4 font-medium'>{uploading ? 'loading...' : 'Upload Signature'}</button>
         </div>
       </section>
     </DashboardLayout>

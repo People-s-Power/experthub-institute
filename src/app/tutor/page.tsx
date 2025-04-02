@@ -146,9 +146,13 @@ const tutor = () => {
           <Link href={'/tutor/courses'}><p className='text-[#DC9F08]'>VIEW ALL</p></Link>
         </div>
         <div className='flex'>
-          <button onClick={() => setOpenAdd(true)} className='bg-primary p-3 rounded-md'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
-            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-          </svg>
+          <button onClick={() => {
+            if (isActionChecked("Add Course Category for the Training Provider", user.privileges)) {
+              setOpenAdd(true)
+            }
+          }} className='bg-primary p-3 rounded-md'><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-plus" viewBox="0 0 16 16">
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+            </svg>
           </button>
           <div className='!flex w-full flex-wrap'>
             <p onClick={() => setActive("")} className='m-2 bg-gray cursor-pointer px-2 text-base'>All</p>

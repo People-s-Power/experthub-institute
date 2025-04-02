@@ -29,7 +29,6 @@ const team = () => {
     { value: "Delete Assessment", checked: false },
     { value: "Edit Assessment", checked: false },
     { value: "View Assessment", checked: false },
-
     { value: "Make Graduate", checked: false },
     { value: "Send Email", checked: false },
     { value: "Respond to Chats", checked: false },
@@ -49,8 +48,24 @@ const team = () => {
     { value: "View Course Participant and send email reminder", checked: false },
     { value: "Delete team member", checked: false },
     { value: "Edit team member", checked: false },
-    { value: "Add team member", checked: false }
-  ])
+    { value: "Add team member", checked: false },
+  
+    // Newly Added Privileges
+    { value: "View Profile Details", checked: false },
+    { value: "Edit Profile Image", checked: false },
+    { value: "Update Bank Account", checked: false },
+    { value: "Edit Basic information", checked: false },
+    { value: "Edit Signature", checked: false },
+    { value: "Switch Roles to Student platform of the Training Provider", checked: false },
+    { value: "Add Course Category for the Training Provider", checked: false },
+    { value: "Delete Category for Training Provider", checked: false },
+    { value: "Enroll Course for Training Provider", checked: false },
+    { value: "Make Enquiries for Training Provider", checked: false },
+    { value: "View Wallet", checked: false },
+    { value: "Withdraw from Wallet", checked: false },
+    { value: "Fund Wallet", checked: false }
+  ]);
+  
 
   const addTeam = async () => {
     if (tutor === "") {

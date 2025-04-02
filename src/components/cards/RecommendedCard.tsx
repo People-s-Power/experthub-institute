@@ -3,11 +3,15 @@ import React, { useState } from 'react';
 import CourseDetails from '../modals/CourseDetails';
 import ShareModal from '../modals/ShareModal';
 import AppointmentModal from '../modals/AppointmentModal';
+import { isActionChecked } from '@/utils/checkPrivilege';
+import { useAppSelector } from '@/store/hooks';
 
 const RecommendedCard = ({ course, call }: { course: CourseType, call: any }) => {
   const [open, setOpen] = useState(false)
   const [share, setShare] = useState(false)
   const [appointment, setAppointment] = useState(false)
+  const user = useAppSelector((state) => state.value);
+
 
   return (
     <div className='lg:flex justify-between border p-3 my-3 lg:w-[49%] rounded-md border-[#1E1E1E75]'>
@@ -43,8 +47,22 @@ const RecommendedCard = ({ course, call }: { course: CourseType, call: any }) =>
       </div>
 
       <div className='lg:w-52 my-auto'>
-        <button onClick={() => setOpen(true)} className='p-2 w-full my-1 bg-primary rounded-sm'>Enrol Now</button>
-        <button onClick={() => setAppointment(true)} className='p-2 w-full bg-primary rounded-sm my-1'>Enquire</button>
+        <button onClick={() => {
+          if (
+            (user.role === 'tutor' && isActionChecked("Enroll Course for Training Provider", user?.privileges)) ||
+            user.role !== 'tutor'
+          ) {
+            setOpen(true)
+          }
+        }} className='p-2 w-full my-1 bg-primary rounded-sm'>Enrol Now</button>
+        <button onClick={() => {
+          if (
+            (user.role === 'tutor' && isActionChecked("Make Enquiries for Training Provider", user?.privileges)) ||
+            user.role !== 'tutor'
+          ) {
+            setAppointment(true)
+          }
+        }} className='p-2 w-full bg-primary rounded-sm my-1'>Enquire</button>
         <button onClick={() => setShare(true)} className='p-2 w-full bg-primary rounded-sm my-1'>Share</button>
       </div>
       <ShareModal open={share} course={course} handleClick={() => setShare(false)} />

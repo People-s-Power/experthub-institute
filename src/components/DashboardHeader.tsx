@@ -10,7 +10,7 @@ import { NoticeType } from '@/types/ResourceType';
 import ImageViewer from './ImageViewer';
 import apiService from '@/utils/apiService';
 import Link from 'next/link';
-import axios from 'axios';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   const user = useAppSelector((state) => state.value);
@@ -83,14 +83,25 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
         {
           key: '1',
           label: (
-            <p onClick={() => changeRole()}>Switch Roles</p>
+            <p onClick={() => {
+              if (isActionChecked("Switch Roles to Student platform of the Training Provider", user.privileges)) {
+                changeRole()
+              }
+            }}>Switch Roles</p>
           ),
         } : null
     ],
     {
       key: '2',
       label: (
-        <Link href={`/${user.role === 'student' ? 'applicant' : user.role}/profile`}><p>View Profile</p></Link>
+        <Link onClick={(e) => {
+          if (!isActionChecked("View Profile Details", user.privileges)) {
+            e.preventDefault(); // Prevent navigation if the user lacks permission
+            // alert("You do not have permission to view the profile.");
+          }
+        }} href={`/${user.role === 'student' ? 'applicant' : user.role}/profile`}>
+          <p>View Profile</p>
+        </Link>
       ),
     },
 
@@ -99,7 +110,13 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
         {
           key: '3',
           label: (
-            <Link href={`/${user.role === 'student' ? 'applicant' : user.role}/wallet`}><p>Wallet</p></Link>
+            <Link onClick={(e) => {
+              if (!isActionChecked("View Wallet", user.privileges)) {
+                e.preventDefault(); // Prevent navigation if the user lacks permission
+                // alert("You do not have permission to View Wallet.");
+              }
+            }} href={`/${user.role === 'student' ? 'applicant' : user.role}/wallet`}><p>Wallet</p></Link>
+
           ),
         } : null
     ],

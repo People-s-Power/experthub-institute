@@ -6,6 +6,7 @@ import { useAppSelector } from '@/store/hooks';
 import { Spin, notification } from 'antd';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import apiService from '@/utils/apiService';
+import { isActionChecked } from '@/utils/checkPrivilege';
 
 const Wallet = () => {
   const user = useAppSelector((state) => state.value);
@@ -180,9 +181,25 @@ const Wallet = () => {
           <p>Balance</p>
           <p className='text-3xl'>₦ {balance}</p>
           {/* {user.role === 'tutor' ? */}
-          <button onClick={() => handleWithdrawal()} className='bg-primary text-white p-3 rounded-md px-10 my-4'>Withdraw</button>
+          <button onClick={() => {
+            if (
+              (user.role === 'tutor' && isActionChecked("Withdraw from Wallet", user?.privileges)) ||
+              user.role !== 'tutor'
+            ) {
+              handleWithdrawal();
+            }
+          }} className='bg-primary text-white p-3 rounded-md px-10 my-4'>
+            Withdraw
+          </button>
           {/* : user.role === 'student' ? */}
-          <button onClick={() => openFund(true)} className='bg-primary ml-4 text-white p-3 rounded-md px-10 my-4'>Fund</button>
+          <button onClick={() => {
+            if (
+              (user.role === 'tutor' && isActionChecked("Fund Wallet", user?.privileges)) ||
+              user.role !== 'tutor'
+            ) {
+              openFund(true)
+            }
+          }} className='bg-primary ml-4 text-white p-3 rounded-md px-10 my-4'>Fund</button>
           {/* : null
           } */}
         </div>
