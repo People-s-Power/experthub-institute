@@ -551,7 +551,7 @@ const SideNav = () => {
   };
   // filter((single: any) => single.ownerId?._id !== user.id)
   const filteredTeam = team && team.length >= 1
-    ? team.filter((single: any) => single.ownerId?._id !== user.id)
+    ? team.filter((single: any) => single.ownerId?._id !== user.id && single.status === "accepted") 
     : [];
 
   // const items: MenuProps['items'] = team
@@ -577,7 +577,7 @@ const SideNav = () => {
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
-      <Link href={"/#courses"} className="font-bold text-lg text-[#DC9F08]">EXPERTHUB INSTITUTE</Link>
+      <Link href={"/#courses"} className="font-bold uppercase text-lg text-[#DC9F08]"> {user.organizationName ? user.organizationName : 'EXPERTHUB INSTITUTE'} </Link>
       <div className="flex-1 flex flex-col h-full my-6 overflow-auto">
         <ol className="text-sm font-medium flex-1">
           {nav?.map((item, idx) => (
@@ -656,7 +656,7 @@ const SideNav = () => {
           )}
           {filteredTeam.length >= 1 && <div className="mt-10">
             <p className="mb-3">Training Provider</p>
-            {filteredTeam.map((single: any) => <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
+            {filteredTeam.map((single: any) => single.status === 'accepted' && <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
               <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
               <p className="capitalize">{single.ownerId?.fullname}</p>
             </div>)}

@@ -7,6 +7,7 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
   const [api, contextHolder] = notification.useNotification();
   const [active, setActive] = useState(false)
   const [fullname, setName] = useState("")
+  const [orgName, setOrgName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [country, setCountry] = useState("nigeria")
@@ -57,6 +58,7 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
     "Federal Capital Territory"
   ]
 
+
   const signupApplicant = async () => {
     if (fullname && email && phone && country && state && address && password) {
       if (password === confirmPassword) {
@@ -70,7 +72,8 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
           state,
           address,
           password,
-          userType: role
+          userType: role,
+          organizationName: orgName
         })
           .then(function (response) {
             console.log(response.data)
@@ -110,6 +113,10 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
           <label className='font-medium'>Full Name</label>
           <input onChange={e => setName(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='e.g John' />
         </div>
+        {role === 'tutor' && <div className='my-2 text-xs'>
+          <label className='font-medium'>Organization's Name</label>
+          <input onChange={e => setOrgName(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='e.g Experthub Institute' />
+        </div>}
         <div className='my-2 text-xs'>
           <label className='font-medium'>Email</label>
           <input onChange={e => setEmail(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="email" placeholder='Sample@gmail.com' />

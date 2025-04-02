@@ -136,6 +136,20 @@ const team = () => {
       })
   }
 
+
+  const updateStatus = (id: any, status: string) => {
+    apiService.put(`/user/team/${user.id}/${id}`, {
+      status: status
+    })
+      .then(function (response) {
+        console.log(response)
+        api.open({
+          message: response.data.message
+        });
+        getTeam()
+      })
+  }
+
   useEffect(() => {
     getTeam()
     getTutors()
@@ -147,7 +161,8 @@ const team = () => {
     setPrivileges(updatedObjects);
   };
 
-  const filteredTeam = team.filter((single: any) => single.ownerId?._id === user.id)
+
+  const filteredTeam = team.filter((single: any) => single.ownerId?._id === user.id || single.status === 'pending')
 
   const options = instructors
     .filter((item: UserType) => !item.blocked && item.id !== user.id)
@@ -230,27 +245,36 @@ const team = () => {
                 </div>
               </div>
             }
-            <div className='flex w-20 justify-between sm:mt-3'>
-              <button onClick={() => {
-                if (isActionChecked("Edit team member", user.privileges)) {
-                  setOpen(true), setPrivileges(single.privileges)
-                }
-              }} className=''>
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
-                  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                  <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                </svg>
-              </button>
-              <button className='text-red' onClick={() => {
-                if (isActionChecked("Delete team member", user.privileges)) {
-                  removeTeam(single.tutorId._id)
-                }
-              }}  >
-                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-trash3-fill" viewBox="0 0 16 16">
-                  <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
-                </svg>
-              </button>
-            </div>
+            {
+              user.id === single.ownerId?._id ?
+                <div className='flex w-20 justify-between sm:mt-3'>
+                  <button onClick={() => {
+                    if (isActionChecked("Edit team member", user.privileges)) {
+                      setOpen(true), setPrivileges(single.privileges)
+                    }
+                  }} className=''>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-pencil-square" viewBox="0 0 16 16">
+                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                      <path fillRule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                    </svg>
+                  </button>
+                  <button className='text-red' onClick={() => {
+                    if (isActionChecked("Delete team member", user.privileges)) {
+                      removeTeam(single.tutorId._id)
+                    }
+                  }}  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-trash3-fill" viewBox="0 0 16 16">
+                      <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                    </svg>
+                  </button>
+                </div>
+                :
+                <div className="flex w-38 justify-between">
+                  <button onClick={() => updateStatus(single.ownerId._id, 'accepted')} className="bg-green-500 my-auto text-white px-2 py-1 rounded-full">Accept</button>
+                  <button onClick={() => updateStatus(single.ownerId._id, 'rejected')} className="bg-red-500 my-auto px-2 text-white py-1 rounded-full">Reject</button>
+                </div>
+            }
+
           </div>) : <div>
             <img src="/images/unread.jpg" alt="" />
             <p className='text-center my-3'>No added team member!</p></div>}
