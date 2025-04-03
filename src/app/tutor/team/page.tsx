@@ -49,7 +49,7 @@ const team = () => {
     { value: "Delete team member", checked: false },
     { value: "Edit team member", checked: false },
     { value: "Add team member", checked: false },
-  
+
     // Newly Added Privileges
     { value: "View Profile Details", checked: false },
     { value: "Edit Profile Image", checked: false },
@@ -65,7 +65,7 @@ const team = () => {
     { value: "Withdraw from Wallet", checked: false },
     { value: "Fund Wallet", checked: false }
   ]);
-  
+
 
   const addTeam = async () => {
     if (tutor === "") {
@@ -153,9 +153,7 @@ const team = () => {
 
 
   const updateStatus = (id: any, status: string) => {
-    apiService.put(`/user/team/${user.id}/${id}`, {
-      status: status
-    })
+    apiService.get(`/user/team/${user.id}/${id}/${status}`)
       .then(function (response) {
         console.log(response)
         api.open({
