@@ -63,7 +63,8 @@ const team = () => {
     { value: "Make Enquiries for Training Provider", checked: false },
     { value: "View Wallet", checked: false },
     { value: "Withdraw from Wallet", checked: false },
-    { value: "Fund Wallet", checked: false }
+    { value: "Fund Wallet", checked: false },
+    { value: "View Calender", checked: false }
   ]);
 
 
@@ -180,17 +181,11 @@ const team = () => {
   const options = instructors
     .filter((item: UserType) => !item.blocked && item.id !== user.id)
     .map((item: UserType) => ({
-      value: item.id, label: (
-        <div className="flex items-center">
-          <img
-            src={item.profilePicture ? item.profilePicture : '/images/user.png'}
-            alt={item.fullname}
-            className="w-6 h-6 rounded-full mr-2"
-          />
-          <span>{item.fullname}</span>
-        </div>
-      ),
+      value: item.id,
+      label: item.fullname, // plain text label for search
+      profilePicture: item.profilePicture,
     }));
+
 
 
   return (
@@ -206,6 +201,17 @@ const team = () => {
               placeholder="Add team member"
               className="react-select-container"
               classNamePrefix="react-select"
+              isSearchable
+              formatOptionLabel={(e) => (
+                <div className="flex items-center">
+                  <img
+                    src={e.profilePicture || '/images/user.png'}
+                    alt={e.label}
+                    className="w-6 h-6 rounded-full mr-2"
+                  />
+                  <span>{e.label}</span>
+                </div>
+              )}
             />
             {/* <select onChange={(e) => setTutor(e.target.value)} className='border p-4 w-full mt-1'>
               <option className='hidden' value="">Add team member</option>

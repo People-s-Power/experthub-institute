@@ -7,6 +7,7 @@ import { Dropdown, MenuProps, notification } from "antd";
 import apiService from "@/utils/apiService";
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/userSlice';
+import { isActionChecked } from "@/utils/checkPrivilege";
 
 const SideNav = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -551,7 +552,7 @@ const SideNav = () => {
   };
   // filter((single: any) => single.ownerId?._id !== user.id)
   const filteredTeam = team && team.length >= 1
-    ? team.filter((single: any) => single.ownerId?._id !== user.id && single.status === "accepted") 
+    ? team.filter((single: any) => single.ownerId?._id !== user.id && single.status === "accepted")
     : [];
 
   // const items: MenuProps['items'] = team
@@ -598,7 +599,11 @@ const SideNav = () => {
 
           <li className="my-3">
             <div
-              onClick={() => setActive(!active)}
+              onClick={() => {
+                if (isActionChecked("View Calender", user.privileges)) {
+                  setActive(!active)
+                }
+              }}
               className={
                 "flex items-center gap-x-2 text-gray-600 p-2 rounded-lg cursor-pointer"
               }
