@@ -49,11 +49,11 @@ const UserPage = () => {
         </>
       ) : (
         <div>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl">
             {status === 'rejected' ? "Invite Rejected Successfully!" : "Invite Accepted Successfully!"}
           </h1>
           <Link href="/tutor">
-            <button className='mt-4 bg-primary text-white p-4 rounded-md'>Go Back to Dashboard</button>
+            <button className='mt-4 bg-primary p-4 rounded-md'>Go Back to Dashboard</button>
           </Link>
         </div>
       )}
