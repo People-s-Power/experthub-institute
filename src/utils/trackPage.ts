@@ -1,5 +1,6 @@
 // lib/gtag.js
 export const GA_MEASUREMENT_ID = 'G-KKVTDS2T71'; // Replace with your ID
+
 export const pageview = (url: string) => {
   if (typeof window !== 'undefined') {
     window.gtag?.('config', GA_MEASUREMENT_ID, {
