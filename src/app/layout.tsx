@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from "@/store/providers";
+import Analytics from "@/components/Analytics";
 
 export const metadata: Metadata = {
   title: 'EXPERTHUB INSTITUTE',
@@ -17,6 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
+          <Analytics />
           {children}
         </Providers>
       </body>
