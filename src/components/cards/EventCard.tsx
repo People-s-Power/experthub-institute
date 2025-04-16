@@ -115,7 +115,7 @@ const EventCard = ({ event, action }: { event: CourseType, action: any }) => {
         </div>
       </div>
       <CourseDetails course={event} open={open} call={null} action={"Event"} type='view' handleClick={() => setOpen(false)} />
-      <AddEvents open={edit} course={event} handleClick={() => setEdit(false)} />
+      <AddEvents setOpen={setEdit} open={edit} course={event} handleClick={() => setEdit(false)} />
       {
         deletec && <div>
           <div onClick={() => setDelete(false)} className='fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10'></div>

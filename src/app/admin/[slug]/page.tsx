@@ -66,7 +66,7 @@ const SingleCourse = () => {
           </div>}
 
           {repo && <SinglePage pathname={pathname} repo={repo} page={page} />}
-          {repo && <AddCourse course={repo} open={edit} handleClick={() => setEdit(false)} />}
+          {repo && <AddCourse course={repo} open={edit} setOpen={setEdit} handleClick={() => setEdit(false)} />}
         </section>
       </DashboardLayout>
     </Fragment>

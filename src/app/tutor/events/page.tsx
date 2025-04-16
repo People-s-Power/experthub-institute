@@ -75,9 +75,9 @@ const Events = () => {
       </div>
       <EventsComp action={() => getAllEvents()} events={events} />
 
-      <AddCourse course={null} open={open} handleClick={() => setOpen(!open)} />
+      <AddCourse course={null} setOpen={setOpen} open={open} handleClick={() => setOpen(!open)} />
       {/* <AddResources open={resources} handleClick={() => setResources(!resources)} /> */}
-      <AddEvents setShowPremium={setShowPremuim} open={event} handleClick={() => setEvent(!event)} course={null} />
+      <AddEvents setOpen={setEvent} setShowPremium={setShowPremuim} open={event} handleClick={() => setEvent(!event)} course={null} />
       <GoPremuim show={showPremuim} setShow={setShowPremuim} />
 
     </DashboardLayout>

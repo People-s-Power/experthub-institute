@@ -1,5 +1,5 @@
 import apiService from '@/utils/apiService';
-import { notification } from 'antd';
+import { notification, Spin } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
@@ -15,6 +15,8 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const states_in_nigeria = [
@@ -102,6 +104,11 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
       });
     }
   }
+
+  const handleGoogleLogin = () => {
+    setGoogleLoading(true)
+    window.location.href = `${apiService.getUri()}auth/google?role=${role}&redirectUrl=/auth/login`
+  }
   return (
     <div>
       {contextHolder}
@@ -152,6 +159,32 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
         </div>
         <div className='my-2 text-xs'>
           <button onClick={() => signupApplicant()} className='w-full bg-primary p-2 rounded-sm font-medium'>{loading ? "Loading..." : "Signup"}</button>
+        </div>
+        <div className="my-4 text-center font-semibold text-xs">
+          Or
+        </div>
+        <div className="my-2 text-xs">
+          <button
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+            className="w-full border border-gray-300 bg-white p-2 rounded-sm font-medium flex items-center justify-center hover:bg-gray-50 transition-colors"
+          >
+            {googleLoading ? (
+              <Spin />
+            ) : (
+              <>
+                <img
+                  src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                  alt="Google"
+                  className="w-4 h-4 mr-2"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                  }}
+                />
+                Sign up with Google
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dropdown, MenuProps, Progress } from 'antd';
 import { usePathname } from 'next/navigation';
 import CourseDetails from '../modals/CourseDetails';
@@ -30,7 +30,9 @@ const CoursesCard = ({ course, getCourse }: { course: CourseType, getCourse: () 
   const [participants, setParticipants] = useState(false)
   const [appointment, setAppointment] = useState(false)
   const router = useRouter()
-
+  useEffect(() => {
+    console.log(open);
+  }, [open])
   const items: MenuProps['items'] = [
     {
       key: '1',
@@ -157,7 +159,7 @@ const CoursesCard = ({ course, getCourse }: { course: CourseType, getCourse: () 
         </div>
       </div>
       <CourseDetails course={course} action={"Course"} open={open} call={null} type='view' handleClick={() => setOpen(false)} />
-      <AddCourse course={course} open={edit} handleClick={() => setEdit(false)} />
+      <AddCourse setOpen={setEdit} course={course} open={edit} handleClick={() => setEdit(false)} />
       <EnrollStudent open={enroll} handleClick={() => setEnroll(false)} course={course} />
       <AssignTutor open={assign} handleClick={() => setAssign(false)} course={course} getCourse={() => getCourse()} />
       {

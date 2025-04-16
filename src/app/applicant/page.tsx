@@ -137,7 +137,7 @@ const applicant = () => {
               .map((course: any) => <RecommendedCard key={course._id} course={course} call={() => getCourses()} />)
           }
         </div>
-        <AddCourseInterests open={open} handleClick={() => setOpen(false)} />
+        <AddCourseInterests open={open} handleClick={() => setOpen(!open)} />
       </section>
     </DashboardLayout>
   );

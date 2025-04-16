@@ -247,10 +247,10 @@ const courses = () => {
 
       </section>
 
-      <AddCourse course={null} setShowPremium={setShowPremuim} open={open} handleClick={() => setOpen(!open)} />
+      <AddCourse course={null} setOpen={setOpen} setShowPremium={setShowPremuim} open={open} handleClick={() => setOpen(!open)} />
       <GoPremuim show={showPremuim} setShow={setShowPremuim} />
       {/* <AddResources open={resources} handleClick={() => setResources(!resources)} /> */}
-      <AddEvents open={event} handleClick={() => setEvent(!event)} course={null} />
+      <AddEvents setOpen={setEvent} open={event} handleClick={() => setEvent(!event)} course={null} />
 
     </DashboardLayout>
   );

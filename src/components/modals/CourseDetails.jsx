@@ -126,6 +126,9 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
   // Function to start the Zoom meeting
   async function startMeeting() {
     try {
+      if (course.meetingMode === "google") {
+        return router.push(course.meetingLink, { target: '_blank' })
+      }
       setLoading(true);
 
       // Initialize the client and retrieve the signature
@@ -278,11 +281,11 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
       const meetingStartTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.startTime}`).tz(userTimeZone);
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.endTime}`).tz(userTimeZone);
       if (currentDate.isBetween(meetingStartTime, meetingEndTime)) {
-        return { on: true, msg: `${type} is ongoing` };
+        return { on: true, msg: `${action} is ongoing` };
       } else if (currentDate.isBefore(meetingStartTime)) {
-        return { on: false, msg: `${type} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
+        return { on: false, msg: `${action} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
       } else {
-        return { on: false, msg: `${type} has ended, ended at ${meetingEndTime.format('HH:mm')}` };
+        return { on: false, msg: `${action} has ended, ended at ${meetingEndTime.format('HH:mm')}` };
       }
     }
     const todayMeeting = activeDays?.find(day => day.day === currentDate.format('dddd'));
@@ -292,11 +295,11 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${todayMeeting.endTime}`).tz(userTimeZone);
 
       if (currentDate.isBetween(meetingStartTime, meetingEndTime)) {
-        return { on: true, msg: `${type} is ongoing` };
+        return { on: true, msg: `${action} is ongoing` };
       } else if (currentDate.isBefore(meetingStartTime)) {
-        return { on: false, msg: `${type} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
+        return { on: false, msg: `${action} has not started, will start at ${meetingStartTime.format('HH:mm')}` };
       }
-    } else if (type === "Event") {
+    } else if (action === "Event") {
       const meetingStartTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.startTime}`).tz(userTimeZone);
       const meetingEndTime = dayjs(`${currentDate.format('YYYY-MM-DD')}T${course.endTime}`).tz(userTimeZone);
 

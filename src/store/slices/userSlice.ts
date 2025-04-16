@@ -6,6 +6,7 @@ type UserState = {
   value: {
     otherCourse: any;
     role: string;
+    isGoogleLinked: boolean;
     fullName: String
     id: string
     email: string

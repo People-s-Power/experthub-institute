@@ -182,9 +182,9 @@ const courses = () => {
             </Slider>
           </div> : <div>No courses to review</div>}
         </div> */}
-        <AddCourse course={null} open={open} handleClick={() => setOpen(!open)} />
+        <AddCourse course={null} open={open} setOpen={setOpen} handleClick={() => setOpen(!open)} />
         {/* <AddResources open={resources} handleClick={() => setResources(!resources)} /> */}
-        <AddEvents open={event} handleClick={() => setEvent(!event)} course={null} />
+        <AddEvents setOpen={setEvent} open={event} handleClick={() => setEvent(!event)} course={null} />
         <CategoryModal open={category} category={null} handleClick={() => setCategory(false)} />
 
       </section >
