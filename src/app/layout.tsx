@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from "@/store/providers";
+import Analytics from "@/components/Analytics";
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'EXPERTHUB INSTITUTE',
@@ -15,6 +17,21 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-KKVTDS2T71"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-KKVTDS2T71');
+          `}
+        </Script>
+      </head>
       <body>
         <Providers>
           {children}

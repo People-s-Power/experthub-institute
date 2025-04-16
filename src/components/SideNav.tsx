@@ -7,6 +7,7 @@ import { Dropdown, MenuProps, notification } from "antd";
 import apiService from "@/utils/apiService";
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/userSlice';
+import { isActionChecked } from "@/utils/checkPrivilege";
 
 const SideNav = () => {
   const [api, contextHolder] = notification.useNotification();
@@ -347,6 +348,15 @@ const SideNav = () => {
       ),
     },
     {
+      href: "/admin/analytics",
+      name: "Analytics",
+      icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M0 0h1v15h15v1H0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5" />
+        </svg>
+      ),
+    },
+    {
       href: "/admin/message",
       name: "Message",
       icon: (
@@ -551,7 +561,7 @@ const SideNav = () => {
   };
   // filter((single: any) => single.ownerId?._id !== user.id)
   const filteredTeam = team && team.length >= 1
-    ? team.filter((single: any) => single.ownerId?._id !== user.id)
+    ? team.filter((single: any) => single.ownerId?._id !== user.id && single.status === "accepted")
     : [];
 
   // const items: MenuProps['items'] = team
@@ -577,7 +587,7 @@ const SideNav = () => {
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-10 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
-      <Link href={"/#courses"} className="font-bold text-lg text-[#DC9F08]">EXPERTHUB INSTITUTE</Link>
+      <Link href={"/#courses"} className="font-bold uppercase text-lg text-[#DC9F08]"> {user.organizationName ? user.organizationName : 'EXPERTHUB INSTITUTE'} </Link>
       <div className="flex-1 flex flex-col h-full my-6 overflow-auto">
         <ol className="text-sm font-medium flex-1">
           {nav?.map((item, idx) => (
@@ -598,7 +608,11 @@ const SideNav = () => {
 
           <li className="my-3">
             <div
-              onClick={() => setActive(!active)}
+              onClick={() => {
+                if (isActionChecked("View Calender", user.privileges)) {
+                  setActive(!active)
+                }
+              }}
               className={
                 "flex items-center gap-x-2 text-gray-600 p-2 rounded-lg cursor-pointer"
               }
@@ -656,7 +670,7 @@ const SideNav = () => {
           )}
           {filteredTeam.length >= 1 && <div className="mt-10">
             <p className="mb-3">Training Provider</p>
-            {filteredTeam.map((single: any) => <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
+            {filteredTeam.map((single: any) => single.status === 'accepted' && <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
               <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
               <p className="capitalize">{single.ownerId?.fullname}</p>
             </div>)}

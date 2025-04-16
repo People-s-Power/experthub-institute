@@ -8,13 +8,14 @@ type UserState = {
     role: string;
     isGoogleLinked: boolean;
     fullName: String
-    id: string
-    email: string
-    assignedCourse: string,
-    profilePicture: string,
-    accessToken?: string,
-    privileges?: any
-    mainUser?: any
+    id: string;
+    email: string;
+    assignedCourse: string;
+    organizationName?: string;    
+    profilePicture: string;
+    accessToken?: string;
+    privileges?: any;
+    mainUser?: any;
   };
 };
 
