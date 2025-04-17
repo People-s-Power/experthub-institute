@@ -378,7 +378,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         </div>}
                       </div>
                       {
-                        type === "view" ? course.type === "online" ? isOn().on ? <button onClick={() => startMeeting()} className='bg-primary p-2 my-3 rounded-md px-8 w-[150px]'>{loading ? <Spin /> : "Join Live"}</button> : null : user.role !== 'student' ?
+                        type === "view" ? course.type === "online" ? true ? <button onClick={() => startMeeting()} className='bg-primary p-2 my-3 rounded-md px-8 w-[150px]'>{loading ? <Spin /> : "Join Live"}</button> : null : user.role !== 'student' ?
                           <button onClick={() => router.push(`/${action === "Course" ? course.type : "event"}}/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button> :
                           action === "Event" ? null : <button onClick={() => router.push(`/applicant/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button>
                           : <button onClick={() => {
