@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 
 const FooterNav = () => {
@@ -19,13 +20,13 @@ const FooterNav = () => {
           <img className='m-2' src="/images/icons/icomoon-free_linkedin.svg" alt="" />
         </div>
       </div>
-      <div className='lg:w-[20%] w-[40%]'>
+      <div className='lg:w-[20%] flex flex-col gap-3 w-[40%]'>
         <p className='font-medium uppercase'>Navigate</p>
-        <p className='my-3 text-sm'>www.experthubllc.com</p>
-        <p className='my-3 text-sm'>www.peoplespower.me</p>
-        <p className='my-3 text-sm'>theplaint.org</p>
-        <p className='my-3 text-sm'>Terms & Conditions</p>
-        <p className='my-3 text-sm'>Privacy Policy</p>
+        <p className=' text-sm'>www.experthubllc.com</p>
+        <p className=' text-sm'>www.peoplespower.me</p>
+        <p className=' text-sm'>theplaint.org</p>
+        <Link href={"/terms"} className=' text-sm hover:opacity-60 duration-300'>Terms & Conditions</Link>
+        <Link href={"/privacy"} className=' text-sm  hover:opacity-60 duration-300'>Privacy Policy</Link>
       </div>
       <div className='lg:w-[20%] w-[55%]'>
         <p className='font-medium uppercase'>Contact</p>
