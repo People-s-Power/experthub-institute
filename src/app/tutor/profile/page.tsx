@@ -23,6 +23,7 @@ const profile = () => {
   const [profilePicture, setProfilePicture] = useState<string>()
   const [signature, setSignature] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
+  const [userData, setUserData] = useState<any>()
 
   const [uploading, setUploading] = useState(false)
   const [updating, setUpdating] = useState(false)
@@ -146,6 +147,7 @@ const profile = () => {
         setAccountNumber(response.data.user.accountNumber)
         setCode(response.data.user.bankCode)
         setSignature(response.data.user.signature)
+        setUserData(response.data.user)
         console.log(response.data)
       })
   }
@@ -355,6 +357,8 @@ const profile = () => {
             }
           }} className='bg-primary p-2 px-6  my-4 font-medium'>{uploading ? 'loading...' : 'Upload Signature'}</button>
         </div>
+        <ThirdPartyManagement user={userData} />
+
       </section>
     </DashboardLayout>
   );
