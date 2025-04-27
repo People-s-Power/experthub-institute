@@ -7,6 +7,7 @@ import { useAppSelector } from '@/store/hooks';
 import { notification } from 'antd';
 import apiService from '@/utils/apiService';
 import { isActionChecked } from '@/utils/checkPrivilege';
+import ThirdPartyManagement from './third-party';
 
 const profile = () => {
   const user = useAppSelector((state) => state.value);

@@ -153,9 +153,7 @@ button:focus {
   display: none;
 }
 
-.fixed {
-  z-index: 90;
-}
+
 
 .tooltip {
   position: relative;

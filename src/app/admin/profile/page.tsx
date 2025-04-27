@@ -7,11 +7,13 @@ import { useAppSelector } from '@/store/hooks';
 import { useAppDispatch } from '@/store/hooks';
 import { notification } from 'antd';
 import apiService from '@/utils/apiService';
+import ThirdPartyManagement from '@/app/tutor/profile/third-party';
 
 const profile = () => {
   const user = useAppSelector((state: { value: any; }) => state.value);
   const uploadRef = useRef<HTMLInputElement>(null)
   const dispatch = useAppDispatch();
+  const [userData, setUserData] = useState<any>()
   const [api, contextHolder] = notification.useNotification();
   const [phone, setPhone] = useState("")
   const [skill, setSkill] = useState("")
@@ -57,7 +59,7 @@ const profile = () => {
         setState(response.data.user.state)
         setCountry(response.data.user.country)
         setProfilePicture(response.data.user.profilePicture)
-
+        setUserData(response.data.user)
         console.log(response.data)
       })
   }
@@ -168,6 +170,7 @@ const profile = () => {
         <div className='my-4 text-center p-3 shadow-[0px_2px_4px_0px_#1E1E1E21] rounded-md'>
           <p className='font-medium text-sm'>Highlights</p>
         </div>
+
         <div className='my-4 p-3 shadow-[0px_2px_4px_0px_#1E1E1E21] rounded-md'>
           <div className='my-2'>
             <label className='text-sm font-medium my-1'>Phone Number</label>
@@ -237,6 +240,8 @@ const profile = () => {
           />
           <button onClick={() => addSign()} className='bg-primary p-2 px-6  my-4 font-medium'>{uploading ? 'loading...' : 'Upload Signature'}</button>
         </div>
+        <ThirdPartyManagement user={userData} />
+
       </section>
     </DashboardLayout>
   );

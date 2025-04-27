@@ -1,5 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
+import apiService from '@/utils/apiService';
 
 
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const id = params.slug
   // // fetch data
-  let course = await fetch(`${process.env.NEXT_SERVER_URL}/courses/single-course/${id}`).then((res) => res.json())
+  let { data: course } = await apiService.get(`/courses/single-course/${id}`)
 
   return {
     title: `${course.course?.title}`,

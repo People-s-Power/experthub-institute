@@ -1,352 +1,459 @@
-'use client'
+"use client"
 
-import { useEffect } from 'react'
-import { motion, useAnimation } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
-import Image from 'next/image'
-import dayjs from 'dayjs'
-import { Calendar, Clock, MapPin, Users, Video, ChevronRight, Star } from 'lucide-react'
-import EnrollButton from './enroll-button'
-import { CourseTypeSingle, EventTypeSingle } from '@/types/CourseType'
-import { VideoPreview } from './video-preview'
+import type React from "react"
+
+import { useEffect, useState, useRef, MutableRefObject, RefObject } from "react"
+import { motion, useAnimation, useScroll, useTransform } from "framer-motion"
+import { useInView } from "react-intersection-observer"
+import { MapPin, ArrowRight } from "lucide-react"
+import EnrollButton from "./components/enroll-button"
+import { VideoPreview } from "./components/video-preview"
+import { TestimonialsSection } from "./components/testimonials/testimonials-section"
+import { CourseStats } from "./components/course-stats"
+import { CourseSidebar } from "./components/course-sidebar"
+import { CourseHero } from "./components/course-hero"
+import { BenefitsSection } from "./components/benefits-section"
+import { ScheduleSection } from "./components/schedule-section"
+import type { CourseTypeSingle, EventTypeSingle } from "@/types/course-type"
+import Image from "next/image"
+
+// Default benefits if none provided
+const defaultBenefits = [
+    "Master essential concepts and practical applications",
+    "Learn from industry experts with real-world experience",
+    "Gain hands-on experience through practical exercises",
+    "Receive a certificate of completion for your portfolio",
+]
 
 interface CourseDetailProps {
-    data: CourseTypeSingle | EventTypeSingle
-    type: 'course' | 'event'
+    data: any
+    type: "course" | "event"
 }
 
 export default function CourseDetail({ data, type }: CourseDetailProps) {
-    const [ref, inView] = useInView({
-        triggerOnce: true,
-        threshold: 0.1
-    })
+    const [activeSection, setActiveSection] = useState("overview")
+    const [isVideoPlaying, setIsVideoPlaying] = useState(false)
 
-    const controls = useAnimation()
+    const overviewRef = useRef<HTMLDivElement | null>(null)
+    const benefitsRef = useRef<HTMLDivElement | null>(null)
+    const scheduleRef = useRef<HTMLDivElement | null>(null)
+    const instructorRef = useRef<HTMLDivElement | null>(null)
 
+    // Parallax and scroll effects
+    const { scrollYProgress } = useScroll()
+    const opacity = useTransform(scrollYProgress, [0, 0.1], [1, 0])
+    const scale = useTransform(scrollYProgress, [0, 0.1], [1, 0.95])
+
+    // Intersection observers for animations
+    const [heroRef, heroInView] = useInView({ triggerOnce: true, threshold: 0.1 })
+    const [overviewInViewRef, overviewInView] = useInView({ threshold: 0.1 })
+    const [benefitsInViewRef, benefitsInView] = useInView({ threshold: 0.1 })
+    const [scheduleInViewRef, scheduleInView] = useInView({ threshold: 0.1 })
+    const [ctaRef, ctaInView] = useInView({ threshold: 0.1 })
+
+    // Animation controls
+    const heroControls = useAnimation()
+    const overviewControls = useAnimation()
+    const benefitsControls = useAnimation()
+    const scheduleControls = useAnimation()
+    const ctaControls = useAnimation()
+
+    // Handle scroll-based section activation
     useEffect(() => {
-        if (inView) {
-            controls.start('visible')
-        }
-    }, [controls, inView])
+        const handleScroll = () => {
+            const scrollPosition = window.scrollY + 100
 
+            const sections = [
+                { id: "overview", ref: overviewRef },
+                { id: "benefits", ref: benefitsRef },
+                { id: "schedule", ref: scheduleRef },
+                { id: "instructor", ref: instructorRef },
+            ].filter((section) => section.ref.current)
+
+            for (let i = sections.length - 1; i >= 0; i--) {
+                const section = sections[i]
+                if (section.ref.current && scrollPosition >= section.ref.current.offsetTop) {
+                    setActiveSection(section.id)
+                    break
+                }
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll)
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
+
+    // Start animations when sections come into view
+    useEffect(() => {
+        if (heroInView) heroControls.start("visible")
+        if (overviewInView) overviewControls.start("visible")
+        if (benefitsInView) benefitsControls.start("visible")
+        if (scheduleInView) scheduleControls.start("visible")
+        if (ctaInView) ctaControls.start("visible")
+    }, [
+        heroControls,
+        heroInView,
+        overviewControls,
+        overviewInView,
+        benefitsControls,
+        benefitsInView,
+        scheduleControls,
+        scheduleInView,
+        ctaControls,
+        ctaInView,
+    ])
+
+    // Animation variants
     const fadeIn = {
         hidden: { opacity: 0, y: 20 },
-        visible: {
+        visible: (i: number) => ({
             opacity: 1,
             y: 0,
-            transition: { duration: 0.6 }
+            transition: {
+                duration: 0.5,
+                ease: "easeOut",
+                delay: i * 0.1,
+            },
+        }),
+    }
+
+    const staggerContainer = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+            },
+        },
+    }
+
+    const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+        if (ref.current) {
+            ref.current.scrollIntoView({ behavior: "smooth", block: "start" })
         }
     }
 
+    // Get benefits with fallback to default if empty
+    const displayBenefits = data.benefits && data.benefits.length > 0 ? data.benefits : defaultBenefits
+
     return (
-        <div className="min-h-screen">
-            <div className='py-2 shadow-[0px_7px_14px_-10px_rgb(0,0,0,0.2)]'>
-                <div className="relative gap-3    container mx-auto flex items-center px-4 ">
-                    <div className='flex'>
-                        <img src="/images/logo.png" alt="" />
-                        <h3 className='text-base lg:block hidden font-medium my-auto '>EXPERTHUB INSTITUTE</h3>
+        <div className="min-h-screen bg-gradient-to-b from-white to-zinc-50">
+            {/* Navbar */}
+            <header className="fixed top-0 left-0 right-0 z-50 t backdrop-blur-md bg-[#f9f9f990] border-b border-[#d9d9d9]">
+                <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+
+                        <Image src={"/images/logo.png"} className="w-[50px] object-cover h-[50px]" alt="logo " width={50} height={50} />
+                        <h3 className="text-lg font-medium hidden md:block">Experthub</h3>
                     </div>
-                </div>
-            </div>
-            {/* Hero Section */}
 
-
-            <div className="relative gap-3   py-8 container mx-auto flex md:flex-row flex-col items-center px-4">
-                <div className="flex flex-col flex-1 justify-center h-full max-w-4xl">
-                    <motion.div
-                        initial="hidden"
-                        animate="visible"
-                        variants={fadeIn}
-                    >
-                        <div className="flex flex-wrap items-center gap-3 mb-6 ">
-                            <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium">
-                                {type === 'course' ? 'Course' : 'Event'}
-                            </span>
-                            {data.category && (
-                                <>
-                                    <ChevronRight className="w-4 h-4" />
-                                    <span className="px-3 py-1 rounded-full bg-black/10 text-sm">
-                                        {data.category}
-                                    </span>
-                                </>
+                    <nav className="hidden md:flex items-center gap-8">
+                        <button
+                            onClick={() => scrollToSection(overviewRef)}
+                            className={`text-sm font-medium transition-colors relative ${activeSection === "overview" ? "text-primary" : "text-zinc-600 hover:text-primary"}`}
+                        >
+                            Overview
+                            {activeSection === "overview" && (
+                                <motion.div
+                                    layoutId="activeSection"
+                                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                                />
                             )}
-                        </div>
-
-                        <h1 className="text-4xl lg:text-5xl font-medium  mb-3">
-                            {data.title}
-                        </h1>
-
-                        <p className="text-lg  mb-8 max-w-2xl line-clamp-4">
-                            {data.about}
-                        </p>
-                        <p className="text-lg  mb-2 max-w-2xl line-clamp-4">
-                            Basic Info
-                        </p>
-                        <div className="flex flex-wrap gap-6  mb-8">
-                            <div className="flex items-center gap-2 bg-white shadow-md px-4 py-2 rounded-full">
-                                <Calendar className="w-5 h-5 text-primary" />
-                                <span>{dayjs(data.startDate).format('MMM D, YYYY')}&nbsp;{data.endDate ? <span> to &nbsp; {dayjs(data.endDate).format('MMM D, YYYY')}</span> : ""}   </span>
-                            </div>
-                            {data.duration !== 0 && (
-                                <div className="flex items-center gap-2 bg-white shadow-md px-4 py-2 rounded-full">
-                                    <Clock className="w-5 h-5 text-primary" />
-                                    <span>{data.duration} hours</span>
-                                </div>
-                            )}
-                            {data.enrolledStudents?.length > 0 && (
-                                <div className="flex items-center gap-2 bg-white shadow-md px-4 py-2 rounded-full">
-                                    <Users className="w-5 h-5 text-primary" />
-                                    <span>{data.enrolledStudents.length} enrolled</span>
-                                </div>
-                            )}
-                            {data.type && (
-                                <div className="flex items-center gap-2 bg-white shadow-md px-4 py-2 rounded-full">
-                                    {data.type === 'online' ? (
-                                        <Video className="w-5 h-5 text-primary" />
-                                    ) : (
-                                        <MapPin className="w-5 h-5 text-primary" />
-                                    )}
-                                    <span className="capitalize">{data.type}</span>
-                                </div>
-                            )}
-                        </div>
-                        {data.author || data.instructorName && (
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
-                                    {data.instructorName.charAt(0) || data.author.charAt(0)}
-                                </div>
-                                <div className="">
-                                    <p className="font-medium">{data.instructorName || data.author}</p>
-                                    <p className="text-sm text-black/60">Instructor</p>
-                                </div>
-                            </div>
+                        </button>
+                        {displayBenefits.length > 0 && (
+                            <button
+                                onClick={() => scrollToSection(benefitsRef)}
+                                className={`text-sm font-medium transition-colors relative ${activeSection === "benefits" ? "text-primary" : "text-zinc-600 hover:text-primary"}`}
+                            >
+                                Benefits
+                                {activeSection === "benefits" && (
+                                    <motion.div
+                                        layoutId="activeSection"
+                                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                                    />
+                                )}
+                            </button>
                         )}
-                    </motion.div>
+                        {data.days && data.days.length > 0 && (
+                            <button
+                                onClick={() => scrollToSection(scheduleRef)}
+                                className={`text-sm font-medium transition-colors relative ${activeSection === "schedule" ? "text-primary" : "text-zinc-600 hover:text-primary"}`}
+                            >
+                                Schedule
+                                {activeSection === "schedule" && (
+                                    <motion.div
+                                        layoutId="activeSection"
+                                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                                    />
+                                )}
+                            </button>
+                        )}
+                        {(data.author || data.instructorName) && (
+                            <button
+                                onClick={() => scrollToSection(instructorRef)}
+                                className={`text-sm font-medium transition-colors relative ${activeSection === "instructor" ? "text-primary" : "text-zinc-600 hover:text-primary"}`}
+                            >
+                                Instructor
+                                {activeSection === "instructor" && (
+                                    <motion.div
+                                        layoutId="activeSection"
+                                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
+                                    />
+                                )}
+                            </button>
+                        )}
+                    </nav>
+
+                    <EnrollButton
+                        type={type}
+                        data={data}
+                        className="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-all text-sm"
+                    />
                 </div>
-                <div>
-                    {data.thumbnail && (
-                        <Image
-                            src={data.thumbnail.url || data.thumbnail as unknown as string}
-                            alt={data.title}
-                            width={500}
-                            height={500}
-                            className=" object-cover w-[700px] p-[4px] bg-gradient-to-br from-primary to-blue-500 rounded-xl  bg-clip-border  h-[400px] "
-                        />
-                    )}
-                </div>
-            </div>
+            </header>
+
+            {/* Hero Section */}
+            <CourseHero
+                data={data}
+                type={type}
+                onPlayVideo={() => {
+                    setIsVideoPlaying(true)
+                    document.getElementById("preview-video")?.scrollIntoView({ behavior: "smooth" })
+                }}
+            />
+
+            {/* Stats Section */}
+            <CourseStats data={data} benefits={displayBenefits} />
 
             {/* Main Content */}
             <div className="container mx-auto px-4 py-12">
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Left Content */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-12">
+                        {/* Overview Section */}
                         <motion.section
-                            ref={ref}
+                            ref={(el) => {
+                                overviewRef.current = el as HTMLDivElement
+                                overviewInViewRef(el)
+                            }}
+                            variants={staggerContainer}
                             initial="hidden"
-                            animate={controls}
-                            variants={fadeIn}
-                            className="bg-white rounded-xl p-8 shadow-sm"
+                            animate={overviewControls}
+                            id="overview"
+                            className="scroll-mt-24"
                         >
-                            <h2 className="text-2xl font-medium mb-6">Overview</h2>
-                            <div className="prose max-w-none">
-                                <p className="text-slate-600 whitespace-pre-line">{data.about}</p>
+                            <motion.h2 variants={fadeIn} custom={0} className="text-2xl font-bold mb-2 text-zinc-900">
+                                Overview
+                            </motion.h2>
 
+                            <motion.div variants={fadeIn} custom={1} className="w-16 h-1 bg-primary rounded-full mb-6" />
 
-                            </div>
-                            {data.benefits && <div className='my-3 flex flex-col gap-2 mt-4'>
-                                <p className='font-medium text-xl'> Why you should enroll in this course</p>
-                                <div className=' flex flex-col '>
-                                    {data.benefits.map((single, index) => <div className='flex gap-3 items-center py-3 border-b border-slate-200 '>
-                                        <div className='w-8 h-8  bg-primary/25 border border-primary  flex items-center justify-center font-medium rounded-full'>
-                                            {index + 1}
-                                        </div>
-                                        <div className='flex-1'>{single}</div>
-                                    </div>)}
+                            <motion.div variants={fadeIn} custom={2} className="prose max-w-none text-zinc-700">
+                                <p className="whitespace-pre-line">{data.about}</p>
+                            </motion.div>
 
-
-
-                                </  div>
-                            </div>}
+                            {(data.videos?.length > 0 || data.videoUrl) && (
+                                <motion.div variants={fadeIn} custom={3} id="preview-video" className="mt-8">
+                                    <VideoPreview
+                                        data={{
+                                            videos: data.videos,
+                                            videoUrl: data.videoUrl,
+                                            thumbnail: data.thumbnail,
+                                            title: data.title,
+                                        }}
+                                        isPlaying={isVideoPlaying}
+                                        onPlay={() => setIsVideoPlaying(true)}
+                                    />
+                                </motion.div>
+                            )}
                         </motion.section>
 
-                        {data.type !== "pdf" && data.days && data.days.length > 0 && (
-                            <motion.section
-                                initial="hidden"
-                                animate={controls}
-                                variants={fadeIn}
-                                className="bg-white rounded-xl p-8 shadow-sm"
-                            >
-                                <h2 className="text-2xl font-medium mb-6">Schedule</h2>
-                                <div className="grid gap-4">
-                                    {data.days.filter(day => day.checked).map((day, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                                    <Calendar className="w-5 h-5 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium">{day.day}s</p>
-                                                    <p className="text-sm text-slate-500">Weekly</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-medium text-slate-900">
-                                                    {day.startTime
-                                                        ? dayjs(dayjs().format('YYYY-MM-DD') + ' ' + day.startTime).format('h:mm A')
-                                                        : "Check Venue"}
-                                                </p>
-                                                <p className="text-sm text-slate-500">
-                                                    {day.endTime
-                                                        ? dayjs(dayjs().format('YYYY-MM-DD') + ' ' + day.endTime).format('h:mm A')
-                                                        : "Check Venue"}
-                                                </p>
+                        {/* Benefits Section */}
+                        <BenefitsSection
+                            benefits={displayBenefits}
+                            benefitsRef={(el: RefObject<HTMLDivElement>) => {
+                                benefitsRef.current = el as any
+                                benefitsInViewRef(el as unknown as Element)
+                            }}
+                            benefitsControls={benefitsControls}
+                        />
 
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </motion.section>
-                        )}
+                        {/* Schedule Section */}
+                        <ScheduleSection
+                            data={data}
+                            scheduleRef={(el: RefObject<HTMLDivElement>) => {
+                                scheduleRef.current = el as any
+                                scheduleInViewRef(el as unknown as Element)
+                            }}
+                            scheduleControls={scheduleControls}
+                        />
 
+                        {/* Location Section */}
                         {data.location && (
                             <motion.section
+                                variants={staggerContainer}
                                 initial="hidden"
-                                animate={controls}
-                                variants={fadeIn}
-                                className="bg-white rounded-xl p-8 shadow-sm"
+                                animate={scheduleControls}
+                                className="scroll-mt-24"
                             >
-                                <h2 className="text-2xl font-medium mb-6">Location</h2>
-                                <div className="p-6 rounded-lg bg-slate-50 border border-slate-100">
+                                <motion.h2 variants={fadeIn} custom={0} className="text-2xl font-bold mb-2 text-zinc-900">
+                                    Location
+                                </motion.h2>
+
+                                <motion.div variants={fadeIn} custom={1} className="w-16 h-1 bg-primary rounded-full mb-6" />
+
+                                <motion.div
+                                    variants={fadeIn}
+                                    custom={2}
+                                    whileHover={{ scale: 1.03 }}
+                                    className="p-6 rounded-lg bg-white border border-zinc-100 shadow-sm"
+                                >
                                     <div className="flex items-start gap-4">
                                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                                             <MapPin className="w-5 h-5 text-primary" />
                                         </div>
                                         <div>
-                                            <h3 className="font-medium text-lg mb-2">Venue Details</h3>
-                                            <p className="text-slate-600 mb-1">{data.location}</p>
+                                            <h3 className="font-medium text-lg mb-2 text-zinc-900">Venue Details</h3>
+                                            <p className="text-zinc-700 mb-1">{data.location}</p>
                                             {data.room && (
-                                                <p className="text-slate-600"><span className='text-black'>Room:</span> {data.room}</p>
+                                                <p className="text-zinc-700">
+                                                    <span className="font-medium">Room:</span> {data.room}
+                                                </p>
                                             )}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             </motion.section>
                         )}
+
+                        {/* Instructor Section */}
+                        {(data.instructor || data.author || data.instructorName) && (
+                            <motion.section
+                                ref={instructorRef}
+                                variants={staggerContainer}
+                                initial="hidden"
+                                animate={scheduleControls}
+                                id="instructor"
+                                className="scroll-mt-24"
+                            >
+                                <motion.h2 variants={fadeIn} custom={0} className="text-2xl font-bold mb-2 text-zinc-900">
+                                    Meet Your Instructor
+                                </motion.h2>
+
+                                <motion.div variants={fadeIn} custom={1} className="w-16 h-1 bg-primary rounded-full mb-6" />
+
+                                <motion.div
+                                    variants={fadeIn}
+                                    custom={2}
+                                    whileHover={{ scale: 1.01 }}
+                                    className="p-6 duration-300 rounded-lg bg-white border border-zinc-100 shadow-sm"
+                                >
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        {/* Instructor Image/Avatar */}
+                                        <div className="flex items-center  rounded-full">
+                                            {data.instructor?.profilePicture || data.instructor?.image ? (
+                                                <Image
+                                                    src={data.instructor.profilePicture || data.instructor.image}
+                                                    alt={data.instructor.fullname || data.instructor.name || "Instructor"}
+                                                    width={120}
+                                                    height={120}
+                                                    className=" border  object-cover w-[120px] h-[120px] shadow-[0px_0px_20px_0px_rgba(200,200,150,0.7)] rounded-full"
+                                                />
+                                            ) : (
+                                                <div className="w-[120px] h-[120px] shadow-[0px_0px_20px_0px_rgba(200,200,150,0.7)] rounded-full bg-primary/20 flex items-center justify-center text-primary text-4xl font-bold">
+                                                    {(
+                                                        data.instructor?.fullname ||
+                                                        data.instructor?.name ||
+                                                        data.instructorName ||
+                                                        data.author ||
+                                                        ""
+                                                    ).charAt(0)}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Instructor Details */}
+                                        <div className="flex-1 space-y-4">
+                                            <div>
+                                                <h3 className="font-bold text-xl text-zinc-900">
+                                                    {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author}
+                                                </h3>
+                                                <p className="text-primary font-medium">
+                                                    {data.instructor?.role === "tutor" ? "Expert Instructor" : "Course Instructor"}
+                                                </p>
+
+                                                <p className="mt-4 text-[#707070]">An experienced and passionate educator on Experthub, {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author} brings expert knowledge and a commitment to helping learners grow. With a focus on practical skills and student success, also  delivers engaging, high-quality content tailored for today's learners.</p>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </motion.section>
+                        )}
+                        {/* Testimonials Section */}
+                        <TestimonialsSection />
                     </div>
 
                     {/* Right Sidebar */}
-                    <div>
-                        <div className="sticky top-4 space-y-6">
-                            <motion.div
-                                initial="hidden"
-                                animate="visible"
-                                variants={fadeIn}
-                                className="bg-white rounded-xl p-6 shadow-sm"
-                            >
-                                <div className="mb-6">
-                                    <div className="flex items-center justify-between mb-2">
-                                        {data.fee > 0 ? (
-                                            <div>
-                                                <p className="text-3xl font-medium">${data.fee}</p>
-                                                {data.strikedFee && (
-                                                    <p className="text-slate-400 line-through">
-                                                        ${data.strikedFee}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <p className="text-3xl font-medium text-green-500">Free</p>
-                                        )}
-                                        {data.target && (
-                                            <div className="text-right">
-                                                <p className="text-sm text-slate-500">Capacity</p>
-                                                <p className="font-medium">{data.target} seats</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {data.enrolledStudents?.length > 0 && (
-                                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                                            <Star className="w-4 h-4 fill-primary text-primary" />
-                                            <span>{data.enrolledStudents.length} already enrolled</span>
-                                        </div>
-                                    )}
-                                </div>
+                    <CourseSidebar data={data} type={type} />
+                </div>
+            </div>
 
+            {/* CTA Section */}
+            <motion.section
+                ref={ctaRef}
+                variants={staggerContainer}
+                initial="hidden"
+                animate={ctaControls}
+                className="py-16 bg-gradient-to-r from-primary/90 to-blue-600 text-white"
+            >
+                <div className="container mx-auto px-4">
+                    <div className="max-w-2xl mx-auto text-center">
+                        <motion.h2 variants={fadeIn} custom={0} className="text-3xl font-bold mb-4">
+                            Ready to Transform Your Skills?
+                        </motion.h2>
+
+                        <motion.p variants={fadeIn} custom={1} className="text-white/90 mb-8">
+                            Join thousands of satisfied students and take the next step in your learning journey.
+                        </motion.p>
+
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <div  >
                                 <EnrollButton
                                     type={type}
                                     data={data}
-                                    className="w-full bg-primary text-black font-medium py-3 px-6 rounded-lg hover:bg-primary/90 transition-colors mb-6"
+                                    className="bg-white text-primary hover:bg-white/90 font-medium py-3 px-6 rounded-lg transition-all"
                                 />
+                            </div>
 
-                                <div className="space-y-4 border-t border-slate-200 pt-6">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                            <Calendar className="w-5 h-5 text-primary" />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">Start Date</p>
-                                            <p className="text-sm text-slate-600">
-                                                {dayjs(data.startDate).format('MMMM D, YYYY')}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    {
-                                        data.endDate && <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                                <Calendar className="w-5 h-5 text-primary" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">End Date</p>
-                                                <p className="text-sm text-slate-600">
-                                                    {dayjs(data.startDate).format('MMMM D, YYYY')}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    }
-
-                                    {data.duration !== 0 && (
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                                <Clock className="w-5 h-5 text-primary" />
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">Duration</p>
-                                                <p className="text-sm text-slate-600">
-                                                    {data.duration} hours total
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {data.type && (
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                                {data.type === 'online' ? (
-                                                    <Video className="w-5 h-5 text-primary" />
-                                                ) : (
-                                                    <MapPin className="w-5 h-5 text-primary" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="font-medium">Type</p>
-                                                <p className="text-sm text-slate-600 capitalize">
-                                                    {data.type} {type}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </motion.div>
-                            <VideoPreview data={{ videoUrl: data.videoUrl, thumbnail: data.thumbnail }} />
+                            <motion.button
+                                onClick={() => document.getElementById("overview")?.scrollIntoView({ behavior: "smooth" })}
+                                className="bg-transparent border-2 border-white hover:bg-white/10 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center gap-2"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                Learn More <ArrowRight className="w-4 h-4" />
+                            </motion.button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </motion.section>
+
+            {/* Footer */}
+            <footer className="bg-zinc-900 text-white py-8">
+                <div className="container mx-auto px-4">
+                    <div className="flex flex-col md:flex-row justify-between items-center">
+                        <div className="flex items-center mb-4 md:mb-0">
+                            <Image src={"/images/logo.png"} className="w-[50px] object-cover h-[50px]" alt="logo " width={50} height={50} />
+
+                            <span className="ml-2 text-lg font-bold">Experthub</span>
+                        </div>
+
+                        <div className="text-sm text-zinc-400">© {new Date().getFullYear()} Experthub. All rights reserved.</div>
+                    </div>
+                </div>
+            </footer>
         </div>
     )
 }
-

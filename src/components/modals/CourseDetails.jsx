@@ -17,6 +17,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import Link from 'next/link';
 import WebinarVideo from '../video-component';
+import ShareSection from './course-share';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -337,7 +338,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
           />
 
           <Slide in={open} mountOnEnter unmountOnExit timeout={300}>
-            <div className='fixed z-[1000] top-10 bottom-10 left-0 rounded-md right-0 lg:w-[80%] overflow-y-auto w-[95%] mx-auto  bg-[#F8F7F4]'>
+            <div className='fixed  z-[1000] top-10 bottom-10 left-0 rounded-md right-0 lg:w-[80%] overflow-y-auto w-[95%] mx-auto  bg-[#F8F7F4]'>
               <div className='shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38]  p-4 lg:px-12 flex justify-between'>
                 <p className='font-medium capitalize'>{action} Details</p>
                 <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" />
@@ -377,23 +378,25 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                           <p className='text-sm'>Certificate of completion</p>
                         </div>}
                       </div>
-                      {
-                        type === "view" ? course.type === "online" ? true ? <button onClick={() => startMeeting()} className='bg-primary p-2 my-3 rounded-md px-8 w-[150px]'>{loading ? <Spin /> : "Join Live"}</button> : null : user.role !== 'student' ?
-                          <button onClick={() => router.push(`/${action === "Course" ? course.type : "event"}}/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button> :
-                          action === "Event" ? null : <button onClick={() => router.push(`/applicant/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button>
-                          : <button onClick={() => {
-                            if (user.id) {
-                              parseInt(course.fee) === 0 ? checkTyoe() : setIsModalOpen(true)
 
-                            } else {
-                              router.push(`/auth/signup?enroll=${course._id}`)
-                            }
-                          }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
-                      }
-                      <div>
-                        <Link className='text-primary border border-primary  inline-block p-2 my-2 rounded-md px-8 hover:bg-primary/50 hover:border-black hover:text-black duration-300 ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
+                      <div className='w-[200px] flex flex-col'>
+                        {
+                          type === "view" ? course.type === "online" ? true ? <button onClick={() => startMeeting()} className='bg-primary p-2 my-3 rounded-md px-8 w-full'>{loading ? <Spin /> : "Join Live"}</button> : null : user.role !== 'student' ?
+                            <button onClick={() => router.push(`/${action === "Course" ? course.type : "event"}}/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button> :
+                            action === "Event" ? null : <button onClick={() => router.push(`/applicant/${course._id}?page=${action === "Course" ? course.type : "event"}`)} className='bg-primary p-2 my-3 rounded-md px-8'>{course.type}</button>
+                            : <button onClick={() => {
+                              if (user.id) {
+                                parseInt(course.fee) === 0 ? checkTyoe() : setIsModalOpen(true)
+
+                              } else {
+                                router.push(`/auth/signup?enroll=${course._id}`)
+                              }
+                            }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
+                        }
+                        <Link className='text-primary border border-black/55 text-center  inline-block p-2 my-2 rounded-md px-8 hover:bg-primary/50 hover:border-black hover:text-black duration-300 w-full ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
 
                       </div>
+
                     </div>
                     {course.type === "offline" && type === "view" ? <div className='text-sm'>
                       <p><span className='font-bold'>Location:</span> {course.location}</p>
@@ -514,6 +517,8 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                         </div>)}
                       </div>}
                     </div>}
+
+                    <ShareSection courseTitle={course.title} courseDescription={course.description} marketLink={`${window.location.origin}/${action === "Course" ? "courses" : "events"}/${course._id}`} />
                   </div>
                 </div>
               </div>

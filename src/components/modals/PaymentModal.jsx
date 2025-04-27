@@ -7,8 +7,8 @@ const PaymentModal = ({ isOpen, onClose, card, wallet }) => {
 
   const [loader, setLoading] = useState(false)
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 !z-[999999]">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-md">
+    <div className="fixed h-screen w-full !top-0 !left-0 flex items-center justify-center bg-black bg-opacity-50 !z-[9999999999]">
+      <div className="bg-white !text-black p-8 rounded-lg shadow-lg w-11/12 max-w-md">
         <h2 className="text-2xl font-bold mb-4">Payment Method</h2>
         <p className="mb-6">Choose your payment method:</p>
         {loader ? <div className='w-full text-center'>

@@ -41,8 +41,10 @@
     "src/components/Wallet.jsx",
     "src/components/date-time-pickers/TimePicker.jsx",
     "src/components/modals/GoPremuium.jsx",
-    "src/app/tutor/plans/components/plans.sx"
-, "src/components/date-time-pickers/ScheduledCourse.jsx", "src/utils/trackPage.ts"  ],
+    "src/app/tutor/plans/components/plans.sx",
+    "src/components/date-time-pickers/ScheduledCourse.jsx",
+    "src/utils/trackPage.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

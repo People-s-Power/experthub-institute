@@ -6,9 +6,9 @@ import apiService from "@/utils/apiService"
 export async function getCourse(id: string): Promise<CourseTypeSingle | null> {
     try {
         const response = await apiService.get(`courses/single-course/${id}`)
-        console.log(response.data.course);
+        console.log(response.data.instructor);
 
-        return response.data.course
+        return { ...response.data.course, instructor: response.data.instructor }
     } catch (e) {
         console.log(e)
         return null
@@ -19,7 +19,7 @@ export async function getEvent(id: string): Promise<EventTypeSingle | null> {
     try {
         const response = await apiService.get(`events/${id}`)
 
-        return response.data.course
+        return { ...response.data.course, instructor: response.data.instructor }
     } catch (e) {
         console.log(e)
         return null
