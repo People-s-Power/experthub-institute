@@ -20,7 +20,7 @@ import isBetween from "dayjs/plugin/isBetween"
 import advancedFormat from "dayjs/plugin/advancedFormat"
 import SelectCourseDate from "../date-time-pickers/SelectCourseDate"
 import SheduledCourse from "../date-time-pickers/ScheduledCourse"
-import { usePathname, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { jwtDecode } from "jwt-decode"
 import { setUser } from "@/store/slices/userSlice"
 
@@ -78,7 +78,7 @@ const AddCourse = ({
   const [loading, setLoading] = useState(false)
   const [students, setStudents] = useState<{ label: string; value: string }[]>([])
   const [myStudents, setMyStudents] = useState<{ id: string; fullname: string }[]>([])
-
+  const router=useRouter()
   const [scholarship, setScholarship] = useState([])
   const [audience, setAudience] = useState([])
   const searchParams = useSearchParams()
@@ -618,7 +618,7 @@ const AddCourse = ({
 
           // Clear localStorage after successful submission
           localStorage.removeItem("pendingCourseData")
-
+          router.push(`/courses/${response.data.course._id}`)
           handleClick()
         })
         .catch((error) => {

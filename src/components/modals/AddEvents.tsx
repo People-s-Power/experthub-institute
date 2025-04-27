@@ -525,7 +525,8 @@ const AddEvents = ({
           // Clear localStorage after successful submission
           localStorage.removeItem("pendingEventData")
 
-          router.refresh()
+          router.push(`/events/${response.data.event._id}`)
+
           handleClick()
         })
         .catch((error) => {
