@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
-const verify = ({ hideBg, onClose }: { hideBg?: boolean, onClose: () => void }) => {
+const verify = () => {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const [code, setCode] = useState("")
@@ -58,10 +58,7 @@ const verify = ({ hideBg, onClose }: { hideBg?: boolean, onClose: () => void }) 
   }
   return (
     <main >
-      {
-        !hideBg && <img src="/images/auth-bg.png" className='h-[100vh] w-full' alt="" />
-
-      }
+      <img src="/images/auth-bg.png" className='h-[100vh] w-full' alt="" />
       <section className='absolute top-32 left-0 right-0 mx-auto lg:w-[30%] w-[95%]'>
         <section className='rounded-md bg-white border border-[#FDC3327D] p-10 '>
           {success === false ? <div>
