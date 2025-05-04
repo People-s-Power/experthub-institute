@@ -227,7 +227,7 @@ export default function Plans() {
                                     <button onClick={() => {
                                         setPaymentInfo({ amount: isYearly ? plan.price.yearly.amount : plan.price.monthly.amount, plan: plan.name, planId: isYearly ? plan.price.yearly.payment_id : plan.price.monthly.payment_id })
                                         setOpen(true)
-                                    }} className="bg-yellow-500 text-black font-semibold uppercase py-2 px-4 rounded-lg shadow-[0px_4px_2px_-1px_rgb(0,0,0,0.5)] mt-9 mx-auto hover:shadow-none duration-300">
+                                    }} className="bg-primary text-black font-semibold uppercase py-2 px-4 rounded-lg shadow-[0px_4px_2px_-1px_rgb(0,0,0,0.5)] mt-9 mx-auto hover:shadow-none duration-300">
                                         {plan.buttonLabel}
                                     </button>
                                 </div>

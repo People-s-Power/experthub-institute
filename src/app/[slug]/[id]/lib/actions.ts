@@ -6,7 +6,7 @@ import apiService from "@/utils/apiService"
 export async function getCourse(id: string): Promise<CourseTypeSingle | null> {
     try {
         const response = await apiService.get(`courses/single-course/${id}`)
-        console.log(response.data.instructor);
+        // console.log(JSON.stringify(response.data.course));
 
         return { ...response.data.course, instructor: response.data.instructor }
     } catch (e) {

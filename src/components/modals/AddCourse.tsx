@@ -23,6 +23,7 @@ import SheduledCourse from "../date-time-pickers/ScheduledCourse"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { jwtDecode } from "jwt-decode"
 import { setUser } from "@/store/slices/userSlice"
+import { Trash, Trash2 } from "lucide-react"
 
 dayjs.extend(isBetween)
 dayjs.extend(advancedFormat)
@@ -62,7 +63,7 @@ const AddCourse = ({
   const [fileName, setFileName] = useState("")
 
   const [liveCourses, setLiveCourses] = useState([])
-  const [courseDuration, setCourseDuration] = useState<number>(0)
+  const [courseDuration, setCourseDuration] = useState<number>(course?.daration || 0)
   const [timeframe, setTimeframe] = useState("days")
 
   const [userProfile, setUserProfile] = useState<any>()
@@ -78,7 +79,7 @@ const AddCourse = ({
   const [loading, setLoading] = useState(false)
   const [students, setStudents] = useState<{ label: string; value: string }[]>([])
   const [myStudents, setMyStudents] = useState<{ id: string; fullname: string }[]>([])
-  const router=useRouter()
+  const router = useRouter()
   const [scholarship, setScholarship] = useState([])
   const [audience, setAudience] = useState([])
   const searchParams = useSearchParams()
@@ -95,8 +96,21 @@ const AddCourse = ({
     title: "",
     description: "",
   }
-  const [videos, setVideos] = useState(course?.videos || [layout])
 
+  const defaultVideoLayout = {
+    title: "",
+    videoUrl: "",
+    video: null,
+    submodules: [],
+  };
+
+  const defaultSubmoduleLayout = {
+    title: "",
+    videoUrl: "",
+    video: null,
+  };
+
+  const [videos, setVideos] = useState(course?.videos || [defaultVideoLayout]);
   const [uploadedCount, setUploadedCount] = useState(0)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -152,6 +166,13 @@ const AddCourse = ({
   useEffect(() => {
     if (open) {
       const storedData = localStorage.getItem("pendingCourseData")
+      const open = localStorage.getItem("openCreate")
+      if (open) {
+        setActive(1)
+        setMeetingPlatform("google")
+        setType("online")
+        localStorage.removeItem("openCreate")
+      }
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData)
@@ -204,69 +225,90 @@ const AddCourse = ({
     setEndDate(undefined)
   }
 
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null)
+  const [playingIndex, setPlayingIndex] = useState<string | null>(null);
 
-  const handlePlayClick = (index: number) => {
-    const video = document.querySelector(`video.video${index}`) as HTMLVideoElement
+  const handlePlayClick = (mainIndex: number, subIndex: number | null = null) => {
+    const key = subIndex === null ? `${mainIndex}-main` : `${mainIndex}-${subIndex}`;
+    const selector =
+      subIndex === null
+        ? `.video-main-${mainIndex}`
+        : `.video-sub-${mainIndex}-${subIndex}`;
+    const video = document.querySelector(selector) as HTMLVideoElement;
 
     if (video) {
       if (video.paused) {
-        video.play()
-        setPlayingIndex(index)
+        video.play();
+        setPlayingIndex(key);
       } else {
-        video.pause()
-        setPlayingIndex(null)
+        video.pause();
+        setPlayingIndex(null);
       }
     }
-  }
+  };
 
-  const uploadVideo = async (index: number) => {
+  const uploadSingleVideo = async (
+    mainIndex: number,
+    subIndex: number | null,
+    file: File,
+    existingUrl: string,
+    totalCount: number
+  ) => {
+    if (!file || existingUrl.includes("res.cloudinary.com")) return;
+
     try {
-      const { video, videoUrl } = videos[index]
 
-      if (videoUrl.includes(`res.cloudinary.com`)) return
-      if (!video) return
-      const { data } = await apiService.get("courses/cloudinary/signed-url")
-      console.log(data)
+      const { data } = await apiService.get("courses/cloudinary/signed-url");
 
-      const formData = new FormData()
-      formData.append("file", video)
-      formData.append("api_key", data.apiKey)
-      formData.append("timestamp", data.timestamp)
-      formData.append("signature", data.signature)
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", data.apiKey);
+      formData.append("timestamp", data.timestamp);
+      formData.append("signature", data.signature);
 
       const { data: dataCloud } = await apiService.post(
         `https://api.cloudinary.com/v1_1/${data.cloudname}/video/upload`,
         formData,
         {
           onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))
-            setUploadProgress(percentCompleted)
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / (progressEvent.total || 1)
+            );
+            setUploadProgress(percent); // For this individual upload
           },
-        },
-      )
-      console.log(dataCloud)
-
-      setUploadedCount((prev) => prev + 1)
-      setVideos((prevVideos) => {
-        const updatedVideos = [...prevVideos]
-        updatedVideos[index] = {
-          ...updatedVideos[index],
-          videoUrl: dataCloud.secure_url,
         }
-        return updatedVideos
-      })
+      );
+
+      setUploadedCount((prev) => prev + 1);
+      const updated = videos;
+      if (subIndex === null) {
+        updated[mainIndex].videoUrl = dataCloud.secure_url;
+      } else {
+        updated[mainIndex].submodules[subIndex].videoUrl = dataCloud.secure_url;
+      }
+      setVideos(updated)
+      return updated
     } catch (e) {
-      console.error(e, `\n from uploader`)
-      throw e
+      console.error(e, "from uploader");
+      throw e;
     }
-  }
+  };
+
 
   const getCategories = () => {
     apiService
       .get("category/all")
       .then((response) => {
         setCategories(response.data.category)
+        // use course.catgory which is sub catrgry to get the main catgory
+        if (course?.category) {
+          const mainCategory = response.data.category.find((cat: any) => cat.subCategory.find((sub: any) => sub === course?.category))
+
+          console.log(mainCategory);
+
+          setCategoryIndex(mainCategory.category)
+        }
+
+
       })
       .catch((error) => {
         console.log(error)
@@ -327,30 +369,51 @@ const AddCourse = ({
     return setDays(updatedObjects)
   }
 
-  const handleInputChange = (index: number, field: string, value: string | number) => {
-    const updatedObjects = [...videos]
-    updatedObjects[index] = { ...updatedObjects[index], [field]: value }
-    setVideos(updatedObjects)
-  }
+  const handleInputChange = (mainIndex: number, field: string, value: any, subIndex = null) => {
+    setVideos((prev) => {
+      const updated = [...prev];
+      if (subIndex === null) {
+        updated[mainIndex][field] = value;
+      } else {
+        updated[mainIndex].submodules[subIndex][field] = value;
+      }
+      return updated;
+    });
+  };
 
-  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, index: any) => {
-    const files = e.target.files
-    if (files && files.length > 0) {
-      const updatedObjects = [...videos]
-      const videoUrl = URL.createObjectURL(files[0])
-      updatedObjects[index] = { ...updatedObjects[index], video: files[0], videoUrl }
-      setVideos(updatedObjects)
-    }
-  }
 
-  const removeVideo = (index: number) => {
-    const newVideos = videos.filter((_, i) => i !== index)
-    if (newVideos.length === 0) {
-      setVideos([...newVideos, layout])
-    } else {
-      setVideos([...newVideos])
-    }
-  }
+  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, mainIndex: number, subIndex = null) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const videoUrl = URL.createObjectURL(file);
+
+    setVideos((prev) => {
+      const updated = [...prev];
+      if (subIndex === null) {
+        updated[mainIndex].video = file;
+        updated[mainIndex].videoUrl = videoUrl;
+      } else {
+        updated[mainIndex].submodules[subIndex].video = file;
+        updated[mainIndex].submodules[subIndex].videoUrl = videoUrl;
+      }
+      return updated;
+    });
+  };
+
+  const deleteMainVideo = (index: number) => {
+    setVideos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const deleteSubmodule = (mainIndex: number, subIndex: number) => {
+    setVideos((prev) => {
+      const updated = [...prev];
+      updated[mainIndex].submodules = updated[mainIndex].submodules.filter(
+        (_: any, i: number) => i !== subIndex
+      );
+      return updated;
+    });
+  };
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -393,41 +456,196 @@ const AddCourse = ({
     return arrayOfIds
   }
 
-  const edit = () => {
+  const edit = async () => {
     try {
-      setLoading(true)
-      const startDateTime = dayjs.utc(`${startDate}T${startTime}:00`)
-      const endDateTime = dayjs.utc(`${endDate}T${endTime}:00`)
+      if (type === "online" && meetingPlatform === "google" && !user.isGoogleLinked) {
+        // Save form data to localStorage
+        localStorage.setItem(
+          "pendingCourseData",
+          JSON.stringify({
+            title,
+            about,
+            benefits,
+            modules,
+            category,
+            image,
+            startDate,
+            endDate,
+            instant,
+            startTime,
+            endTime,
+            days,
+            duration,
+            type,
+            privacy,
+            fee,
+            strikedFee: striked,
+            room,
+            location,
+            meetingType: meetingPlatform,
+            courseDuration,
+            timeframe,
+            scholarship: getScholarship(),
+            audience: Array.from(
+              new Set(
+                audience.flatMap((data: any) => {
+                  if (data.value === "students") {
+                    return myStudents.map((data2) => data2.id)
+                  }
+                  return data.value
+                }),
+              ),
+            ),
+          }),
+        )
+
+        // Redirect to Google sign-in
+        console.log(apiService.getUri())
+
+        window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
+        return
+      }
+
+      let newVideos;
+      if (type === "video") {
+        const incompleteModules = videos.some(
+          (v) => !v.title.trim() || (!v.video && !v.videoUrl) || v.submodules.some((s: any) => !s.title.trim() || (!s.video && !s.videoUrl))
+        );
+
+        if (incompleteModules) {
+          setActive(1)
+
+          return api.open({
+            type: "error",
+            message: "Please remove or complete empty modules or submodules before submitting.",
+          });
+        }
+        setUploading(true);
+        setUploadedCount(0);
+        setUploadProgress(0);
+
+        const totalCount =
+          videos.length + videos.reduce((count, video) => count + video.submodules.length, 0);
+
+        try {
+          for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
+
+            // Upload main video
+            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount);
+
+            // Upload each submodule
+            for (let j = 0; j < video.submodules.length; j++) {
+              const sub = video.submodules[j];
+              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount);
+            }
+
+
+          }
+
+          setUploading(false);
+        } catch (e) {
+          console.error(e);
+          setUploading(false);
+          return api.open({
+            message: `Something went wrong during video upload`,
+          });
+        }
+      }
+
+
+
+      const requiredFields = {
+        title,
+        about,
+        benefits,
+        modules,
+        category,
+        image,
+        ...(type === "offline" && { startDate, endDate, startTime, endTime, room, location }),
+        ...(type === "online" && {
+          startDate,
+          endDate,
+          ...(instant ? { startTime, endTime } : { days: days.filter((day: any) => day.checked).length }),
+        }),
+        ...(type === "video" && { videos }),
+        ...(type === "pdf" && { pdf }),
+      }
+
+      const missingFields = Object.entries(requiredFields)
+        .filter(([key, value]) => !value || (Array.isArray(value) && value.length === 0))
+        .map(([key]) => key)
+
+      if (missingFields.length > 0) {
+        return api.open({
+          message: `Please fill in the following fields: ${missingFields.join(", ")}`,
+        })
+      }
+
+      const startDateTime =
+        type === "video" || type === "pdf"
+          ? dayjs()
+          : dayjs.utc(
+            `${dayjs(startDate || "").format(`YYYY-MM-DD`)}T${instant ? startTime : days.filter((day: any) => day.checked)[0]?.startTime
+            }:00`,
+          )
+      const endDateTime =
+        type === "video" || type === "pdf"
+          ? dayjs()
+          : dayjs.utc(
+            `${dayjs(endDate || "").format(`YYYY-MM-DD`)}T${instant ? endTime : days.filter((day: any) => day.checked)[0]?.endTime
+            }:00`,
+          )
+
       const startDateJS = startDateTime.toDate()
       const endDateJS = endDateTime.toDate()
+
+      setLoading(true)
+
+      const streamlinedAudience = Array.from(
+        new Set(
+          audience.flatMap((data: any) => {
+            if (data.value === "students") {
+              return myStudents.map((data2) => data2.id)
+            }
+            return data.value
+          }),
+        ),
+      )
+
+      console.log(newVideos);
+
       apiService
         .put(`courses/edit/${course?._id}`, {
-          // image,
+          image,
+          // asset: image,
           title,
-          benefits,
-          days: days,
+          target,
           about,
-          modules,
           duration: duration.toString(),
-          type,
+          // type,
           startDate: new Date(startDateJS).toISOString(),
           endDate: new Date(endDateJS).toISOString(),
-          target,
-          startTime,
-          endTime,
-          category,
+          startTime: startTime,
+          endTime: endTime,
+          category: category === "" ? categoryIndex : category,
           privacy,
           fee: fee.toString(),
           strikedFee: striked.toString(),
-          enrolledStudents: course && [...course?.enrolledStudents, ...getScholarship()],
           room,
+          modules,
           location,
+          videos: newVideos || [],
+          pdf,
+          days,
+          benefits,
           timeframe: {
             value: courseDuration,
             unit: timeframe,
           },
-          // videos,
-          // pdf
+          scholarship: getScholarship(),
+          audience: streamlinedAudience,
+          meetingType: meetingPlatform,
         })
         .then((response) => {
           console.log(response.data)
@@ -438,7 +656,11 @@ const AddCourse = ({
       console.log(e)
     }
   }
-
+  const handleGoogleLogin = async () => {
+    localStorage.setItem("openCreate", "true")
+    window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
+    return
+  }
   const add = async () => {
     try {
       if (type === "online" && meetingPlatform === "google" && !user.isGoogleLinked) {
@@ -488,35 +710,57 @@ const AddCourse = ({
         window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
         return
       }
+
+      let newVideos;
       if (type === "video") {
-        console.log(videos.filter((video) => video.video === null))
+        const incompleteModules = videos.some(
+          (v) => !v.title.trim() || !v.video || v.submodules.some((s: any) => !s.title.trim() || !s.video)
+        );
 
-        if (videos.some((video) => !video.video)) {
+        if (incompleteModules) {
+          setActive(1)
+
           return api.open({
-            message: `You must upload a video file to create this course`,
-          })
+            type: "error",
+            message: "Please remove or complete empty modules or submodules before submitting.",
+          });
         }
+        setUploading(true);
+        setUploadedCount(0);
+        setUploadProgress(0);
 
-        setUploading(true)
-        console.log(videos)
+        const totalCount =
+          videos.length + videos.reduce((count, video) => count + video.submodules.length, 0);
 
         try {
-          await Promise.all(videos.map((_, index) => uploadVideo(index)))
+          for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
+
+            // Upload main video
+            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount);
+
+            // Upload each submodule
+            for (let j = 0; j < video.submodules.length; j++) {
+              const sub = video.submodules[j];
+              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount);
+            }
+          }
+
+          setUploading(false);
         } catch (e) {
-          console.error(e)
-          setUploading(false)
+          console.error(e);
+          setUploading(false);
           return api.open({
             message: `Something went wrong during video upload`,
-          })
+          });
         }
-
-        setUploading(false)
       }
+
 
       if (type === `online` && conflict) {
         setActive(1)
         return api.open({
-          message: "You have chosen a disabled time, please check",
+          message: "You have chosen a disabled time, please check or use another platform",
         })
       }
 
@@ -597,7 +841,7 @@ const AddCourse = ({
           room,
           modules,
           location,
-          videos,
+          videos: newVideos || [],
           pdf,
           days,
           benefits,
@@ -729,6 +973,8 @@ const AddCourse = ({
         const decoded: any = jwtDecode(encodedData)
 
         if (decoded) {
+          console.log(decoded);
+
           dispatch(
             setUser({
               ...user,
@@ -738,15 +984,16 @@ const AddCourse = ({
 
           // Clear the URL params without refreshing
           const newUrl = window.location.pathname
-          window.history.replaceState({}, "", newUrl)
-
           api.open({
             message: "Google account linked successfully, Continue adding course",
             type: "success",
           })
+          window.history.replaceState({}, "", newUrl)
+
+
 
           // Check for pending course data and open modal if exists
-          const storedData = localStorage.getItem("pendingCourseData")
+          const storedData = localStorage.getItem("pendingCourseData") || localStorage.getItem("openCreate")
           if (storedData) {
             setOpen(true)
           }
@@ -772,7 +1019,7 @@ const AddCourse = ({
     <div>
       <div
         onClick={() => handleClick()}
-        className="fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10"
+        className="fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-[999999s]"
       ></div>
       <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[70%] w-[95%] mx-auto z-20 bg-[#F8F7F4]">
         <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12 flex justify-between">
@@ -1034,7 +1281,8 @@ const AddCourse = ({
                             <select
                               onChange={handleTypeChange}
                               value={type}
-                              className="border rounded-md w-full border-[#1E1E1ED9] p-2.5 bg-transparent"
+                              disabled={Boolean(course?.type)}
+                              className="border disabled:cursor-not-allowed rounded-md w-full border-[#1E1E1ED9] p-2.5 bg-transparent"
                             >
                               <option value="offline">Offline</option>
                               <option value="online">Live</option>
@@ -1131,6 +1379,24 @@ const AddCourse = ({
                                 <option value="zoom">Zoom</option>
                                 <option value="google">Google Meet</option>
                               </select>
+                              {
+                                meetingPlatform === "google" && (!user.isGoogleLinked ? (
+                                  <p className="text-sm flex items-center gap-2 text-red-500">
+                                    You need to sign in with Google to create a live course.
+                                    <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                      Sign in with Google
+                                    </button>
+                                  </p>
+                                ) : (
+                                  <p className="flex items-center  gap-2">
+                                    <span >Email : <span className="font-medium">{userProfile?.gMail || "Connected"}</span></span>
+                                    <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                      Change account
+                                    </button>
+                                  </p>
+
+                                ))
+                              }
                             </div>
                             <div className="flex items-center border-b border-slate-500 my-5 gap-3 px-4">
                               <button
@@ -1310,92 +1576,140 @@ const AddCourse = ({
                           />
                         )}
                         {type === "video" && (
-                          <>
+                          <div className="mt-4 flex flex-col gap-3">
+                            <h2 className="font-medium ">Video Modules</h2>
                             {videos.map((video, index) => (
-                              <div key={index}>
-                                <div className="my-1">
-                                  <label className="text-sm font-medium my-1">Sub Title</label>
-                                  <input
-                                    onChange={(e) => handleInputChange(index, "title", e.target.value)}
-                                    value={video.title}
-                                    type="text"
-                                    className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
-                                  />
-                                </div>
-                                <input
-                                  onChange={(e) => handleVideo(e, index)}
-                                  type="file"
-                                  name="identification"
-                                  accept="video/*"
-                                  id={`video${index}`}
-                                  hidden
-                                  multiple={false}
-                                />
-                                <label className="flex cursor-pointer h-full   " htmlFor={`video${index}`}>
-                                  {video.videoUrl === "" ? (
-                                    <div className="w-full gap-1 flex items-center">
-                                      <span className="text-primary text-[18px]">
-                                        <Video />
-                                      </span>
-                                      <span className="text-sm">Add Video to Sub-title</span>
-                                    </div>
-                                  ) : (
-                                    <div className="relative w-[250px] group  h-full">
-                                      <video
-                                        key={video.videoUrl}
-                                        className={`rounded-lg w-full video${index}`}
-                                        width="250"
-                                      >
-                                        <source src={video.videoUrl} type="video/mp4" />
-                                      </video>
-                                      <div className="absolute inset-0 bg-[rgb(0,0,0,0.3)] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100 flex justify-center gap-2 items-center">
-                                        <button
-                                          className="text-primary text-[40px] transform scale-75 group-hover:scale-100 transition-transform duration-300"
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            e.preventDefault()
-                                            handlePlayClick(index)
-                                          }}
-                                        >
-                                          {playingIndex === index ? <Pause /> : <Play />}
-                                        </button>
-                                      </div>
-                                      <div className="absolute bg-[rgb(0,0,0,0.3)] bottom-0 w-full transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                                        <div className="px-3 py-1.5 flex items-center gap-3">
-                                          <label
-                                            title="Change Video"
-                                            htmlFor={`video${index}`}
-                                            className="cursor-pointer text-white hover:text-gray text-[13px]"
-                                          >
-                                            <Replace />
-                                          </label>
-                                          <button
-                                            className="text-white hover:text-red-400 text-[13px]"
-                                            title="remove video"
-                                            onClick={(e) => {
-                                              e.stopPropagation()
-                                              e.preventDefault()
-                                              removeVideo(index)
-                                            }}
-                                          >
-                                            <Bin />
-                                          </button>
+                              <div key={index} className=" border-b mb-3 pb-6 space-y-4">
+                                {/* Main Video */}
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1 space-y-2">
+                                    <input
+                                      value={video.title}
+                                      onChange={(e) => handleInputChange(index, "title", e.target.value)}
+                                      placeholder="Main Video Title"
+                                      className="w-full border p-2 rounded-md text-sm border-gray-300"
+                                    />
+                                    <input
+                                      type="file"
+                                      hidden
+                                      accept="video/*"
+                                      id={`main-${index}`}
+                                      onChange={(e) => handleVideo(e, index)}
+                                    />
+                                    <label htmlFor={`main-${index}`} className="group block w-[250px] cursor-pointer relative">
+                                      {video.videoUrl ? (
+                                        <div className="relative rounded-lg overflow-hidden">
+                                          <video className={`video-main-${index} w-full rounded-md`} width="250">
+                                            <source src={video.videoUrl} type="video/mp4" />
+                                          </video>
+                                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex justify-center items-center">
+                                            <button
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                handlePlayClick(index);
+                                              }}
+                                              className="text-white text-3xl"
+                                            >
+                                              {playingIndex === `${index}-main` ? <Pause /> : <Play />}
+                                            </button>
+                                          </div>
                                         </div>
-                                      </div>
-                                    </div>
-                                  )}
+                                      ) : (
+                                        <div className="text-sm text-gray-500 flex items-center gap-2">
+                                          <Video />
+                                          <span>Add Main Video</span>
+                                        </div>
+                                      )}
+                                    </label>
+                                  </div>
+                                  <button
+                                    onClick={() => deleteMainVideo(index)}
+                                    className="ml-4 text-red-500 mt-3 hover:text-red-700 text-sm"
+                                  >
+                                    <Trash className="w-5 h-5" />
+                                  </button>
+                                </div>
 
-                                  {/* <p className='text-sm'>{video.videoUrl === "" ?  : video.videoUrl.slice(0, 20)}</p> */}
-                                </label>
+                                {/* Submodules */}
+                                <div className="ml-4 pl-4 border-l border-gray-200">
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">Sub-modules</h4>
+                                  {video.submodules.map((sub: any, subIndex: any) => (
+                                    <div key={subIndex} className="flex items-start justify-between mb-4">
+                                      <div className="space-y-2 w-full">
+                                        <input
+                                          value={sub.title}
+                                          onChange={(e) =>
+                                            handleInputChange(index, "title", e.target.value, subIndex)
+                                          }
+                                          placeholder="Submodule Title"
+                                          className="w-full border p-2 rounded-md text-sm border-gray-300"
+                                        />
+                                        <input
+                                          type="file"
+                                          hidden
+                                          accept="video/*"
+                                          id={`sub-${index}-${subIndex}`}
+                                          onChange={(e) => handleVideo(e, index, subIndex)}
+                                        />
+                                        <label
+                                          htmlFor={`sub-${index}-${subIndex}`}
+                                          className="group block w-[180px] cursor-pointer relative"
+                                        >
+                                          {sub.videoUrl ? (
+                                            <div className="relative rounded-md overflow-hidden">
+                                              <video className={`video-sub-${index}-${subIndex} w-full`} width="180">
+                                                <source src={sub.videoUrl} type="video/mp4" />
+                                              </video>
+                                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex justify-center items-center">
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.preventDefault();
+                                                    handlePlayClick(index, subIndex);
+                                                  }}
+                                                  className="text-white text-2xl"
+                                                >
+                                                  {playingIndex === `${index}-${subIndex}` ? <Pause /> : <Play />}
+                                                </button>
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="text-sm text-gray-500 flex items-center gap-2">
+                                              <Video />
+                                              <span>Add Submodule Video</span>
+                                            </div>
+                                          )}
+                                        </label>
+                                      </div>
+                                      <button
+                                        onClick={() => deleteSubmodule(index, subIndex)}
+                                        className="ml-4 text-red-400 hover:text-red-600 mt-3 text-sm"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <button
+                                    className="text-xs text-blue-600 hover:underline"
+                                    onClick={() => {
+                                      const updated = [...videos];
+                                      updated[index].submodules.push({ ...defaultSubmoduleLayout });
+                                      setVideos(updated);
+                                    }}
+                                  >
+                                    + Add Submodule
+                                  </button>
+                                </div>
                               </div>
                             ))}
+
                             <button
-                              className="px-3 bg-gray rounded-md py-1 mt-4 font-medium"
-                              onClick={() => setVideos([...videos, layout])}
+                              className="mt-3 w-fit px-5  py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
+                              onClick={() => setVideos([...videos, { ...defaultVideoLayout }])}
                             >
-                              Add Videos{" "}
+                              + Add Main Video
                             </button>
-                          </>
+
+                          </div>
                         )}
                       </div>
                     )
@@ -1502,7 +1816,7 @@ const AddCourse = ({
                         <div style={{ width: `${uploadProgress}%` }} className="bg-primary h-2 rounded-md"></div>
                       </div>
                       <p className="text-[14px] text-slate-500">
-                        Uploaded {uploadedCount} of {videos.length} videos.
+                        Uploaded {uploadedCount} of {videos.length + videos.reduce((count, video) => count + video.submodules.length, 0)} videos.
                       </p>
                     </div>
                   </div>

@@ -141,6 +141,13 @@ const AddEvents = ({
   useEffect(() => {
     if (open) {
       const storedData = localStorage.getItem("pendingEventData")
+      const open = localStorage.getItem("openCreateEvent")
+      if (open) {
+        setActive(1)
+        setMeetingPlatform("google")
+        setType("online")
+        localStorage.removeItem("openCreateEvent")
+      }
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData)
@@ -205,7 +212,7 @@ const AddEvents = ({
           window.history.replaceState({}, "", newUrl)
 
           // Check for pending event data and open modal if exists
-          const storedData = localStorage.getItem("pendingEventData")
+          const storedData = localStorage.getItem("pendingEventData") || localStorage.getItem("openCreateEvent")
           if (storedData) {
             setOpen(true)
           }
@@ -398,7 +405,11 @@ const AddEvents = ({
       throw e
     }
   }
-
+  const handleGoogleLogin = async () => {
+    localStorage.setItem("openCreateEvent", "true")
+    window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
+    return
+  }
   const add = async () => {
     // Check if Google authentication is needed for online events
     if (type === "online" && meetingPlatform === "google" && !user.isGoogleLinked) {
@@ -826,6 +837,24 @@ const AddEvents = ({
                                   <option value="zoom">Zoom</option>
                                   <option value="google">Google Meet</option>
                                 </select>
+                                {
+                                  meetingPlatform === "google" && (!user.isGoogleLinked ? (
+                                    <p className="text-sm flex items-center gap-2 text-red-500">
+                                      You need to sign in with Google to create a live course.
+                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                        Sign in with Google
+                                      </button>
+                                    </p>
+                                  ) : (
+                                    <p className="flex items-center  gap-2">
+                                      <span >Email : <span className="font-medium">{userProfile?.gMail || "Connected"}</span></span>
+                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                        Change account
+                                      </button>
+                                    </p>
+
+                                  ))
+                                }
                               </div>
                               <SelectCourseDate
                                 setEndDate={setEndDate}

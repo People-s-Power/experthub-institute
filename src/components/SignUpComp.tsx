@@ -1,9 +1,10 @@
 import apiService from '@/utils/apiService';
 import { notification, Spin } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
+import { BsX } from 'react-icons/bs';
 
-const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean, action?: () => void }) => {
+const SignUpComp = ({ role, action, onClose, contact, className, innerClassName }: { role: string, contact?: boolean, action?: () => void, className?: string, innerClassName?: string, onClose?: () => void }) => {
   const [api, contextHolder] = notification.useNotification();
   const [active, setActive] = useState(false)
   const [fullname, setName] = useState("")
@@ -11,12 +12,13 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [country, setCountry] = useState("nigeria")
-  const [state, setState] = useState("")
+  // const [state, setState] = useState("")
   const [address, setAddress] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const pathname = usePathname()
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -62,45 +64,41 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
 
 
   const signupApplicant = async () => {
-    if (fullname && email && phone && country && state && address && password) {
-      if (password === confirmPassword) {
-        setLoading(true)
-        apiService.post(`/auth/register`, {
-          fullname,
-          email,
-          phone,
-          country,
-          contact,
-          state,
-          address,
-          password,
-          userType: role,
-          organizationName: orgName
+    if (fullname && email && phone && country && address && password) {
+      setLoading(true)
+      apiService.post(`/auth/register`, {
+        fullname,
+        email,
+        phone,
+        country,
+        contact,
+        // state,
+        address,
+        password,
+        userType: role,
+        organizationName: orgName
+      })
+        .then(function (response) {
+          console.log(response.data)
+          api.open({
+            message: response.data.message
+          });
+          setLoading(false)
+          if (action) {
+            localStorage.setItem("id", response.data.id)
+            action()
+          } else {
+            router.push(`/auth/verify?user=${response.data.id}&enroll=${searchParams.get('enroll')}`)
+          }
         })
-          .then(function (response) {
-            console.log(response.data)
-            api.open({
-              message: response.data.message
-            });
-            setLoading(false)
-            if (action) {
-              action()
-            } else {
-              router.push(`/auth/verify?user=${response.data.id}&enroll=${searchParams.get('enroll')}`)
-            }
-          })
-          .catch(error => {
-            setLoading(false)
-            api.open({
-              message: error.response.data.message
-            });
-            console.log(error.response.data.message)
-          })
-      } else {
-        api.open({
-          message: "Password don't match confirm password"
-        });
-      }
+        .catch(error => {
+          setLoading(false)
+          api.open({
+            message: error.response.data.message
+          });
+          console.log(error.response.data.message)
+        })
+
     } else {
       api.open({
         message: "Please fill all fields!"
@@ -110,12 +108,15 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
 
   const handleGoogleLogin = () => {
     setGoogleLoading(true)
-    window.location.href = `${apiService.getUri()}auth/google?role=${role}&redirectUrl=/auth/login`
+    window.location.href = `${apiService.getUri()}auth/google?role=${role}&redirectUrl=${pathname !== "/auth/signup" ? pathname : "/auth/login"}`
   }
   return (
-    <div>
+    <div className={className}>
+      {
+        onClose && <div onClick={onClose} className='fixed top-8 right-8 text-[30px] cursor-pointer z-50 text-white ' ><BsX /></div>
+      }
       {contextHolder}
-      <div>
+      <div className={innerClassName}>
         <div className='my-2 text-xs'>
           <label className='font-medium'>Full Name</label>
           <input onChange={e => setName(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='e.g John' />
@@ -140,29 +141,30 @@ const SignUpComp = ({ role, action, contact }: { role: string, contact?: boolean
             </select>
           </div> */}
         </div>
-        <div className='flex justify-between'>
-          <div className='my-2 text-xs w-[48%]'>
+        <div className='flex '>
+          {/* <div className='my-2 text-xs w-[48%]'>
             <label className='font-medium'>State</label>
             <select onChange={e => setState(e.target.value)} value={state} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm'>
               <option className='hidden' value="">Select your state</option>
               {states_in_nigeria.map(value => <option key={value} value={value}>{value}</option>)}
             </select>
-          </div>
-          <div className='my-2 text-xs w-[48%]'>
+          </div> */}
+          <div className='my-2 text-xs  w-full'>
             <label className='font-medium'>Address</label>
             <input onChange={e => setAddress(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="text" placeholder='' />
           </div>
         </div>
-        <div className='flex justify-between'>
-          <div className='my-2 text-xs w-[48%]'>
+        <div className='flex w-full '>
+          <div className='my-2 text-xs  w-full relative'>
             <label className='font-medium'>Password</label>
-            <input onChange={e => setPassword(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="password" placeholder='************' />
-          </div>
-          <div className='my-2 text-xs w-[48%] relative'>
-            <label className='font-medium'>Confirm Password</label>
-            <input onChange={(e) => setConfirmPassword(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type={active ? "text" : "password"} placeholder='************' />
+            <input onChange={(e) => setPassword(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type={active ? "text" : "password"} placeholder='************' />
             <img onClick={() => setActive(!active)} className='absolute top-7 right-2 cursor-pointer' src="/images/icons/eyes.svg" alt="" />
           </div>
+          {/* <div className='my-2 text-xs w-[48%]'>
+            <label className='font-medium'>Password</label>
+            <input onChange={e => setPassword(e.target.value)} className='w-full border my-1 border-[#FA815136] p-2 rounded-sm' type="password" placeholder='************' />
+          </div> */}
+
         </div>
         <div className='my-2 text-xs'>
           <button onClick={() => signupApplicant()} className='w-full bg-primary p-2 rounded-sm font-medium'>{loading ? "Loading..." : "Signup"}</button>

@@ -61,7 +61,7 @@ export function CourseHero({ data, type, onPlayVideo }: CourseHeroProps) {
 
         <div className="container mx-auto px-4">
           <div className="flex flex-col  bg-[radial-gradient(circle_at_center,_10%_10%,_#FDC332_0%,_white_70%)] items-center text-center mb-12">
-            <motion.div variants={fadeIn} custom={0} className="flex flex-wrap items-center justify-center gap-3 mb-4">
+            {/* <motion.div variants={fadeIn} custom={0} className="flex flex-wrap items-center justify-center gap-3 mb-4">
               <motion.span
                 className="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium"
                 whileHover={{ scale: 1.05 }}
@@ -79,7 +79,7 @@ export function CourseHero({ data, type, onPlayVideo }: CourseHeroProps) {
                   </motion.span>
                 </>
               )}
-            </motion.div>
+            </motion.div> */}
 
             <motion.h1
               variants={fadeIn}
@@ -127,6 +127,7 @@ export function CourseHero({ data, type, onPlayVideo }: CourseHeroProps) {
             </motion.div>
             <EnrollButton
               type={type}
+              id="enroll-hero"
               data={data}
               className="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg transition-all hover:shadow-lg"
             />
@@ -136,7 +137,7 @@ export function CourseHero({ data, type, onPlayVideo }: CourseHeroProps) {
               {hasVideo && (
                 <motion.button
                   onClick={onPlayVideo}
-                  className="flex items-center gap-2 text-zinc-700 hover:text-primary transition-colors"
+                  className="flex items-center gap-2 mt-6 text-zinc-700 hover:text-primary transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -156,13 +157,25 @@ export function CourseHero({ data, type, onPlayVideo }: CourseHeroProps) {
           <motion.div variants={scaleUp} className="max-w-4xl mx-auto z-50 shadow-[3px_3px_40px_40px_#00000016]">
             {data.thumbnail && (
               <motion.div className="relative   rounded-xl overflow-hidden shadow-xl duration-300" whileHover={{ scale: 1.01 }}>
-                <Image
-                  src={data.thumbnail.url || "/placeholder.svg"}
-                  alt={data.title}
-                  width={1200}
-                  height={600}
-                  className="w-full aspect-[2/1] object-cover "
-                />
+                {data.thumbnail.url?.endsWith(".mp4") ? (
+                  <video
+                    className="w-full h-full object-cover"
+                    src={data.thumbnail.url}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                  />
+                ) : (
+                  <Image
+                    src={data.thumbnail.url || data.thumbnail || "/images/expat.png"}
+                    alt={data.title}
+                    width={1200}
+                    height={600}
+                    className="w-full aspect-[2/1] object-cover"
+                  />
+                )}
+
 
                 {(data.enrolledStudents?.length || 0) > 0 && (
                   <motion.div

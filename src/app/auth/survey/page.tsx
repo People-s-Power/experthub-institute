@@ -42,7 +42,7 @@ const test = () => {
   }, [])
 
   const submit = async () => {
-    if (computer && internet && gender && status && time && age && experience && education && accomplishment) {
+    if (gender && status && time && age && experience && education && accomplishment) {
       setLoading(true)
       apiService.post(`/assessment/survey/${user}`, {
         computerAccess: computer,
@@ -85,30 +85,29 @@ const test = () => {
           {(() => {
             switch (steps) {
               case 0:
-                return <div>
-                  <p className='font-medium text-sm'>Do you have access to a computer?</p>
-                  <div className='flex text-sm my-2'>
-                    <input onChange={e => setComputer(e.target.value)} type="radio" value={"yes"} checked={computer === "yes"} />
-                    <p className='ml-3'>Yes</p>
-                  </div>
-                  <div className='flex text-sm my-2'>
-                    <input onChange={e => setComputer(e.target.value)} type="radio" value={"no"} checked={computer === "no"} />
-                    <p className='ml-3'>No</p>
-                  </div>
-                </div>
-              case 1:
-                return <div>
-                  <p className='font-medium text-sm'>Do you have access to an internet?</p>
-                  <div className='flex text-sm my-2'>
-                    <input onChange={e => setInternet(e.target.value)} type="radio" value={"yes"} checked={internet === "yes"} />
-                    <p className='ml-3'>Yes</p>
-                  </div>
-                  <div className='flex text-sm my-2'>
-                    <input onChange={e => setInternet(e.target.value)} type="radio" value={"no"} checked={internet === "no"} />
-                    <p className='ml-3'>No</p>
-                  </div>
-                </div>
-              case 2:
+                // return <div>
+                //   <p className='font-medium text-sm'>Do you have access to a computer?</p>
+                //   <div className='flex text-sm my-2'>
+                //     <input onChange={e => setComputer(e.target.value)} type="radio" value={"yes"} checked={computer === "yes"} />
+                //     <p className='ml-3'>Yes</p>
+                //   </div>
+                //   <div className='flex text-sm my-2'>
+                //     <input onChange={e => setComputer(e.target.value)} type="radio" value={"no"} checked={computer === "no"} />
+                //     <p className='ml-3'>No</p>
+                //   </div>
+                // </div>
+                // case 1:
+                //   return <div>
+                //     <p className='font-medium text-sm'>Do you have access to an internet?</p>
+                //     <div className='flex text-sm my-2'>
+                //       <input onChange={e => setInternet(e.target.value)} type="radio" value={"yes"} checked={internet === "yes"} />
+                //       <p className='ml-3'>Yes</p>
+                //     </div>
+                //     <div className='flex text-sm my-2'>
+                //       <input onChange={e => setInternet(e.target.value)} type="radio" value={"no"} checked={internet === "no"} />
+                //       <p className='ml-3'>No</p>
+                //     </div>
+                //   </div>
                 return <div>
                   <p className='font-medium text-sm'>Gender</p>
                   <div className='flex text-sm my-2'>
@@ -120,7 +119,7 @@ const test = () => {
                     <p className='ml-3'>Female</p>
                   </div>
                 </div>
-              case 3:
+              case 1:
                 return <div>
                   <p className='font-medium text-sm'>What is your employment status?</p>
                   <div className='flex text-sm my-2'>
@@ -139,8 +138,12 @@ const test = () => {
                     <input onChange={e => setStatus(e.target.value)} type="radio" value={"Full time employment"} checked={status === "Full time employment"} />
                     <p className='ml-3'>Full time employment</p>
                   </div>
+                  <div className='flex text-sm my-2'>
+                    <input onChange={e => setStatus(e.target.value)} type="radio" value={"Self employed"} checked={status === "Self employed"} />
+                    <p className='ml-3'>Self employed</p>
+                  </div>
                 </div>
-              case 4:
+              case 2:
                 return <div>
                   <p className='font-medium text-sm'>How many hours can you commit to your training a week?</p>
                   <div className='flex text-sm my-2'>
@@ -160,7 +163,7 @@ const test = () => {
                     <p className='ml-3'>I’m open for anytime</p>
                   </div>
                 </div>
-              case 5:
+              case 3:
                 return <div>
                   <p className='font-medium text-sm'>What is your age?</p>
                   <div className='flex text-sm my-2'>
@@ -180,7 +183,7 @@ const test = () => {
                     <p className='ml-3'>26 and above</p>
                   </div>
                 </div>
-              case 6:
+              case 4:
                 return <div>
                   <div className='flex justify-between my-2'>
                     <div className='w-full'>
@@ -217,25 +220,27 @@ const test = () => {
           })()}
 
           <div className='border-t border-[#DCDCDC36] mt-10 p-2 flex justify-between'>
-            <p className='text-sm'>{steps + 1}/07</p>
-            <div className='flex'>
-              <button onClick={() => setSteps(steps >= 1 ? steps - 1 : 0)} className='bg-primary p-2 rounded-sm'>
+            {/* <p className='text-sm'>{steps + 1}/7</p> */}
+            <div className='flex justify-between items-center w-full'>
+              <button onClick={() => setSteps(steps >= 1 ? steps - 1 : 0)} className='bg-gray p-2 rounded-sm'>
                 {/* <img src="/images/icons/arrow-left.svg" alt="" /> */}
                 Prev
               </button>
-              {steps <= 5 && <button onClick={() => setSteps(steps <= 6 ? steps + 1 : 0)} className='bg-gray p-2 rounded-sm ml-2'>
+              {steps <= 3 && <button onClick={() => setSteps(steps <= 4 ? steps + 1 : 0)} className=' bg-primary p-2 rounded-sm ml-2'>
                 {/* <img src="/images/icons/arrow-right.svg" alt="" /> */}
                 Next
               </button>}
+              {steps < 4 ? null : <button onClick={() => submit()} disabled={steps < 4} className='  p-3  rounded-sm bg-primary hover:scale-105 duration-300'>{loading ? <Spin /> : "Sumbit"}</button>}
+
             </div>
           </div>
 
         </section>
-        <div className='text-sm p-6 font-medium bg-[#F9ECCC] rounded-md mt-3'>
+        {/* <div className='text-sm p-6 font-medium bg-[#F9ECCC] rounded-md mt-3'>
           <p>Thanks for your interest in Experthub trainings. Note, you need to own a laptop & have access to internet to be part of our trainings.</p>
-        </div>
+        </div> */}
         <div className='text-center'>
-          {steps < 6 ? null : <button onClick={() => submit()} disabled={steps < 6} className='w-44  p-3 my-3 rounded-sm bg-primary text-white'>{loading ? <Spin /> : "Sumbit"}</button>}
+
         </div>
       </section>
     </main>

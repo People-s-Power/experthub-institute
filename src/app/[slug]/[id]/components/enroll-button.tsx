@@ -1,29 +1,36 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import type { CourseTypeSingle, EventTypeSingle } from "@/types/course-type"
-import { useAppSelector } from "@/store/hooks"
+import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import apiService from "@/utils/apiService"
 import { notification } from "antd"
 import PaymentModal from "@/components/modals/PaymentModal"
 import { useFlutterwave, closePaymentModal } from "flutterwave-react-v3"
 import { formatToNaira } from "@/lib/utils"
-
+import SignUpComp from "@/components/SignUpComp"
+import { jwtDecode } from "jwt-decode"
+import { setUser } from "@/store/slices/userSlice"
+// import Verify from "@/app/auth/verify/page"
 interface EnrollButtonProps {
   type: "course" | "event"
   data: CourseTypeSingle | EventTypeSingle
   className?: string
-  id?: string
+  id?: string,
+  buttonText?: string
 }
 
-export default function EnrollButton({ type, data, className, id }: EnrollButtonProps) {
+export default function EnrollButton({ type, data, className, buttonText, id }: EnrollButtonProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const [api, contextHolder] = notification.useNotification()
   const [isModalOpen, setIsModalOpen] = useState(false)
-
+  const [showSignUp, setShowSignUp] = useState(false)
+  // const [showVerify, setShowVerify] = useState(false)
+  const searchParams = useSearchParams()
   const user = useAppSelector((state) => state.value)
+  const dispatch = useAppDispatch()
 
   const enroll = () => {
     try {
@@ -114,7 +121,44 @@ export default function EnrollButton({ type, data, className, id }: EnrollButton
         })
       })
   }
+  useEffect(() => {
+    handleGoogleLink()
+  }, [])
 
+  const handleGoogleLink = () => {
+    // Handle auth redirect with JWT data
+    const encodedData = searchParams.get("data")
+
+    if (encodedData) {
+      try {
+        const decoded: any = jwtDecode(encodedData)
+
+        if (decoded) {
+          dispatch(
+            setUser({
+              ...decoded.user,
+              accessToken: decoded.accessToken,
+            }),
+          )
+          api.open({
+            message: "Login  successfully, Continue payment",
+            type: "success",
+          })
+          // Clear the URL params without refreshing
+          const newUrl = window.location.pathname
+
+          window.history.replaceState({}, "", newUrl)
+          const storedId = localStorage.getItem("enrollButtonId")
+          if (storedId === id) {
+            setIsModalOpen(true)
+            localStorage.removeItem("enrollButtonId")
+          }
+        }
+      } catch (error) {
+        console.error("Invalid user data", error)
+      }
+    }
+  }
   return (
     <>
       {contextHolder}
@@ -124,7 +168,8 @@ export default function EnrollButton({ type, data, className, id }: EnrollButton
           if (user.id) {
             Number.parseInt(data.fee.toString()) === 0 ? checkType() : setIsModalOpen(true)
           } else {
-            router.push(`/auth/signup?enroll=${data._id}`)
+            localStorage.setItem("enrollButtonId", id || "")
+            setShowSignUp(true)
           }
         }}
         disabled={loading}
@@ -133,9 +178,9 @@ export default function EnrollButton({ type, data, className, id }: EnrollButton
         {loading
           ? "Processing..."
           : data.fee > 0
-            ? `Enroll for ${formatToNaira(data.fee)}`
+            ? buttonText || `Enroll for ${formatToNaira(data.fee)}`
             : type === "course"
-              ? "Enroll for Free"
+              ? buttonText || "Enroll for Free"
               : "Register Now"}
       </button>
       <PaymentModal
@@ -153,6 +198,16 @@ export default function EnrollButton({ type, data, className, id }: EnrollButton
           })
         }
       />
+      {/* {
+        showVerify && <div className="fixed text-left z-50 top-0 left-0 bg-black/80 h-screen w-full flex items-center justify-center">
+          <Verify onClose={() => setIsModalOpen(true)} hideBg={true} />
+        </div>
+      } */}
+
+      {
+        showSignUp && <SignUpComp role="student" action={() => setIsModalOpen(true)} onClose={() => { setShowSignUp(false); }} className="fixed text-left z-50 top-0 left-0 bg-black/80 h-screen w-full flex items-center justify-center text-black" innerClassName="bg-white p-8 w-full max-w-[440px]" />
+      }
+
     </>
   )
 }

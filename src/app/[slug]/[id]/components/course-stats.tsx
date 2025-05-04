@@ -20,7 +20,7 @@ export function CourseStats({ data, benefits }: CourseStatsProps) {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <motion.div
-            className="p-4 py-8 rounded-[8px] relative overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
+            className="p-4 py-8 rounded-[8px] relative z-0  overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
             whileHover={{
               scale: 1.05,
               boxShadow: "0px 0px 25px 5px rgba(200,200,150,0.4)",
@@ -48,7 +48,7 @@ export function CourseStats({ data, benefits }: CourseStatsProps) {
           </motion.div>
 
           <motion.div
-            className="p-4 py-8 rounded-[8px] relative overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
+            className="p-4 py-8 rounded-[8px] relative z-0 overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
             whileHover={{
               scale: 1.05,
               boxShadow: "0px 0px 25px 5px rgba(200,200,150,0.4)",
@@ -76,7 +76,7 @@ export function CourseStats({ data, benefits }: CourseStatsProps) {
           </motion.div>
 
           <motion.div
-            className="p-4 py-8 rounded-[8px] relative overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
+            className="p-4 py-8 rounded-[8px] relative z-0  overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
             whileHover={{
               scale: 1.05,
               boxShadow: "0px 0px 25px 5px rgba(200,200,150,0.4)",
@@ -104,7 +104,7 @@ export function CourseStats({ data, benefits }: CourseStatsProps) {
           </motion.div>
 
           <motion.div
-            className="p-4 py-8 rounded-[8px] relative overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
+            className="p-4 py-8 rounded-[8px] relative z-0  overflow-hidden bg-gradient-to-br from-white to-zinc-50 shadow-[0px_0px_20px_0px_rgba(200,200,150,0.3)] duration-300"
             whileHover={{
               scale: 1.05,
               boxShadow: "0px 0px 25px 5px rgba(200,200,150,0.4)",

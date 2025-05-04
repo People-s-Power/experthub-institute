@@ -394,7 +394,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                             }} className='bg-primary p-2 my-3  rounded-md px-8'>{(course.type === "pdf" && parseInt(course.fee) > 0) ? "Buy Now" : action === "Event" ? "Book Now" : loading ? <Spin /> : "Enroll Now"}</button>
                         }
                         <Link className='text-primary border border-black/55 text-center  inline-block p-2 my-2 rounded-md px-8 hover:bg-primary/50 hover:border-black hover:text-black duration-300 w-full ' href={`/${action === "Course" ? "courses" : "events"}/${course._id}?`}>{action} Details</Link>
-
+                        <ShareSection courseTitle={course.title} courseDescription={course.description} marketLink={`${window.location.origin}/${action === "Course" ? "courses" : "events"}/${course._id}`} />
                       </div>
 
                     </div>
@@ -518,7 +518,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                       </div>}
                     </div>}
 
-                    <ShareSection courseTitle={course.title} courseDescription={course.description} marketLink={`${window.location.origin}/${action === "Course" ? "courses" : "events"}/${course._id}`} />
+
                   </div>
                 </div>
               </div>
