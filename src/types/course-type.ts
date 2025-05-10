@@ -23,7 +23,7 @@ interface BaseType {
         startTime?: string
         endTime?: string
     }[]
-    enrolledStudents?: string[]
+    enrolledStudents?: any[]
     target?: number
     meetingId?: string
     meetingPassword?: string

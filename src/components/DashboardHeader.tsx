@@ -14,7 +14,7 @@ import { isActionChecked } from '@/utils/checkPrivilege';
 
 const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   const user = useAppSelector((state) => state.value);
-  const [dbUser, setDBUser] = useState<{ premiumPlan: string } | undefined>()
+  const [dbUser, setDBUser] = useState<{ premiumPlan: string, profilePicture?: string } | undefined>()
   const dispatch = useAppDispatch();
   const [notice, setNotice] = useState<NoticeType | null>()
   const [show, setShow] = useState(false)
@@ -27,6 +27,11 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
         setDBUser(response.data.user)
       })
   }
+
+  useEffect(() => {
+    console.log(user);
+
+  }, [user])
   const getNotice = () => {
     apiService.get(`notice/${user.id}`).then(function (response) {
       console.log(response.data)
@@ -219,7 +224,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </Link>} */}
           <Notification />
           <Dropdown menu={{ items }} trigger={["click"]}>
-            <img className='h-10 w-10 rounded-full my-auto' src={user.profilePicture ? user.profilePicture : '/images/user.png'} alt="" />
+            <img className='h-10 w-10 rounded-full my-auto object-cover' src={dbUser?.profilePicture ? dbUser.profilePicture : '/images/user.png'} alt="" />
           </Dropdown>
           {/* <button onClick={() => logout()} className="text-[20px] shadow-md rounded-full p-4 relative">
             <svg

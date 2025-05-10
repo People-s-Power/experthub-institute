@@ -64,6 +64,7 @@ const team = () => {
     { value: "View Wallet", checked: false },
     { value: "Withdraw from Wallet", checked: false },
     { value: "Fund Wallet", checked: false },
+    { value: "Add and Change Linked Google Account", checked: false },
     { value: "View Calender", checked: false }
   ]);
 

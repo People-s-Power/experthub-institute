@@ -19,7 +19,7 @@ export default function CallToAction() {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                    <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+                    <h2 className="text-3xl font-medium text-white sm:text-4xl">
                         <span className="block">Ready to start learning?</span>
                         <span className="block">Sign up today and get your first course!</span>
                     </h2>
@@ -38,7 +38,7 @@ export default function CallToAction() {
                         <div className="ml-3 inline-flex">
                             <Link
                                 href="/auth/signup"
-                                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-primary"
+                                className="inline-flex items-center justify-center px-5 py-3 border border-white hover:border-primary text-base font-medium rounded-md text-white bg-yellow-600 hover:bg-primary"
                             >
                                 Learn more
                             </Link>

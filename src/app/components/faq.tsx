@@ -60,7 +60,7 @@ export function FAQ() {
   return (
     <section className="py-8 sm:py-10 md:py-12 bg-[#f5f5f5]">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Frequently Asked Questions</h2>
+        <h2 className="text-3xl font-medium tracking-tighter text-center mb-8">Frequently Asked Questions</h2>
         <div className="max-w-3xl mx-auto">
           {faqs.map((faq, index) => (
             <div key={index} className="py-4">

@@ -6,6 +6,7 @@ import { useAppSelector } from '@/store/hooks';
 import apiService from '@/utils/apiService';
 import { notification } from 'antd';
 import { closePaymentModal, useFlutterwave } from 'flutterwave-react-v3';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import { BsCheckCircleFill, BsX } from 'react-icons/bs';
@@ -13,7 +14,7 @@ import { BsCheckCircleFill, BsX } from 'react-icons/bs';
 export default function Plans() {
     const [isYearly, setIsYearly] = useState(false);
     const [userProfile, setUser] = useState();
-
+    const [loading, setLoading] = useState(false)
     const user = useAppSelector((state) => state.value);
     const [api, contextHolder] = notification.useNotification();
     const router = useRouter()
@@ -29,11 +30,13 @@ export default function Plans() {
                 setUser(response.data.user)
             })
     }
-    const updateUserStatus = () => {
+    const updateUserStatus = (txId) => {
         try {
+            setLoading(true)
             apiService.post(`user/premium`, {
                 id: user.id,
                 ...paymentInfo,
+                txId,
                 isYearly,
             })
                 .then(function (response) {
@@ -48,13 +51,22 @@ export default function Plans() {
                         message: err.response.data.message
                     });
                     // console.log(err.response.data.message)
+                }).finally(() => {
+                    setLoading(false)
+
                 })
         } catch (e) {
-            // console.log(e.response.data.message)
+            console.log(e);
+
+            console.log(e.response.data.message)
+            setLoading(false)
+
         }
 
     }
     const payWithWallet = () => {
+        setLoading(true)
+
         apiService.post(`transactions/pay-with`, {
             amount: paymentInfo.amount,
             userId: user.id
@@ -76,12 +88,17 @@ export default function Plans() {
                     message: err.response.data,
                     placement: 'top'
                 });
+            }).finally(() => {
+                setLoading(false)
+
             })
+
     }
 
 
     const config = {
         public_key: 'FLWPUBK-56b564d97f4bfe75b37c3f180b6468d5-X',
+        // public_key: 'FLWPUBK_TEST-6330f5c973d7919b3b553f52d5a82098-X',
         tx_ref: Date.now(),
         amount: parseFloat(paymentInfo.amount),
         currency: 'NGN',
@@ -97,6 +114,7 @@ export default function Plans() {
             logo: 'https://trainings.experthubllc.com/images/logo.png',
         },
     };
+
     const plans = [
         {
             name: "Basic",
@@ -240,7 +258,7 @@ export default function Plans() {
 
             <PaymentModal isOpen={open} onClose={() => setOpen(false)} wallet={() => payWithWallet()} card={() => handleFlutterPayment({
                 callback: (response) => {
-                    updateUserStatus()
+                    updateUserStatus(response.transaction_id)
                     setOpen(false)
                     console.log(response)
                     closePaymentModal()
@@ -249,6 +267,12 @@ export default function Plans() {
                     console.log("closed")
                 },
             })} />
+
+            {
+                loading && <div className='fixed z-50 top-0 left-0 w-full h-full flex items-center justify-center bg-black/70'>
+                    <Loader2 className='animate-spin text-primary' size={30} />
+                </div>
+            }
         </>
 
 

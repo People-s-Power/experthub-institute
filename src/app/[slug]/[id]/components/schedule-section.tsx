@@ -45,7 +45,7 @@ export function ScheduleSection({ data, scheduleRef, scheduleControls }: Schedul
     },
   }
 
-  if (!data.days || !data.days.length || data.type === "pdf") return null
+  if (!data.days || !data.days.length || data.days.filter((day: any) => day.checked).length === 0 || data.type === "pdf") return null
 
   return (
     <motion.section
@@ -56,6 +56,7 @@ export function ScheduleSection({ data, scheduleRef, scheduleControls }: Schedul
       id="schedule"
       className="scroll-mt-24"
     >
+
       <motion.h2 variants={fadeIn} custom={0} className="text-2xl font-bold mb-2 text-zinc-900">
         Course Schedule
       </motion.h2>

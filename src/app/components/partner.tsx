@@ -69,7 +69,7 @@ export default function PartnerSection() {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-16"
                     >
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                        <h2 className="text-4xl md:text-5xl font-medium text-white mb-6">
                             Come partner with us
                         </h2>
                         <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
@@ -94,7 +94,7 @@ export default function PartnerSection() {
                                 className="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white hover:bg-white/20 transition-colors"
                             >
                                 <partner.icon className="w-10 h-10 mb-4" />
-                                <h3 className="text-xl font-semibold mb-2">{partner.title}</h3>
+                                <h3 className="text-xl font-medium mb-2">{partner.title}</h3>
                                 <p className="text-white/70">{partner.description}</p>
                             </motion.div>
                         ))}
@@ -109,7 +109,7 @@ export default function PartnerSection() {
                     >
                         <Link
                             href={"https://team.experthubllc.com/form/qnxyx7"}
-                            className="bg-white inline-flex mx-auto w-fit items-center justify-center text-black py-2 px-8 hover:bg-white/90 font-semibold text-lg group"
+                            className="bg-white inline-flex mx-auto w-fit items-center justify-center text-black py-2 px-8 hover:bg-white/90 font-medium text-lg group"
                         >
                             PARTNER WITH US
                             <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />

@@ -16,7 +16,7 @@ export function Hero() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
                         >
-                            <h1 className="text-3xl lg:text-[55px] font-bold leading-tight mb-6">
+                            <h1 className="text-3xl lg:text-[55px] font-medium leading-tight mb-6">
                                 Start Your Journey to Become {" "}
                                 <span className="text-primary">a Digital</span>
                                 {" "}Nomad
@@ -28,7 +28,7 @@ export function Hero() {
                             <div className="flex gap-4">
                                 <Link
                                     href={"/auth/signup"}
-                                    className="bg-primary hover:bg-yellow-400 duration-300 px-8 py-3 font-bold text-lg text-white rounded-lg"
+                                    className="bg-primary hover:bg-yellow-400 duration-300 px-8 py-3 font-medium text-lg text-white rounded-lg"
                                 >
                                     Register
                                 </Link>
@@ -88,15 +88,15 @@ export function Hero() {
                     transition={{ duration: 0.5, delay: 0.4 }}
                 >
                     <div className="text-center">
-                        <h3 className="text-4xl font-bold text-primary mb-2">10k+</h3>
+                        <h3 className="text-4xl font-medium text-primary mb-2">10k+</h3>
                         <p className="text-gray-600 uppercase text-sm tracking-wider">Total Courses</p>
                     </div>
                     <div className="text-center">
-                        <h3 className="text-4xl font-bold text-primary mb-2">500+</h3>
+                        <h3 className="text-4xl font-medium text-primary mb-2">500+</h3>
                         <p className="text-gray-600 uppercase text-sm tracking-wider">Expert Mentors</p>
                     </div>
                     <div className="text-center">
-                        <h3 className="text-4xl font-bold text-primary mb-2">300k+</h3>
+                        <h3 className="text-4xl font-medium text-primary mb-2">300k+</h3>
                         <p className="text-gray-600 uppercase text-sm tracking-wider">Students Globally</p>
                     </div>
                 </motion.div>

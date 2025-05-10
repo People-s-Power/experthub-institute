@@ -25,16 +25,20 @@ export default function ShareButton({ urlToShare, title, about }: { urlToShare: 
     };
 
     return (
-        <button
-            onClick={handleShare}
-            className="flex mt-6 mb-4 mx-auto w-[200px] justify-center items-center gap-2 px-4 py-2 bg-white border border-primary rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-            {copied ? (
-                <Check size={20} className="" />
-            ) : (
-                <Share2 size={20} className="" />
-            )}
-            <span className="font-medium">{copied ? 'Copied!' : 'Share'}</span>
-        </button>
+        <div className='flex flex-col mt-6 '>
+            <p className='text-center mb-2'>Your Sales and Marketing Copy</p>
+            <button
+                onClick={handleShare}
+                className="flex mb-4 mx-auto w-[200px] justify-center items-center gap-2 px-4 py-2 bg-white border border-primary rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+                {copied ? (
+                    <Check size={20} className="" />
+                ) : (
+                    <Share2 size={20} className="" />
+                )}
+                <span className="font-medium">{copied ? 'Copied!' : 'Share'}</span>
+            </button>
+        </div>
+
     );
 }

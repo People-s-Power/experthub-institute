@@ -52,7 +52,7 @@ export function BenefitsSection({ benefits, benefitsRef, benefitsControls }: Ben
       initial="hidden"
       animate={benefitsControls}
       id="benefits"
-      className="scroll-mt-24"
+      className=""
     >
       <motion.h2 variants={fadeIn} custom={0} className="text-2xl font-bold mb-2 text-zinc-900">
         What You'll Learn

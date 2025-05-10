@@ -118,9 +118,9 @@ const ApplicantCourses = ({ course }: { course: CourseType }) => {
           <ImageViewer image={course.thumbnail} />
         </Link>
         <div className="p-2">
-          <h3 className="font-medium text-xl my-2">
+          <h3 className="font-medium flex gap-2 text-xl my-2">
             {course.title}
-            {course.timeframe && hasTimeElapsed(enrolee[0]?.enrolledOn, course.timeframe?.value, course.timeframe?.unit) ? (
+            {false ? (
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-[#FF0000] text-white text-sm rounded-md px-4 py-1"

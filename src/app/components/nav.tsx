@@ -17,7 +17,7 @@ export function Navigation() {
                     <div className="flex items-center">
                         <Link href="/" className="flex items-center space-x-2">
                             <Image src={"/images/logo.png"} alt="logo" className="w-[60px] h-[60px] object-cover" width={800} height={800} />
-                            <span className="text-2xl font-bold  text-primary ">
+                            <span className="text-2xl fond-medium  text-primary ">
                                 Experthub Trainings
                             </span>
                         </Link>
@@ -42,8 +42,8 @@ export function Navigation() {
                         </div>
                     </div>
                     <div className="flex items-center justify-end gap-3">
-                        <Link href={"/auth/login"} className="font-semibold">Sign In</Link>
-                        <Link href={"/auth/signup"} className="duration-300 bg-primary hover:bg-yellow-400 text-white px-6 py-2 rounded-md font-semibold">Register</Link>
+                        <Link href={"/auth/login"} className="font-medium">Sign In</Link>
+                        <Link href={"/auth/signup"} className="duration-300 bg-primary hover:bg-yellow-400 text-white px-6 py-2 rounded-md font-medium">Register</Link>
                     </div>
                 </div>
             </div>

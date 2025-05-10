@@ -20,6 +20,7 @@ import { CourseVideoPreview } from "./components/course-videos"
 import AddEvents from "@/components/modals/AddEvents"
 import AddCourse from "@/components/modals/AddCourse"
 import { useAppSelector } from "@/store/hooks"
+import Link from "next/link"
 
 // Default benefits if none provided
 const defaultBenefits = [
@@ -61,6 +62,8 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
     const overviewControls = useAnimation()
     const benefitsControls = useAnimation()
     const scheduleControls = useAnimation()
+    const scheduleControls2 = useAnimation()
+
     const ctaControls = useAnimation()
 
     // Handle scroll-based section activation
@@ -153,7 +156,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                 {/* Navbar */}
                 <header className="fixed top-0 left-0 right-0 z-10 t backdrop-blur-md bg-[#f9f9f990] border-b border-[#d9d9d9]">
                     <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                        <div className="flex w-1/3 items-center gap-3">
+                        <Link href={data.instructor.orgUrl || "https://www.experthubllc.com"} className="flex w-1/3 items-center gap-3">
 
                             {data.instructor?.profilePicture || data.instructor?.image ? (
                                 <Image
@@ -175,7 +178,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                 </div>
                             )}
                             <h3 className="text-lg font-medium hidden md:block whitespace-nowrap text-ellipsis max-w-[200px] overflow-hidden">  {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author} </h3>
-                        </div>
+                        </Link>
 
                         <nav className="hidden w-1/3 md:flex items-center justify-center gap-8">
                             <button
@@ -235,7 +238,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                         </nav>
                         <div className="w-1/3 flex gap-4 justify-end">
                             {
-                                (user.role === "tutor" || user.role === "admin") && <button
+                                ((user.id === data.instructorId) || user.role === "admin") && <button
                                     onClick={() => type === "event" ? setEvent(!event) : setOpen(!open)}
                                     className="  border border-slate-300 hover:border-primary  gap-1.5    flex font-medium py-2 px-4 rounded-lg transition-all text-sm"
                                 >
@@ -329,6 +332,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                             />
 
                             {/* Schedule Section */}
+
                             <ScheduleSection
                                 data={data}
                                 scheduleRef={(el: RefObject<HTMLDivElement>) => {
@@ -337,6 +341,10 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                 }}
                                 scheduleControls={scheduleControls}
                             />
+
+
+
+
 
                             {/* Location Section */}
                             {data.location && (
@@ -382,7 +390,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                     ref={instructorRef}
                                     variants={staggerContainer}
                                     initial="hidden"
-                                    animate={scheduleControls}
+                                    animate={scheduleControls2}
                                     id="instructor"
                                     className="scroll-mt-24"
                                 >
@@ -433,6 +441,11 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                                     </p>
 
                                                     <p className="mt-4 text-[#707070]">An experienced and passionate educator on Experthub, {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author} brings expert knowledge and a commitment to helping learners grow. With a focus on practical skills and student success, also  delivers engaging, high-quality content tailored for today's learners.</p>
+                                                    {
+                                                        data.instructor.orgUrl && <Link href={data.instructor.orgUrl} className="bg-primary text-white font-medium shadow-lg hover:opacity-70 duration-300 px-5 py-2 rounded-md inline-block mt-4">More About Us</Link>
+
+                                                    }
+
                                                 </div>
 
 

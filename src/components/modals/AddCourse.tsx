@@ -24,6 +24,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { jwtDecode } from "jwt-decode"
 import { setUser } from "@/store/slices/userSlice"
 import { Trash, Trash2 } from "lucide-react"
+import { isActionChecked } from "@/utils/checkPrivilege"
 
 dayjs.extend(isBetween)
 dayjs.extend(advancedFormat)
@@ -87,11 +88,7 @@ const AddCourse = ({
   const pathname = usePathname()
 
   const [pdf, setPdf] = useState("")
-  const layout = {
-    title: "",
-    videoUrl: "",
-    video: null,
-  }
+
   const module = {
     title: "",
     description: "",
@@ -101,12 +98,14 @@ const AddCourse = ({
     title: "",
     videoUrl: "",
     video: null,
+    duration: 0,
     submodules: [],
   };
 
   const defaultSubmoduleLayout = {
     title: "",
     videoUrl: "",
+    duration: 0,
     video: null,
   };
 
@@ -161,6 +160,21 @@ const AddCourse = ({
       },
     ],
   )
+  function formatDuration(seconds: number): string {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const paddedMins = mins.toString().padStart(2, '0');
+    const paddedSecs = secs.toString().padStart(2, '0');
+
+    if (hrs > 0) {
+      return `${hrs.toString().padStart(2, '0')}:${paddedMins}:${paddedSecs}`;
+    } else {
+      return `${paddedMins}:${paddedSecs}`;
+    }
+  }
+
 
   // Load saved course data from localStorage when component mounts or when open changes
   useEffect(() => {
@@ -382,24 +396,42 @@ const AddCourse = ({
   };
 
 
-  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, mainIndex: number, subIndex = null) => {
+  const handleVideo = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    mainIndex: number,
+    subIndex: number | null = null
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const videoUrl = URL.createObjectURL(file);
+    const videoElement = document.createElement('video');
 
-    setVideos((prev) => {
-      const updated = [...prev];
-      if (subIndex === null) {
-        updated[mainIndex].video = file;
-        updated[mainIndex].videoUrl = videoUrl;
-      } else {
-        updated[mainIndex].submodules[subIndex].video = file;
-        updated[mainIndex].submodules[subIndex].videoUrl = videoUrl;
-      }
-      return updated;
-    });
+    videoElement.preload = 'metadata';
+    videoElement.src = videoUrl;
+
+    videoElement.onloadedmetadata = () => {
+      const duration = videoElement.duration;
+
+      setVideos((prev) => {
+        const updated = [...prev];
+        if (subIndex === null) {
+          updated[mainIndex].video = file;
+          updated[mainIndex].videoUrl = videoUrl;
+          updated[mainIndex].duration = duration;
+        } else {
+          updated[mainIndex].submodules[subIndex].video = file;
+          updated[mainIndex].submodules[subIndex].videoUrl = videoUrl;
+          updated[mainIndex].submodules[subIndex].duration = duration;
+        }
+        return updated;
+      });
+
+      // // 
+      // URL.revokeObjectURL(videoUrl);
+    };
   };
+
 
   const deleteMainVideo = (index: number) => {
     setVideos((prev) => prev.filter((_, i) => i !== index));
@@ -663,7 +695,7 @@ const AddCourse = ({
   }
   const add = async () => {
     try {
-      if (type === "online" && meetingPlatform === "google" && !user.isGoogleLinked) {
+      if (type === "online" && meetingPlatform === "google" && (!user.isGoogleLinked && isActionChecked("Add and Change Linked Google Account", user.privileges))) {
         // Save form data to localStorage
         localStorage.setItem(
           "pendingCourseData",
@@ -1329,7 +1361,7 @@ const AddCourse = ({
                             <div className="w-[48%]">
                               <label className="text-sm font-medium my-1 inline-flex items-center gap-1">
                                 Class Duration{" "}
-                                {type === `online` && (
+                                {(type === `online` && meetingPlatform === "zoom") && (
                                   <>
                                     -{" "}
                                     <span className="text-orange-500 leading-3 font-thin text-[12px]">
@@ -1380,15 +1412,17 @@ const AddCourse = ({
                                 <option value="google">Google Meet</option>
                               </select>
                               {
-                                meetingPlatform === "google" && (!user.isGoogleLinked ? (
-                                  <p className="text-sm flex items-center gap-2 text-red-500">
-                                    You need to sign in with Google to create a live course.
+
+                                meetingPlatform === "google" && ((!user.isGoogleLinked) ? (
+
+                                  isActionChecked("Add and Change Linked Google Account", user.privileges) && <p className="text-sm flex items-center gap-2 text-red-500">
+                                    Sign in with Google to create a Live Course. Sign In
                                     <button onClick={handleGoogleLogin} className="text-blue-600 underline">
-                                      Sign in with Google
+                                      Sign in
                                     </button>
                                   </p>
                                 ) : (
-                                  <p className="flex items-center  gap-2">
+                                  isActionChecked("Add and Change Linked Google Account", user.privileges) && <p className="flex items-center  gap-2">
                                     <span >Email : <span className="font-medium">{userProfile?.gMail || "Connected"}</span></span>
                                     <button onClick={handleGoogleLogin} className="text-blue-600 underline">
                                       Change account
@@ -1577,7 +1611,7 @@ const AddCourse = ({
                         )}
                         {type === "video" && (
                           <div className="mt-4 flex flex-col gap-3">
-                            <h2 className="font-medium ">Video Modules</h2>
+                            <h2 className="font-medium text-[18px] ">Modules</h2>
                             {videos.map((video, index) => (
                               <div key={index} className=" border-b mb-3 pb-6 space-y-4">
                                 {/* Main Video */}
@@ -1586,7 +1620,7 @@ const AddCourse = ({
                                     <input
                                       value={video.title}
                                       onChange={(e) => handleInputChange(index, "title", e.target.value)}
-                                      placeholder="Main Video Title"
+                                      placeholder=" Module Title"
                                       className="w-full border p-2 rounded-md text-sm border-gray-300"
                                     />
                                     <input
@@ -1613,11 +1647,15 @@ const AddCourse = ({
                                               {playingIndex === `${index}-main` ? <Pause /> : <Play />}
                                             </button>
                                           </div>
+                                          {
+                                            !video.videoUrl.startsWith("https") && <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">{formatDuration(video.duration)}</div>
+                                          }
+
                                         </div>
                                       ) : (
                                         <div className="text-sm text-gray-500 flex items-center gap-2">
                                           <Video />
-                                          <span>Add Main Video</span>
+                                          <span>Add Module Video</span>
                                         </div>
                                       )}
                                     </label>
@@ -1632,7 +1670,7 @@ const AddCourse = ({
 
                                 {/* Submodules */}
                                 <div className="ml-4 pl-4 border-l border-gray-200">
-                                  <h4 className="text-sm font-medium text-gray-700 mb-2">Sub-modules</h4>
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">Lessons</h4>
                                   {video.submodules.map((sub: any, subIndex: any) => (
                                     <div key={subIndex} className="flex items-start justify-between mb-4">
                                       <div className="space-y-2 w-full">
@@ -1641,7 +1679,7 @@ const AddCourse = ({
                                           onChange={(e) =>
                                             handleInputChange(index, "title", e.target.value, subIndex)
                                           }
-                                          placeholder="Submodule Title"
+                                          placeholder="Lesson Title"
                                           className="w-full border p-2 rounded-md text-sm border-gray-300"
                                         />
                                         <input
@@ -1671,11 +1709,15 @@ const AddCourse = ({
                                                   {playingIndex === `${index}-${subIndex}` ? <Pause /> : <Play />}
                                                 </button>
                                               </div>
+                                              {
+                                                !sub.videoUrl.startsWith("https") && <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">{formatDuration(sub.duration)}</div>
+                                              }
+
                                             </div>
                                           ) : (
                                             <div className="text-sm text-gray-500 flex items-center gap-2">
                                               <Video />
-                                              <span>Add Submodule Video</span>
+                                              <span>Add Lesson Video</span>
                                             </div>
                                           )}
                                         </label>
@@ -1696,7 +1738,7 @@ const AddCourse = ({
                                       setVideos(updated);
                                     }}
                                   >
-                                    + Add Submodule
+                                    + Add Lesson
                                   </button>
                                 </div>
                               </div>
@@ -1706,7 +1748,7 @@ const AddCourse = ({
                               className="mt-3 w-fit px-5  py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
                               onClick={() => setVideos([...videos, { ...defaultVideoLayout }])}
                             >
-                              + Add Main Video
+                              + Add Module
                             </button>
 
                           </div>

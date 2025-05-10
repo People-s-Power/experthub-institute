@@ -66,7 +66,7 @@ export default function CourseCategories() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-12">
                         <h2 className="text-base text-yellow-600 font-semibold tracking-wide uppercase">Course Catalog</h2>
-                        <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        <p className="mt-2 text-3xl leading-8 font-medium tracking-tight text-gray-900 sm:text-4xl">
                             Explore Our Courses
                         </p>
                         <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
@@ -94,11 +94,11 @@ export default function CourseCategories() {
                                             className="rounded-t-lg"
                                         />
                                     </div>
-                                    <span className="absolute top-2 right-2 bg-[#f5f5f5] shadow-md text-xs font-bold rounded-[8px] px-3 py-1.5">
+                                    <span className="absolute top-2 right-2 bg-[#f5f5f5] shadow-md text-xs font-medium rounded-[8px] px-3 py-1.5">
                                         {course.category}
                                     </span>
                                     <div className="px-6 py-4">
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">{course.title}</h3>
+                                        <h3 className="text-xl font-medium text-gray-900 mb-2">{course.title}</h3>
                                         <p className="text-gray-600 mb-4 line-clamp-3">{course.about}</p>
 
                                         {course.instructorName && (

@@ -45,6 +45,10 @@ export default function SingleCourse() {
     }
 
   }, [])
+  useEffect(() => {
+    console.log(repo, "repository");
+
+  }, [repo])
 
 
 
