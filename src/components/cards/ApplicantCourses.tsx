@@ -120,7 +120,7 @@ const ApplicantCourses = ({ course }: { course: CourseType }) => {
         <div className="p-2">
           <h3 className="font-medium flex gap-2 text-xl my-2">
             {course.title}
-            {false ? (
+            {course.timeframe && hasTimeElapsed(enrolee[0]?.enrolledOn, course.timeframe?.value, course.timeframe?.unit) ? (
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="bg-[#FF0000] text-white text-sm rounded-md px-4 py-1"
