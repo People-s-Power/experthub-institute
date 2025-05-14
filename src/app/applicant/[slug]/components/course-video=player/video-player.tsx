@@ -3,7 +3,7 @@
 import type React from "react"
 import { useRef, useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Play, Pause, SkipForward, Volume2, VolumeX, Settings, RotateCcw, RotateCw } from 'lucide-react'
+import { Play, Pause, SkipForward, Volume2, VolumeX, Settings, RotateCcw, RotateCw } from "lucide-react"
 
 interface VideoPlayerProps {
     videoUrl: string
@@ -14,17 +14,17 @@ interface VideoPlayerProps {
     onNext?: () => void
 }
 export function formatTime(seconds: number): string {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
+    const hrs = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = Math.floor(seconds % 60)
 
-    const paddedMins = mins.toString().padStart(2, '0');
-    const paddedSecs = secs.toString().padStart(2, '0');
+    const paddedMins = mins.toString().padStart(2, "0")
+    const paddedSecs = secs.toString().padStart(2, "0")
 
     if (hrs > 0) {
-        return `${hrs.toString().padStart(2, '0')}:${paddedMins}:${paddedSecs}`;
+        return `${hrs.toString().padStart(2, "0")}:${paddedMins}:${paddedSecs}`
     } else {
-        return `${paddedMins}:${paddedSecs}`;
+        return `${paddedMins}:${paddedSecs}`
     }
 }
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -56,14 +56,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     // Reset state when video URL changes
     useEffect(() => {
+        // Reset all player states
         setVideoEnded(false)
         hasEndedRef.current = false
+        setIsPlaying(false)
+        setCurrentTime(0)
+        setDuration(0)
 
         if (videoRef.current) {
-            setDuration(0)
-            setCurrentTime(initialTime)
+            videoRef.current.pause()
+            videoRef.current.currentTime = 0
+
+            // Force reload the video element to ensure clean state
+            videoRef.current.load()
         }
-    }, [videoUrl, initialTime])
+    }, [videoUrl])
 
     // Set initial time when video loads
     useEffect(() => {
@@ -87,15 +94,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             if (isPlaying) {
                 videoRef.current.pause()
             } else {
-                // Add a preload attribute and promise chain for smoother playback
-                videoRef.current.preload = "auto"
-                videoRef.current.play()
+                // Remove preload attribute and simplify play logic
+                videoRef.current
+                    .play()
                     .then(() => {
                         setIsPlaying(true)
                     })
                     .catch((err) => {
                         console.error("Error playing video:", err)
-                        // Some browsers require user interaction before playing
                         setIsPlaying(false)
                     })
             }
@@ -308,7 +314,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         return () => {
             window.removeEventListener("keydown", handleKeyDown)
         }
-    }, [isFullscreen, togglePlay, videoEnded])
+    }, [isFullscreen, videoEnded])
 
     // Event handlers
     const handleTimeUpdate = () => {
@@ -317,29 +323,38 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             setCurrentTime(currentVideoTime)
 
             // Check if we're at the end of the video
-            // Use a threshold slightly before the end to ensure the ended event fires
             if (duration > 0 && currentVideoTime >= duration - 0.2 && !hasEndedRef.current) {
-                // This helps prevent edge cases where the video may not trigger the onEnded event
                 if (Math.abs(currentVideoTime - duration) < 0.5) {
                     handleVideoEnded()
                 }
             }
 
-            if (onTimeUpdate) {
-                onTimeUpdate(currentVideoTime)
-            }
+            // We're not calling onTimeUpdate anymore as it was causing issues
         }
     }
 
     const handleLoadedMetadata = () => {
         if (videoRef.current) {
-            const videoDuration = videoRef.current.duration
-            setDuration(videoDuration)
-            console.log("Video duration loaded:", videoDuration)
+            // Sometimes duration is initially reported as Infinity or NaN
+            // We need to ensure we get a valid duration
+            const checkDuration = () => {
+                if (videoRef.current) {
+                    const videoDuration = videoRef.current.duration
+                    if (isFinite(videoDuration) && videoDuration > 0) {
+                        setDuration(videoDuration)
+                        console.log("Video duration loaded:", videoDuration)
 
-            if (initialTime > 0) {
-                videoRef.current.currentTime = initialTime
+                        if (initialTime > 0) {
+                            videoRef.current.currentTime = initialTime
+                        }
+                    } else {
+                        // If duration is not valid yet, try again in a short while
+                        setTimeout(checkDuration, 100)
+                    }
+                }
             }
+
+            checkDuration()
         }
     }
 
@@ -368,7 +383,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     // Handle video playing/buffering states
     const handleWaiting = () => {
-        setIsBuffering(true)
+        const bufferTimer = setTimeout(() => {
+            setIsBuffering(true)
+        }, 300) // Increased delay to prevent flickering
+
+        return () => clearTimeout(bufferTimer)
     }
 
     const handlePlaying = () => {
@@ -382,6 +401,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onMouseMove={() => setShowControls(true)}
+            onTouchStart={() => setShowControls(true)}
+            onTouchEnd={() => {
+                if (isPlaying) {
+                    setTimeout(() => setShowControls(false), 3000)
+                }
+            }}
             tabIndex={0}
         >
             {/* Video Element */}
@@ -398,7 +423,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 onPlaying={handlePlaying}
                 onClick={togglePlay}
                 playsInline
-                preload="auto"
             />
 
             {/* Title Overlay */}
@@ -412,14 +436,101 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             exit={{ opacity: 0, y: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <h2 className="text-white font-semibold text-lg truncate">{title}</h2>
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-white font-semibold text-lg truncate">{title}</h2>
+
+                                {/* Mobile Top Controls */}
+                                <div className="flex items-center space-x-3 md:hidden">
+                                    <div className="relative">
+                                        <motion.button
+                                            className="text-white/90 hover:text-yellow-400 transition-colors p-1.5"
+                                            onClick={() => setShowSettings(!showSettings)}
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            title="Settings"
+                                        >
+                                            <Settings className="w-5 h-5" />
+                                        </motion.button>
+
+                                        {/* Settings Menu */}
+                                        <AnimatePresence>
+                                            {showSettings && (
+                                                <motion.div
+                                                    className="absolute top-full left-0 mt-2 bg-black/90 backdrop-blur-md border border-white/10 rounded-lg shadow-lg overflow-hidden"
+                                                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                                    transition={{ duration: 0.2 }}
+                                                >
+                                                    <div className="p-3">
+                                                        <div className="text-sm font-medium mb-2 text-white/70">Playback Speed</div>
+                                                        <div className="space-y-1">
+                                                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
+                                                                <button
+                                                                    key={rate}
+                                                                    className={`flex items-center justify-between w-full px-3 py-1.5 text-sm rounded-md transition-colors ${playbackRate === rate
+                                                                        ? "bg-yellow-600/90 text-white"
+                                                                        : "text-white/80 hover:bg-white/10"
+                                                                        }`}
+                                                                    onClick={() => changePlaybackRate(rate)}
+                                                                >
+                                                                    <span>{rate === 1 ? "Normal" : `${rate}x`}</span>
+                                                                    {playbackRate === rate && (
+                                                                        <span className="w-1.5 h-1.5 rounded-full bg-white ml-6"></span>
+                                                                    )}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+
+                                    {/* Fullscreen button */}
+                                    <motion.button
+                                        className="text-white/90 hover:text-yellow-400 transition-colors p-1.5"
+                                        onClick={toggleFullscreen}
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        title={isFullscreen ? "Exit Fullscreen (f)" : "Fullscreen (f)"}
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="w-5 h-5"
+                                        >
+                                            {isFullscreen ? (
+                                                <>
+                                                    <path d="M8 3v4a1 1 0 0 1-1 1H3" />
+                                                    <path d="M21 8h-4a1 1 0 0 1-1-1V3" />
+                                                    <path d="M3 16h4a1 1 0 0 1 1 1v4" />
+                                                    <path d="M16 21v-4a1 1 0 0 1 1-1h4" />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                                                    <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+                                                    <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+                                                    <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+                                                </>
+                                            )}
+                                        </svg>
+                                    </motion.button>
+                                </div>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
             )}
 
             {/* Loading Indicator */}
-            <AnimatePresence>
+            {/* <AnimatePresence>
                 {isBuffering && (
                     <motion.div
                         className="absolute inset-0 flex items-center justify-center bg-black/25"
@@ -434,9 +545,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         />
                     </motion.div>
                 )}
-            </AnimatePresence>
+            </AnimatePresence> */}
 
-            {/* Large Play/Pause Button Overlay */}
+            {/* Centralized Play/Pause Button Overlay - YouTube Style */}
             <AnimatePresence>
                 {(!isPlaying || videoEnded) && !isBuffering && (
                     <motion.button
@@ -447,11 +558,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         onClick={togglePlay}
                     >
                         <motion.div
-                            className="bg-black/40 backdrop-blur-sm rounded-full p-5"
+                            className="bg-black/40 backdrop-blur-sm rounded-full p-4 sm:p-6"
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                         >
-                            <Play className="w-12 h-12 text-white fill-white/20" />
+                            <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white fill-white/20" />
                         </motion.div>
 
                         {/* Video Ended Indicator */}
@@ -479,10 +590,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         transition={{ duration: 0.2 }}
                     >
                         {/* Progress Bar */}
-                        <div className="mb-3 relative">
+                        <div className="mb-3 relative ">
                             <div
                                 ref={progressRef}
-                                className="w-full h-1.5 bg-white/30 rounded-full cursor-pointer group"
+                                className="w-full h-1.5 relative bg-white/30 rounded-full cursor-pointer group"
                                 onClick={handleSeek}
                                 onMouseDown={handleProgressMouseDown}
                             >
@@ -513,26 +624,27 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
                                 {/* Progress Handle */}
                                 <motion.div
-                                    className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-500 border-2 border-white rounded-full transform -translate-x-1/2 opacity-0 group-hover:opacity-100 ${isDragging ? "opacity-100" : ""}`}
+                                    className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-yellow-500 border-2 border-white rounded-full transform -translate-x-1/2 opacity-0 group-hover:opacity-100 ${isDragging ? "opacity-100" : ""
+                                        }`}
                                     style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                                    whileHover={{ scale: 1.2 }}
+                                    // whileHover={{ scale: 1.2 }}
                                     whileTap={{ scale: 1 }}
                                 />
                             </div>
                         </div>
 
                         {/* Controls Row */}
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
                             {/* Left Controls */}
-                            <div className="flex items-center space-x-3">
+                            <div className="flex items-center space-x-1 sm:space-x-3">
                                 <motion.button
-                                    className="text-white/90 hover:text-yellow-400 transition-colors p-1.5"
+                                    className="text-white/90 hover:text-yellow-400 transition-colors p-1 sm:p-1.5"
                                     onClick={togglePlay}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                     title={isPlaying ? "Pause (k)" : "Play (k)"}
                                 >
-                                    {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                                    {isPlaying ? <Pause className="w-4 h-4 sm:w-5 sm:h-5" /> : <Play className="w-4 h- sm:w-5 sm:h-5" />}
                                 </motion.button>
 
                                 {onNext && (
@@ -591,13 +703,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     </div>
                                 </div>
 
-                                <div className="text-sm text-white/90 font-medium">
+                                <div className="text-xs sm:text-sm text-white/90 font-medium">
                                     {formatTime(currentTime)} / {formatTime(duration)}
                                 </div>
                             </div>
 
-                            {/* Right Controls */}
-                            <div className="flex items-center space-x-3">
+                            {/* Right Controls - Only visible on desktop */}
+                            <div className="hidden md:flex items-center space-x-3">
                                 <div className="relative">
                                     <motion.button
                                         className="text-white/90 hover:text-yellow-400 transition-colors p-1.5"
