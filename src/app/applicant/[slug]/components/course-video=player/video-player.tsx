@@ -19,11 +19,9 @@ export function formatTime(seconds: number): string {
     const paddedMins = mins.toString().padStart(2, "0")
     const paddedSecs = secs.toString().padStart(2, "0")
 
-    if (hrs > 0) {
-        return `${hrs.toString().padStart(2, "0")}:${paddedMins}:${paddedSecs}`
-    } else {
-        return `${paddedMins}:${paddedSecs}`
-    }
+    return hrs > 0
+        ? `${hrs.toString().padStart(2, "0")}:${paddedMins}:${paddedSecs}`
+        : `${paddedMins}:${paddedSecs}`
 }
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, initialTime = 0, onTimeUpdate, onEnded }) => {
     const videoRef = useRef<HTMLVideoElement>(null)
@@ -49,6 +47,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, initialTime = 0, on
         }
     }
 
+    // Add error handling and logging
+    useEffect(() => {
+        const video = videoRef.current
+        if (!video) return
+
+        const handleError = (e: Event) => {
+            console.error("Video error event:", e)
+            if (video.error) {
+                console.error("Video error code:", video.error.code)
+                console.error("Video error message:", video.error.message)
+            }
+        }
+
+        video.addEventListener("error", handleError)
+
+        return () => {
+            video.removeEventListener("error", handleError)
+        }
+    }, [])
+
     return (
         <div className="w-full aspect-video rounded-lg overflow-hidden">
             <video
@@ -57,8 +75,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ videoUrl, initialTime = 0, on
                 src={videoUrl}
                 controls
                 playsInline
+                preload="auto"
+                controlsList="nodownload"
+                disablePictureInPicture={false}
+                muted={false}
+                webkit-playsinline="true"
+                x5-playsinline="true"
                 onTimeUpdate={handleTimeUpdate}
                 onEnded={handleVideoEnded}
+                onError={(e) => console.error("Video error:", e)}
             />
         </div>
     )
