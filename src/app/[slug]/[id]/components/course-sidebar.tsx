@@ -105,7 +105,7 @@ export function CourseSidebar({ data, type }: CourseSidebarProps) {
             </ul>
 
             <div>
-              <ShareButton title={data.title} about={data.about} urlToShare={`${window.location.origin}/${type}s/${data._id}`} />
+              <ShareButton instructorId={((data as CourseTypeSingle).instructorId || (data as EventTypeSingle).authorId) as string} title={data.title} about={data.about} urlToShare={`${window.location.origin}/${type}s/${data._id}`} />
             </div>
           </div>
 

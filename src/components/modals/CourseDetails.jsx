@@ -395,7 +395,7 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                 <div className='p-6 '>
                   <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
                     {/* Left Column */}
-                    <div className='lg:col-span-1  h-fit sticky top-20'>
+                    <div className='lg:col-span-1  h-fit md:sticky top-20'>
                       <div className='bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100'>
                         {/* Course Image */}
                         <div className='aspect-video relative overflow-hidden'>

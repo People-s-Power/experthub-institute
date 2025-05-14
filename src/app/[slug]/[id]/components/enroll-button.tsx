@@ -172,7 +172,7 @@ export default function EnrollButton({ type, data, className, buttonText, id }: 
             setShowSignUp(true)
           }
         }}
-        disabled={loading || ((data as CourseTypeSingle).instructorId === user.id) || data.enrolledStudents?.includes(user.id) || Boolean(data.enrolledStudents?.find(stud => stud?._id === user.id))}
+        disabled={loading || ((data as CourseTypeSingle).instructorId === user.id) || ((data as EventTypeSingle).authorId === user.id) || data.enrolledStudents?.includes(user.id) || Boolean(data.enrolledStudents?.find(stud => stud?._id === user.id))}
         className={`${className} disabled:cursor-not-allowed  disabled:opacity-70`}
       >
         {loading
