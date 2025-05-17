@@ -7,7 +7,7 @@ import VideoPlayer from "./video-player"
 import ModulesList from "./module-list"
 import ProgressBar from "./progress-bar"
 import CourseOverview from "./course-overview"
-import type { CourseType } from "@/types/CourseType"
+import type { CourseType, ThumbnailType } from "@/types/CourseType"
 import { Menu, X } from "lucide-react"
 
 interface VideoCoursePlayerProps {
@@ -236,11 +236,8 @@ const VideoCoursePlayer: React.FC<VideoCoursePlayerProps> = ({ course }) => {
                             {/* Video Player */}
                             <VideoPlayer
                                 videoUrl={getCurrentVideoUrl()}
-                                title={getCurrentVideoTitle()}
-                                onTimeUpdate={(time) => setVideoTime(time)}
-                                initialTime={videoTime}
                                 onEnded={handleNextVideo}
-                                onNext={handleNextVideo}
+                                poster={(course.thumbnail as ThumbnailType).url}
                             />
 
                             {/* Video Info */}
