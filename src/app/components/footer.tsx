@@ -48,7 +48,7 @@ export default function Footer() {
                             ))}
                         </div>
                     </div>
-                    <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
+                    <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
                         <div className="md:grid md:grid-cols-2 md:gap-8">
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Navigation</h3>

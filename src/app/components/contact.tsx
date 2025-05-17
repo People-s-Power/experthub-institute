@@ -48,7 +48,7 @@ export default function Contact() {
                     <p className="mt-4 text-xl text-gray-600">Get in touch with us for any questions or inquiries</p>
                 </div>
 
-                <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                     <motion.div className="bg-white overflow-hidden shadow rounded-lg" variants={itemVariants}>
                         <div className="px-4 py-5 sm:p-6">
                             <div className="flex items-center">

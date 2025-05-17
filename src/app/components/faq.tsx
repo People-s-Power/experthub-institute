@@ -65,7 +65,7 @@ export function FAQ() {
           {faqs.map((faq, index) => (
             <div key={index} className="py-4">
               <button
-                className={`flex w-full items-center justify-between py-4 text-lg font-medium transition-all hover:underline ${openIndex === index && "pb-2"}`}
+                className={`flex w-full items-center justify-between py-4 text-left text-lg font-medium transition-all hover:underline ${openIndex === index && "pb-2"}`}
                 onClick={() => toggleFAQ(index)}
               >
                 {faq.question}
