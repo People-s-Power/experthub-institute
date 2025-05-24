@@ -45,6 +45,7 @@
     "react-share": "^5.1.0",
     "react-slick": "^0.30.2",
     "redux-persist": "^6.0.0",
+    "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.7.5",
     "swiper": "^11.2.8",
     "tus-js-client": "^4.2.3"
