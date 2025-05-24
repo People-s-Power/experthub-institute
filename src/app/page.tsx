@@ -19,13 +19,13 @@ export default function Home() {
     <main className={`min-h-screen bg-white `} >
       <Navigation />
       <Hero />
-      <AboutUs />
+      {/* <AboutUs /> */}
       <Features />
       <CourseCategories />
       <Partner />
       <Testimonials />
       <CallToAction />
-      <Team />
+      {/* <Team /> */}
       <Contact />
       <FAQ />
       <Footer />

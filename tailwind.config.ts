@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: '#FDC332',
+        primary: 'var(--tw-color-primary)',
         gray: "#D9D9D9",
       },
       zIndex: {

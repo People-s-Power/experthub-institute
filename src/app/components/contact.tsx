@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { MapPin, Mail, Phone } from "lucide-react"
+import Link from "next/link"
 
 export default function Contact() {
     const [ref, inView] = useInView({
@@ -56,7 +57,7 @@ export default function Contact() {
                                 <h3 className="ml-3 text-lg font-medium text-gray-900">Address</h3>
                             </div>
                             <p className="mt-2 text-base text-gray-500">
-                                Ignatius Ajuru University of Education ICT Centre, Port Harcourt, Rivers State, Nigeria.
+                                2nd Floor, Goodmorning Plaza, Tank, Rumuokwurusi, Port Harcourt, Rivers State.
                             </p>
                         </div>
                     </motion.div>
@@ -67,7 +68,7 @@ export default function Contact() {
                                 <Mail className="h-8 w-8 text-primary" />
                                 <h3 className="ml-3 text-lg font-medium text-gray-900">Email</h3>
                             </div>
-                            <p className="mt-2 text-base text-gray-500">adeleempowermentfoundation@gmail.com</p>
+                            <Link href={"mailto:trainings@experthubllc.com"} className="mt-2 text-base text-gray-500">trainings@experthubllc.com</Link>
                         </div>
                     </motion.div>
 
@@ -77,7 +78,7 @@ export default function Contact() {
                                 <Phone className="h-8 w-8 text-primary" />
                                 <h3 className="ml-3 text-lg font-medium text-gray-900">Phone</h3>
                             </div>
-                            <p className="mt-2 text-base text-gray-500">+234 813 303 9718</p>
+                            <Link href={"tel:+2347043567141"} className="mt-2 text-base text-gray-500">+234 704 356 7141</Link>
                         </div>
                     </motion.div>
                 </div>

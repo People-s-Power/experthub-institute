@@ -78,6 +78,8 @@ const AddEvents = ({
   const [loading, setLoading] = useState(false)
   const [scholarship, setScholarship] = useState([])
   const [students, setStudents] = useState([])
+  const [courseColor, setCourseColor] = useState(course?.primaryColor || "#3B82F6")
+
   const [mode, setMode] = useState("")
   const pathname = usePathname()
   const layout = {
@@ -349,6 +351,7 @@ const AddEvents = ({
             value: duration,
             unit: timeframe,
           },
+          primaryColor: courseColor,
           // videos,
           // pdf
         })
@@ -439,6 +442,8 @@ const AddEvents = ({
           target,
           video,
           scholarship: getScholarship(),
+          courseColor,
+
         }),
       )
 
@@ -524,7 +529,9 @@ const AddEvents = ({
             value: duration,
             unit: timeframe,
           },
-          meetingType: meetingPlatform
+          meetingType: meetingPlatform,
+          primaryColor: courseColor,
+
         })
         .then((response) => {
           // console.log(response.data)
@@ -776,6 +783,26 @@ const AddEvents = ({
                               type="text"
                               className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                             />
+                          </div>
+                          <div className="my-1">
+                            <label className="text-sm font-medium my-1">Event Primary Colour</label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                onChange={(e) => setCourseColor(e.target.value)}
+                                value={courseColor}
+                                className="h-10 w-10 cursor-pointer rounded border border-[#1E1E1ED9] bg-transparent p-0"
+                              />
+                              <input
+                                type="text"
+                                maxLength={7}
+                                minLength={7}
+                                value={courseColor}
+                                onChange={(e) => setCourseColor(e.target.value)}
+                                className="flex-1 border rounded-md border-[#1E1E1ED9] p-2 bg-transparent"
+                                placeholder="#000000"
+                              />
+                            </div>
                           </div>
                           <div className="my-1">
                             <label className="text-sm font-medium my-1">About event</label>

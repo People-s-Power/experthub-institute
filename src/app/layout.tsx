@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Providers } from "@/store/providers";
-import Analytics from "@/components/Analytics";
 import Script from 'next/script';
+
 
 export const metadata: Metadata = {
   title: 'EXPERTHUB INSTITUTE',

@@ -5,6 +5,12 @@
 @tailwind components;
 @tailwind utilities;
 
+
+:root {
+  --tw-color-primary: #FDC332; /* Tailwind default blue-500 */
+}  
+
+
 body {
   font-family: 'Fredoka', sans-serif !important;
   background-color: #F8F7F4;

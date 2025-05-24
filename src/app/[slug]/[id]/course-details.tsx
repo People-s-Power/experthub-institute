@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useEffect, useState, useRef, MutableRefObject, RefObject } from "react"
+import { useEffect, useState, useRef, type RefObject } from "react"
 import { motion, useAnimation, useScroll, useTransform } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { MapPin, ArrowRight, Edit } from "lucide-react"
@@ -14,7 +14,6 @@ import { CourseSidebar } from "./components/course-sidebar"
 import { CourseHero } from "./components/course-hero"
 import { BenefitsSection } from "./components/benefits-section"
 import { ScheduleSection } from "./components/schedule-section"
-import type { CourseTypeSingle, EventTypeSingle } from "@/types/course-type"
 import Image from "next/image"
 import { CourseVideoPreview } from "./components/course-videos"
 import AddEvents from "@/components/modals/AddEvents"
@@ -43,7 +42,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
     const benefitsRef = useRef<HTMLDivElement | null>(null)
     const scheduleRef = useRef<HTMLDivElement | null>(null)
     const instructorRef = useRef<HTMLDivElement | null>(null)
-    const user = useAppSelector((state) => state.value);
+    const user = useAppSelector((state) => state.value)
 
     // Parallax and scroll effects
     const { scrollYProgress } = useScroll()
@@ -65,7 +64,18 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
     const scheduleControls2 = useAnimation()
 
     const ctaControls = useAnimation()
+    useEffect(() => {
+        const root = document.documentElement;
+        const previous = root.style.getPropertyValue("--tw-color-primary");
 
+        // Set course-specific color
+        root.style.setProperty("--tw-color-primary", data?.primaryColor || "#FDC332");
+
+        return () => {
+            // Revert when leaving page
+            root.style.setProperty("--tw-color-primary", previous || "#FDC332");
+        };
+    }, [data]);
     // Handle scroll-based section activation
     useEffect(() => {
         const handleScroll = () => {
@@ -143,8 +153,6 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
     const [open, setOpen] = useState(false)
     const [event, setEvent] = useState(false)
 
-
-
     // Get benefits with fallback to default if empty
     const displayBenefits = data.benefits && data.benefits.length > 0 ? data.benefits : defaultBenefits
 
@@ -156,8 +164,10 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                 {/* Navbar */}
                 <header className="fixed top-0 left-0 right-0 z-10 t backdrop-blur-md bg-[#f9f9f990] border-b border-[#d9d9d9]">
                     <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-                        <Link href={data.instructor.orgUrl || "https://www.experthubllc.com"} className="flex w-1/3 items-center gap-3">
-
+                        <Link
+                            href={data.instructor.orgUrl || "https://www.experthubllc.com"}
+                            className="flex w-1/3 items-center gap-3"
+                        >
                             {data.instructor?.profilePicture || data.instructor?.image ? (
                                 <Image
                                     src={data.instructor.profilePicture || data.instructor.image}
@@ -177,7 +187,10 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                     ).charAt(0)}
                                 </div>
                             )}
-                            <h3 className="text-lg font-medium hidden md:block whitespace-nowrap text-ellipsis max-w-[200px] overflow-hidden">  {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author} </h3>
+                            <h3 className="text-lg font-medium hidden md:block whitespace-nowrap text-ellipsis max-w-[200px] overflow-hidden">
+                                {" "}
+                                {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author}{" "}
+                            </h3>
                         </Link>
 
                         <nav className="hidden w-1/3 md:flex items-center justify-center gap-8">
@@ -237,15 +250,14 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                             )}
                         </nav>
                         <div className="w-1/3 flex gap-4 justify-end">
-                            {
-                                ((user.id === data.instructorId) || user.role === "admin") && <button
-                                    onClick={() => type === "event" ? setEvent(!event) : setOpen(!open)}
-                                    className="  border border-slate-300 hover:border-primary  gap-1.5    flex font-medium py-2 px-4 rounded-lg transition-all text-sm"
+                            {(user.id === data.instructorId || user.role === "admin") && (
+                                <button
+                                    onClick={() => (type === "event" ? setEvent(!event) : setOpen(!open))}
+                                    className="border border-slate-300 hover:border-primary gap-1.5 flex font-medium py-2 px-4 rounded-lg transition-all text-sm"
                                 >
                                     Edit <Edit className="text-primary h-5 w-5" />
                                 </button>
-                            }
-
+                            )}
 
                             <EnrollButton
                                 buttonText={"Enroll"}
@@ -256,7 +268,6 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                             />
                         </div>
                     </div>
-
                 </header>
 
                 {/* Hero Section */}
@@ -314,11 +325,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                     </motion.div>
                                 )}
 
-                                {
-                                    data.videos && data.videos.length > 0 && (
-                                        <CourseVideoPreview modules={data.videos} />
-                                    )
-                                }
+                                {data.videos && data.videos.length > 0 && <CourseVideoPreview modules={data.videos} />}
                             </motion.section>
 
                             {/* Benefits Section */}
@@ -341,10 +348,6 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                 }}
                                 scheduleControls={scheduleControls}
                             />
-
-
-
-
 
                             {/* Location Section */}
                             {data.location && (
@@ -389,7 +392,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                 <motion.section
                                     ref={instructorRef}
                                     variants={staggerContainer}
-                                    initial="hidden"
+                                    // initial="hidden"
                                     animate={scheduleControls2}
                                     id="instructor"
                                     className="scroll-mt-24"
@@ -440,15 +443,22 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                                         {data.instructor?.role === "tutor" ? "Expert Instructor" : "Course Instructor"}
                                                     </p>
 
-                                                    <p className="mt-4 text-[#707070]">An experienced and passionate educator on Experthub, {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author} brings expert knowledge and a commitment to helping learners grow. With a focus on practical skills and student success, also  delivers engaging, high-quality content tailored for today's learners.</p>
-                                                    {
-                                                        data.instructor.orgUrl && <Link href={data.instructor.orgUrl} className="bg-primary text-white font-medium shadow-lg hover:opacity-70 duration-300 px-5 py-2 rounded-md inline-block mt-4">More About Us</Link>
-
-                                                    }
-
+                                                    <p className="mt-4 text-[#707070]">
+                                                        An experienced and passionate educator on Experthub,{" "}
+                                                        {data.instructor?.fullname || data.instructor?.name || data.instructorName || data.author}{" "}
+                                                        brings expert knowledge and a commitment to helping learners grow. With a focus on practical
+                                                        skills and student success, also delivers engaging, high-quality content tailored for
+                                                        today's learners.
+                                                    </p>
+                                                    {data.instructor.orgUrl && (
+                                                        <Link
+                                                            href={data.instructor.orgUrl}
+                                                            className="bg-primary text-white font-medium shadow-lg hover:opacity-70 duration-300 px-5 py-2 rounded-md inline-block mt-4"
+                                                        >
+                                                            More About Us
+                                                        </Link>
+                                                    )}
                                                 </div>
-
-
                                             </div>
                                         </div>
                                     </motion.div>
@@ -469,7 +479,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                     variants={staggerContainer}
                     initial="hidden"
                     animate={ctaControls}
-                    className="py-16 bg-gradient-to-r from-primary/90 to-blue-600 text-white"
+                    className="py-16 bg-gradient-to-r from-primary to-blue-600 text-white"
                 >
                     <div className="container mx-auto px-4">
                         <div className="max-w-2xl mx-auto text-center">
@@ -482,7 +492,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                             </motion.p>
 
                             <div className="flex flex-wrap justify-center gap-4">
-                                <div  >
+                                <div>
                                     <EnrollButton
                                         type={type}
                                         id="enroll-2"
@@ -509,7 +519,13 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                     <div className="container mx-auto px-4">
                         <div className="flex flex-col md:flex-row justify-between items-center">
                             <div className="flex items-center mb-4 md:mb-0">
-                                <Image src={"/images/logo.png"} className="w-[50px] object-cover h-[50px]" alt="logo " width={50} height={50} />
+                                <Image
+                                    src={"/images/logo.png"}
+                                    className="w-[50px] object-cover h-[50px]"
+                                    alt="logo "
+                                    width={50}
+                                    height={50}
+                                />
 
                                 <span className="ml-2 text-lg font-bold">Experthub</span>
                             </div>
@@ -519,9 +535,25 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                     </div>
                 </footer>
             </div>
-            <AddCourse course={data} open={open} setOpen={setOpen} handleClick={() => { setOpen(!open); window.location.reload() }} />
+            <AddCourse
+                course={data}
+                open={open}
+                setOpen={setOpen}
+                handleClick={() => {
+                    setOpen(!open)
+                    window.location.reload()
+                }}
+            />
             {/* <AddResources open={resources} handleClick={() => setResources(!resources)} /> */}
-            <AddEvents setOpen={setEvent} open={event} handleClick={() => { setEvent(!event); window.location.reload() }} course={data} />
+            <AddEvents
+                setOpen={setEvent}
+                open={event}
+                handleClick={() => {
+                    setEvent(!event)
+                    window.location.reload()
+                }}
+                course={data}
+            />
         </>
     )
 }

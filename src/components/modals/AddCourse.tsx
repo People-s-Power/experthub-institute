@@ -12,11 +12,11 @@ import apiService from "@/utils/apiService"
 import Play from "../icons/play"
 import Pause from "../icons/pause"
 import Video from "../icons/video"
-import Replace from "../icons/replace"
-import Bin from "../icons/bin"
 import type { AxiosProgressEvent } from "axios"
 import dayjs from "dayjs"
 import isBetween from "dayjs/plugin/isBetween"
+import utc from "dayjs/plugin/utc"
+
 import advancedFormat from "dayjs/plugin/advancedFormat"
 import SelectCourseDate from "../date-time-pickers/SelectCourseDate"
 import SheduledCourse from "../date-time-pickers/ScheduledCourse"
@@ -27,6 +27,7 @@ import { Trash, Trash2 } from "lucide-react"
 import { isActionChecked } from "@/utils/checkPrivilege"
 
 dayjs.extend(isBetween)
+dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
 const AddCourse = ({
@@ -75,6 +76,7 @@ const AddCourse = ({
   const [image, setImage] = useState<any>(course?.thumbnail || null)
   const [location, setLocation] = useState(course?.loaction || "")
   const [target, setTarget] = useState(course?.target || 0)
+  const [courseColor, setCourseColor] = useState(course?.primaryColor || "#3B82F6")
 
   const [room, setRoom] = useState(course?.room || "")
   const [loading, setLoading] = useState(false)
@@ -100,16 +102,16 @@ const AddCourse = ({
     video: null,
     duration: 0,
     submodules: [],
-  };
+  }
 
   const defaultSubmoduleLayout = {
     title: "",
     videoUrl: "",
     duration: 0,
     video: null,
-  };
+  }
 
-  const [videos, setVideos] = useState(course?.videos || [defaultVideoLayout]);
+  const [videos, setVideos] = useState(course?.videos || [defaultVideoLayout])
   const [uploadedCount, setUploadedCount] = useState(0)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
@@ -161,20 +163,19 @@ const AddCourse = ({
     ],
   )
   function formatDuration(seconds: number): string {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
+    const hrs = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
+    const secs = Math.floor(seconds % 60)
 
-    const paddedMins = mins.toString().padStart(2, '0');
-    const paddedSecs = secs.toString().padStart(2, '0');
+    const paddedMins = mins.toString().padStart(2, "0")
+    const paddedSecs = secs.toString().padStart(2, "0")
 
     if (hrs > 0) {
-      return `${hrs.toString().padStart(2, '0')}:${paddedMins}:${paddedSecs}`;
+      return `${hrs.toString().padStart(2, "0")}:${paddedMins}:${paddedSecs}`
     } else {
-      return `${paddedMins}:${paddedSecs}`;
+      return `${paddedMins}:${paddedSecs}`
     }
   }
-
 
   // Load saved course data from localStorage when component mounts or when open changes
   useEffect(() => {
@@ -190,7 +191,7 @@ const AddCourse = ({
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData)
-          console.log(parsedData, "data from localstorage hee rgotren");
+          console.log(parsedData, "data from localstorage hee rgotren")
 
           // Set all form fields from localStorage data
           setTitle(parsedData.title || "")
@@ -215,6 +216,7 @@ const AddCourse = ({
           setMeetingPlatform(parsedData.meetingType || "zoom")
           setCourseDuration(parsedData.courseDuration || 0)
           setTimeframe(parsedData.timeframe || "days")
+          setCourseColor(parsedData.courseColor || "#3B82F6")
 
           // Set active tab to the last one (Modules)
           setActive(3)
@@ -239,74 +241,67 @@ const AddCourse = ({
     setEndDate(undefined)
   }
 
-  const [playingIndex, setPlayingIndex] = useState<string | null>(null);
+  const [playingIndex, setPlayingIndex] = useState<string | null>(null)
 
   const handlePlayClick = (mainIndex: number, subIndex: number | null = null) => {
-    const key = subIndex === null ? `${mainIndex}-main` : `${mainIndex}-${subIndex}`;
-    const selector =
-      subIndex === null
-        ? `.video-main-${mainIndex}`
-        : `.video-sub-${mainIndex}-${subIndex}`;
-    const video = document.querySelector(selector) as HTMLVideoElement;
+    const key = subIndex === null ? `${mainIndex}-main` : `${mainIndex}-${subIndex}`
+    const selector = subIndex === null ? `.video-main-${mainIndex}` : `.video-sub-${mainIndex}-${subIndex}`
+    const video = document.querySelector(selector) as HTMLVideoElement
 
     if (video) {
       if (video.paused) {
-        video.play();
-        setPlayingIndex(key);
+        video.play()
+        setPlayingIndex(key)
       } else {
-        video.pause();
-        setPlayingIndex(null);
+        video.pause()
+        setPlayingIndex(null)
       }
     }
-  };
+  }
 
   const uploadSingleVideo = async (
     mainIndex: number,
     subIndex: number | null,
     file: File,
     existingUrl: string,
-    totalCount: number
+    totalCount: number,
   ) => {
-    if (!file || existingUrl.includes("res.cloudinary.com")) return;
+    if (!file || existingUrl.includes("res.cloudinary.com")) return
 
     try {
+      const { data } = await apiService.get("courses/cloudinary/signed-url")
 
-      const { data } = await apiService.get("courses/cloudinary/signed-url");
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("api_key", data.apiKey);
-      formData.append("timestamp", data.timestamp);
-      formData.append("signature", data.signature);
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("api_key", data.apiKey)
+      formData.append("timestamp", data.timestamp)
+      formData.append("signature", data.signature)
 
       const { data: dataCloud } = await apiService.post(
         `https://api.cloudinary.com/v1_1/${data.cloudname}/video/upload`,
         formData,
         {
           onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const percent = Math.round(
-              (progressEvent.loaded * 100) / (progressEvent.total || 1)
-            );
-            setUploadProgress(percent); // For this individual upload
+            const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))
+            setUploadProgress(percent) // For this individual upload
           },
-        }
-      );
+        },
+      )
 
-      setUploadedCount((prev) => prev + 1);
-      const updated = videos;
+      setUploadedCount((prev) => prev + 1)
+      const updated = videos
       if (subIndex === null) {
-        updated[mainIndex].videoUrl = dataCloud.secure_url;
+        updated[mainIndex].videoUrl = dataCloud.secure_url
       } else {
-        updated[mainIndex].submodules[subIndex].videoUrl = dataCloud.secure_url;
+        updated[mainIndex].submodules[subIndex].videoUrl = dataCloud.secure_url
       }
       setVideos(updated)
       return updated
     } catch (e) {
-      console.error(e, "from uploader");
-      throw e;
+      console.error(e, "from uploader")
+      throw e
     }
-  };
-
+  }
 
   const getCategories = () => {
     apiService
@@ -315,14 +310,14 @@ const AddCourse = ({
         setCategories(response.data.category)
         // use course.catgory which is sub catrgry to get the main catgory
         if (course?.category) {
-          const mainCategory = response.data.category.find((cat: any) => cat.subCategory.find((sub: any) => sub === course?.category))
+          const mainCategory = response.data.category.find((cat: any) =>
+            cat.subCategory.find((sub: any) => sub === course?.category),
+          )
 
-          console.log(mainCategory);
+          console.log(mainCategory)
 
           setCategoryIndex(mainCategory.category)
         }
-
-
       })
       .catch((error) => {
         console.log(error)
@@ -385,67 +380,59 @@ const AddCourse = ({
 
   const handleInputChange = (mainIndex: number, field: string, value: any, subIndex = null) => {
     setVideos((prev) => {
-      const updated = [...prev];
+      const updated = [...prev]
       if (subIndex === null) {
-        updated[mainIndex][field] = value;
+        updated[mainIndex][field] = value
       } else {
-        updated[mainIndex].submodules[subIndex][field] = value;
+        updated[mainIndex].submodules[subIndex][field] = value
       }
-      return updated;
-    });
-  };
+      return updated
+    })
+  }
 
+  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, mainIndex: number, subIndex: number | null = null) => {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-  const handleVideo = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    mainIndex: number,
-    subIndex: number | null = null
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const videoUrl = URL.createObjectURL(file)
+    const videoElement = document.createElement("video")
 
-    const videoUrl = URL.createObjectURL(file);
-    const videoElement = document.createElement('video');
-
-    videoElement.preload = 'metadata';
-    videoElement.src = videoUrl;
+    videoElement.preload = "metadata"
+    videoElement.src = videoUrl
 
     videoElement.onloadedmetadata = () => {
-      const duration = videoElement.duration;
+      const duration = videoElement.duration
 
       setVideos((prev) => {
-        const updated = [...prev];
+        const updated = [...prev]
         if (subIndex === null) {
-          updated[mainIndex].video = file;
-          updated[mainIndex].videoUrl = videoUrl;
-          updated[mainIndex].duration = duration;
+          updated[mainIndex].video = file
+          updated[mainIndex].videoUrl = videoUrl
+          updated[mainIndex].duration = duration
         } else {
-          updated[mainIndex].submodules[subIndex].video = file;
-          updated[mainIndex].submodules[subIndex].videoUrl = videoUrl;
-          updated[mainIndex].submodules[subIndex].duration = duration;
+          updated[mainIndex].submodules[subIndex].video = file
+          updated[mainIndex].submodules[subIndex].videoUrl = videoUrl
+          updated[mainIndex].submodules[subIndex].duration = duration
         }
-        return updated;
-      });
+        return updated
+      })
 
-      // // 
+      // //
       // URL.revokeObjectURL(videoUrl);
-    };
-  };
-
+    }
+  }
 
   const deleteMainVideo = (index: number) => {
-    setVideos((prev) => prev.filter((_, i) => i !== index));
-  };
+    setVideos((prev) => prev.filter((_, i) => i !== index))
+  }
 
   const deleteSubmodule = (mainIndex: number, subIndex: number) => {
     setVideos((prev) => {
-      const updated = [...prev];
-      updated[mainIndex].submodules = updated[mainIndex].submodules.filter(
-        (_: any, i: number) => i !== subIndex
-      );
-      return updated;
-    });
-  };
+      const updated = [...prev]
+      updated[mainIndex].submodules = updated[mainIndex].submodules.filter((_: any, i: number) => i !== subIndex)
+      return updated
+    })
+  }
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -526,8 +513,8 @@ const AddCourse = ({
                   }
                   return data.value
                 }),
-              ),
-            ),
+              )),
+            courseColor,
           }),
         )
 
@@ -538,11 +525,14 @@ const AddCourse = ({
         return
       }
 
-      let newVideos;
+      let newVideos
       if (type === "video") {
         const incompleteModules = videos.some(
-          (v) => !v.title.trim() || (!v.video && !v.videoUrl) || v.submodules.some((s: any) => !s.title.trim() || (!s.video && !s.videoUrl))
-        );
+          (v) =>
+            !v.title.trim() ||
+            (!v.video && !v.videoUrl) ||
+            v.submodules.some((s: any) => !s.title.trim() || (!s.video && !s.videoUrl)),
+        )
 
         if (incompleteModules) {
           setActive(1)
@@ -550,42 +540,37 @@ const AddCourse = ({
           return api.open({
             type: "error",
             message: "Please remove or complete empty modules or submodules before submitting.",
-          });
+          })
         }
-        setUploading(true);
-        setUploadedCount(0);
-        setUploadProgress(0);
+        setUploading(true)
+        setUploadedCount(0)
+        setUploadProgress(0)
 
-        const totalCount =
-          videos.length + videos.reduce((count, video) => count + video.submodules.length, 0);
+        const totalCount = videos.length + videos.reduce((count, video) => count + video.submodules.length, 0)
 
         try {
           for (let i = 0; i < videos.length; i++) {
-            const video = videos[i];
+            const video = videos[i]
 
             // Upload main video
-            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount);
+            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount)
 
             // Upload each submodule
             for (let j = 0; j < video.submodules.length; j++) {
-              const sub = video.submodules[j];
-              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount);
+              const sub = video.submodules[j]
+              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount)
             }
-
-
           }
 
-          setUploading(false);
+          setUploading(false)
         } catch (e) {
-          console.error(e);
-          setUploading(false);
+          console.error(e)
+          setUploading(false)
           return api.open({
             message: `Something went wrong during video upload`,
-          });
+          })
         }
       }
-
-
 
       const requiredFields = {
         title,
@@ -645,8 +630,6 @@ const AddCourse = ({
         ),
       )
 
-      console.log(newVideos);
-
       apiService
         .put(`courses/edit/${course?._id}`, {
           image,
@@ -678,6 +661,7 @@ const AddCourse = ({
           scholarship: getScholarship(),
           audience: streamlinedAudience,
           meetingType: meetingPlatform,
+          primaryColor: courseColor,
         })
         .then((response) => {
           console.log(response.data)
@@ -695,7 +679,12 @@ const AddCourse = ({
   }
   const add = async () => {
     try {
-      if (type === "online" && meetingPlatform === "google" && (!user.isGoogleLinked && isActionChecked("Add and Change Linked Google Account", user.privileges))) {
+      if (
+        type === "online" &&
+        meetingPlatform === "google" &&
+        !user.isGoogleLinked &&
+        isActionChecked("Add and Change Linked Google Account", user.privileges)
+      ) {
         // Save form data to localStorage
         localStorage.setItem(
           "pendingCourseData",
@@ -733,6 +722,7 @@ const AddCourse = ({
                 }),
               ),
             ),
+            courseColor,
           }),
         )
 
@@ -743,11 +733,11 @@ const AddCourse = ({
         return
       }
 
-      let newVideos;
+      let newVideos
       if (type === "video") {
         const incompleteModules = videos.some(
-          (v) => !v.title.trim() || !v.video || v.submodules.some((s: any) => !s.title.trim() || !s.video)
-        );
+          (v) => !v.title.trim() || !v.video || v.submodules.some((s: any) => !s.title.trim() || !s.video),
+        )
 
         if (incompleteModules) {
           setActive(1)
@@ -755,39 +745,37 @@ const AddCourse = ({
           return api.open({
             type: "error",
             message: "Please remove or complete empty modules or submodules before submitting.",
-          });
+          })
         }
-        setUploading(true);
-        setUploadedCount(0);
-        setUploadProgress(0);
+        setUploading(true)
+        setUploadedCount(0)
+        setUploadProgress(0)
 
-        const totalCount =
-          videos.length + videos.reduce((count, video) => count + video.submodules.length, 0);
+        const totalCount = videos.length + videos.reduce((count, video) => count + video.submodules.length, 0)
 
         try {
           for (let i = 0; i < videos.length; i++) {
-            const video = videos[i];
+            const video = videos[i]
 
             // Upload main video
-            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount);
+            newVideos = await uploadSingleVideo(i, null, video.video, video.videoUrl, totalCount)
 
             // Upload each submodule
             for (let j = 0; j < video.submodules.length; j++) {
-              const sub = video.submodules[j];
-              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount);
+              const sub = video.submodules[j]
+              newVideos = await uploadSingleVideo(i, j, sub.video, sub.videoUrl, totalCount)
             }
           }
 
-          setUploading(false);
+          setUploading(false)
         } catch (e) {
-          console.error(e);
-          setUploading(false);
+          console.error(e)
+          setUploading(false)
           return api.open({
             message: `Something went wrong during video upload`,
-          });
+          })
         }
       }
-
 
       if (type === `online` && conflict) {
         setActive(1)
@@ -884,6 +872,7 @@ const AddCourse = ({
           scholarship: getScholarship(),
           audience: streamlinedAudience,
           meetingType: meetingPlatform,
+          primaryColor: courseColor,
         })
         .then((response) => {
           api.open({
@@ -1005,7 +994,7 @@ const AddCourse = ({
         const decoded: any = jwtDecode(encodedData)
 
         if (decoded) {
-          console.log(decoded);
+          console.log(decoded)
 
           dispatch(
             setUser({
@@ -1022,14 +1011,11 @@ const AddCourse = ({
           })
           window.history.replaceState({}, "", newUrl)
 
-
-
           // Check for pending course data and open modal if exists
           const storedData = localStorage.getItem("pendingCourseData") || localStorage.getItem("openCreate")
           if (storedData) {
             setOpen(true)
           }
-
         }
       } catch (error) {
         console.error("Invalid user data", error)
@@ -1053,15 +1039,15 @@ const AddCourse = ({
         onClick={() => handleClick()}
         className="fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-[999999s]"
       ></div>
-      <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[70%] w-[95%] mx-auto z-20 bg-[#F8F7F4]">
-        <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12 flex justify-between">
-          <p className="font-medium">Add Course</p>
-          <img
+      <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-lg right-0 lg:w-[70%] w-[95%] mx-auto z-20 bg-[#F8F7F4] shadow-xl">
+        <div className="shadow-md p-4 lg:px-12 flex justify-between items-center bg-white rounded-t-lg">
+          <p className="font-semibold text-lg">Add Course</p>
+          <button
             onClick={() => handleClick()}
-            className="w-6 h-6 cursor-pointer"
-            src="/images/icons/material-symbols_cancel-outline.svg"
-            alt=""
-          />
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <img className="w-5 h-5" src="/images/icons/material-symbols_cancel-outline.svg" alt="Close" />
+          </button>
         </div>
         {contextHolder}
         <div className="lg:flex justify-between lg:mx-12 mx-4 my-4">
@@ -1154,18 +1140,30 @@ const AddCourse = ({
             </Dragger> */}
           </div>
           <div className="lg:w-[48%]">
-            <div className="border-b font-medium flex justify-between border-[#1E1E1E12]">
-              <div className={active === 0 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
-                <p onClick={() => setActive(0)}>Course Details</p>
+            <div className="border-b font-medium flex justify-between border-[#1E1E1E12] mb-4">
+              <div
+                className={`p-3 cursor-pointer transition-colors ${active === 0 ? "border-b-2 border-primary text-primary" : "hover:bg-gray-50"}`}
+                onClick={() => setActive(0)}
+              >
+                <p>Course Details</p>
               </div>
-              <div className={active === 1 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
-                <p onClick={() => setActive(1)}>Descriptions</p>
+              <div
+                className={`p-3 cursor-pointer transition-colors ${active === 1 ? "border-b-2 border-primary text-primary" : "hover:bg-gray-50"}`}
+                onClick={() => setActive(1)}
+              >
+                <p>Descriptions</p>
               </div>
-              <div className={active === 2 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
-                <p onClick={() => setActive(2)}>Fee</p>
+              <div
+                className={`p-3 cursor-pointer transition-colors ${active === 2 ? "border-b-2 border-primary text-primary" : "hover:bg-gray-50"}`}
+                onClick={() => setActive(2)}
+              >
+                <p>Fee</p>
               </div>
-              <div className={active === 3 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
-                <p onClick={() => setActive(3)}>Modules</p>
+              <div
+                className={`p-3 cursor-pointer transition-colors ${active === 3 ? "border-b-2 border-primary text-primary" : "hover:bg-gray-50"}`}
+                onClick={() => setActive(3)}
+              >
+                <p>Modules</p>
               </div>
             </div>
             <div>
@@ -1257,6 +1255,26 @@ const AddCourse = ({
                             type="text"
                             className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                           />
+                        </div>
+                        <div className="my-1">
+                          <label className="text-sm font-medium my-1">Course Primary Colour</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              onChange={(e) => setCourseColor(e.target.value)}
+                              value={courseColor}
+                              className="h-10 w-10 cursor-pointer rounded border border-[#1E1E1ED9] bg-transparent p-0"
+                            />
+                            <input
+                              type="text"
+                              maxLength={7}
+                              minLength={7}
+                              value={courseColor}
+                              onChange={(e) => setCourseColor(e.target.value)}
+                              className="flex-1 border rounded-md border-[#1E1E1ED9] p-2 bg-transparent"
+                              placeholder="#000000"
+                            />
+                          </div>
                         </div>
                         <div className="my-1">
                           <label className="text-sm font-medium my-1">About course</label>
@@ -1361,7 +1379,7 @@ const AddCourse = ({
                             <div className="w-[48%]">
                               <label className="text-sm font-medium my-1 inline-flex items-center gap-1">
                                 Class Duration{" "}
-                                {(type === `online` && meetingPlatform === "zoom") && (
+                                {type === `online` && meetingPlatform === "zoom" && (
                                   <>
                                     -{" "}
                                     <span className="text-orange-500 leading-3 font-thin text-[12px]">
@@ -1411,26 +1429,27 @@ const AddCourse = ({
                                 <option value="zoom">Zoom</option>
                                 <option value="google">Google Meet</option>
                               </select>
-                              {
-
-                                meetingPlatform === "google" && ((!user.isGoogleLinked) ? (
-
-                                  isActionChecked("Add and Change Linked Google Account", user.privileges) && <p className="text-sm flex items-center gap-2 text-red-500">
-                                    Sign in with Google to create a Live Course. Sign In
-                                    <button onClick={handleGoogleLogin} className="text-blue-600 underline">
-                                      Sign in
-                                    </button>
-                                  </p>
-                                ) : (
-                                  isActionChecked("Add and Change Linked Google Account", user.privileges) && <p className="flex items-center  gap-2">
-                                    <span >Email : <span className="font-medium">{userProfile?.gMail || "Connected"}</span></span>
-                                    <button onClick={handleGoogleLogin} className="text-blue-600 underline">
-                                      Change account
-                                    </button>
-                                  </p>
-
-                                ))
-                              }
+                              {meetingPlatform === "google" &&
+                                (!user.isGoogleLinked
+                                  ? isActionChecked("Add and Change Linked Google Account", user.privileges) && (
+                                    <p className="text-sm flex items-center gap-2 text-red-500">
+                                      Sign in with Google to create a Live Course. Sign In
+                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                        Sign in
+                                      </button>
+                                    </p>
+                                  )
+                                  : isActionChecked("Add and Change Linked Google Account", user.privileges) && (
+                                    <p className="flex items-center  gap-2">
+                                      <span>
+                                        Email :{" "}
+                                        <span className="font-medium">{userProfile?.gMail || "Connected"}</span>
+                                      </span>
+                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                        Change account
+                                      </button>
+                                    </p>
+                                  ))}
                             </div>
                             <div className="flex items-center border-b border-slate-500 my-5 gap-3 px-4">
                               <button
@@ -1630,7 +1649,10 @@ const AddCourse = ({
                                       id={`main-${index}`}
                                       onChange={(e) => handleVideo(e, index)}
                                     />
-                                    <label htmlFor={`main-${index}`} className="group block w-[250px] cursor-pointer relative">
+                                    <label
+                                      htmlFor={`main-${index}`}
+                                      className="group block w-[250px] cursor-pointer relative"
+                                    >
                                       {video.videoUrl ? (
                                         <div className="relative rounded-lg overflow-hidden">
                                           <video className={`video-main-${index} w-full rounded-md`} width="250">
@@ -1639,18 +1661,19 @@ const AddCourse = ({
                                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex justify-center items-center">
                                             <button
                                               onClick={(e) => {
-                                                e.preventDefault();
-                                                handlePlayClick(index);
+                                                e.preventDefault()
+                                                handlePlayClick(index)
                                               }}
                                               className="text-white text-3xl"
                                             >
                                               {playingIndex === `${index}-main` ? <Pause /> : <Play />}
                                             </button>
                                           </div>
-                                          {
-                                            !video.videoUrl.startsWith("https") && <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">{formatDuration(video.duration)}</div>
-                                          }
-
+                                          {!video.videoUrl.startsWith("https") && (
+                                            <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">
+                                              {formatDuration(video.duration)}
+                                            </div>
+                                          )}
                                         </div>
                                       ) : (
                                         <div className="text-sm text-gray-500 flex items-center gap-2">
@@ -1676,9 +1699,7 @@ const AddCourse = ({
                                       <div className="space-y-2 w-full">
                                         <input
                                           value={sub.title}
-                                          onChange={(e) =>
-                                            handleInputChange(index, "title", e.target.value, subIndex)
-                                          }
+                                          onChange={(e) => handleInputChange(index, "title", e.target.value, subIndex)}
                                           placeholder="Lesson Title"
                                           className="w-full border p-2 rounded-md text-sm border-gray-300"
                                         />
@@ -1701,18 +1722,19 @@ const AddCourse = ({
                                               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex justify-center items-center">
                                                 <button
                                                   onClick={(e) => {
-                                                    e.preventDefault();
-                                                    handlePlayClick(index, subIndex);
+                                                    e.preventDefault()
+                                                    handlePlayClick(index, subIndex)
                                                   }}
                                                   className="text-white text-2xl"
                                                 >
                                                   {playingIndex === `${index}-${subIndex}` ? <Pause /> : <Play />}
                                                 </button>
                                               </div>
-                                              {
-                                                !sub.videoUrl.startsWith("https") && <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">{formatDuration(sub.duration)}</div>
-                                              }
-
+                                              {!sub.videoUrl.startsWith("https") && (
+                                                <div className="absolute top-1 right-1 px-2 py-0.5 rounded-[5px] bg-white/50 backdrop-blur-md text-[12px]">
+                                                  {formatDuration(sub.duration)}
+                                                </div>
+                                              )}
                                             </div>
                                           ) : (
                                             <div className="text-sm text-gray-500 flex items-center gap-2">
@@ -1733,9 +1755,9 @@ const AddCourse = ({
                                   <button
                                     className="text-xs text-blue-600 hover:underline"
                                     onClick={() => {
-                                      const updated = [...videos];
-                                      updated[index].submodules.push({ ...defaultSubmoduleLayout });
-                                      setVideos(updated);
+                                      const updated = [...videos]
+                                      updated[index].submodules.push({ ...defaultSubmoduleLayout })
+                                      setVideos(updated)
                                     }}
                                   >
                                     + Add Lesson
@@ -1750,7 +1772,6 @@ const AddCourse = ({
                             >
                               + Add Module
                             </button>
-
                           </div>
                         )}
                       </div>
@@ -1858,42 +1879,49 @@ const AddCourse = ({
                         <div style={{ width: `${uploadProgress}%` }} className="bg-primary h-2 rounded-md"></div>
                       </div>
                       <p className="text-[14px] text-slate-500">
-                        Uploaded {uploadedCount} of {videos.length + videos.reduce((count, video) => count + video.submodules.length, 0)} videos.
+                        Uploaded {uploadedCount} of{" "}
+                        {videos.length + videos.reduce((count, video) => count + video.submodules.length, 0)} videos.
                       </p>
                     </div>
                   </div>
                 )}
-                <div className="flex">
+                <div className="flex mt-6">
                   {course === null ? (
                     active === 3 ? (
                       <button
                         disabled={uploading}
                         onClick={() => add()}
-                        className="p-2 bg-primary font-medium w-40 rounded-md text-sm"
+                        className="p-2.5 bg-primary font-medium w-40 rounded-md text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {loading ? <Spin /> : "Add Course"}
                       </button>
                     ) : (
                       <button
                         onClick={() => setActive(active + 1)}
-                        className="p-2 bg-primary font-medium w-40 rounded-md text-sm"
+                        className="p-2.5 bg-primary font-medium w-40 rounded-md text-sm hover:opacity-90 transition-opacity"
                       >
                         Next
                       </button>
                     )
                   ) : active === 3 ? (
-                    <button onClick={() => edit()} className="p-2 bg-primary font-medium w-40 rounded-md text-sm">
+                    <button
+                      onClick={() => edit()}
+                      className="p-2.5 bg-primary font-medium w-40 rounded-md text-sm hover:opacity-90 transition-opacity"
+                    >
                       {loading ? <Spin /> : "Edit Course"}
                     </button>
                   ) : (
                     <button
                       onClick={() => setActive(active + 1)}
-                      className="p-2 bg-primary font-medium w-40 rounded-md text-sm"
+                      className="p-2.5 bg-primary font-medium w-40 rounded-md text-sm hover:opacity-90 transition-opacity"
                     >
                       Next
                     </button>
                   )}
-                  <button onClick={() => handleClick()} className="mx-4">
+                  <button
+                    onClick={() => handleClick()}
+                    className="mx-4 px-4 py-2.5 hover:bg-gray-100 rounded-md transition-colors"
+                  >
                     Cancel
                   </button>
                 </div>

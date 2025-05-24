@@ -17,13 +17,12 @@ export function Hero() {
                             transition={{ duration: 0.5 }}
                         >
                             <h1 className="text-3xl lg:text-[55px] font-medium leading-tight mb-6">
-                                Start Your Journey to Become {" "}
-                                <span className="text-primary">a Digital</span>
-                                {" "}Nomad
+                                Connecting you to the {" "}
+                                <span className="text-primary">the Right </span>
+                                {" "}Experts
                             </h1>
                             <p className="text-gray-600 text-lg mb-8">
-                                Learn how to become a trained professional and gain the
-                                financial freedom that you want!
+                                Discover a world of opportunities through expert-led services, training programs and flexible workspace solutions.
                             </p>
                             <div className="flex gap-4">
                                 <Link
@@ -93,7 +92,7 @@ export function Hero() {
                     </div>
                     <div className="text-center">
                         <h3 className="text-4xl font-medium text-primary mb-2">500+</h3>
-                        <p className="text-gray-600 uppercase text-sm tracking-wider">Expert Mentors</p>
+                        <p className="text-gray-600 uppercase text-sm tracking-wider">Instructors and Mentors</p>
                     </div>
                     <div className="text-center">
                         <h3 className="text-4xl font-medium text-primary mb-2">300k+</h3>

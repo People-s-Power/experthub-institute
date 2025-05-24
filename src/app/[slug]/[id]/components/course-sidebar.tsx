@@ -40,7 +40,7 @@ export function CourseSidebar({ data, type }: CourseSidebarProps) {
               {data.fee > 0 ? (
                 <div>
                   <p className="text-2xl font-bold text-zinc-900">{formatToNaira(data.fee)}</p>
-                  {data.strikedFee ? <p className="text-zinc-400 line-through text-sm">${data.strikedFee}</p> : ""}
+                  {data.strikedFee ? <p className="text-zinc-400 line-through text-sm">{formatToNaira(data.strikedFee)}</p> : ""}
                 </div>
               ) : (
                 <p className="text-2xl font-bold text-green-500">Free</p>

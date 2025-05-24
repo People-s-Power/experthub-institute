@@ -1,11 +1,16 @@
 "use client"
 
-import { ArrowRight, Building2, Handshake, Users } from 'lucide-react'
+import { ArrowRight, Building2, GraduationCap, Handshake, Users } from 'lucide-react'
 import { motion } from "framer-motion"
 import Link from 'next/link'
 import Image from 'next/image'
 
 const partners = [
+    {
+        title: "Training Providers",
+        icon: GraduationCap,
+        description: "Offer expert-led training and empower learners with us."
+    },
     {
         title: "Funders",
         icon: Building2,
@@ -21,17 +26,13 @@ const partners = [
         icon: Users,
         description: "Provide opportunities for our participants"
     },
-    {
-        title: "Others",
-        icon: Handshake,
-        description: "Join us in other meaningful ways"
-    }
+
 ]
 
 export default function PartnerSection() {
     return (
         <>
-            <section id="patners" className="py-12 bg-white">
+            {/* <section id="patners" className="py-12 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="lg:text-center mb-10">
                         <h3 className="text-2xl font-medium text-center">Improve Skills & Earn Through Our Partners</h3>
@@ -51,7 +52,7 @@ export default function PartnerSection() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             <section id='partner' className="relative overflow-hidden bg-[#2B5329] py-24 px-6 md:px-8">
                 {/* Background Pattern */}
