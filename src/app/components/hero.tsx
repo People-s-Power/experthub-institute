@@ -19,10 +19,10 @@ export function Hero() {
                             <h1 className="text-3xl lg:text-[55px] font-medium leading-tight mb-6">
                                 Connecting you to the {" "}
                                 <span className="text-primary">the Right </span>
-                                {" "}Experts
+                                {" "}Instructors
                             </h1>
                             <p className="text-gray-600 text-lg mb-8">
-                                Discover a world of opportunities through expert-led services, training programs and flexible workspace solutions.
+                                Discover a world of opportunities through expert-led training
                             </p>
                             <div className="flex gap-4">
                                 <Link
