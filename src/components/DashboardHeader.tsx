@@ -105,7 +105,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             // alert("You do not have permission to view the profile.");
           }
         }} href={`/${user.role === 'student' ? 'applicant' : user.role}/profile`}>
-          <p>View Profile</p>
+          <p>Settings</p>
         </Link>
       ),
     },

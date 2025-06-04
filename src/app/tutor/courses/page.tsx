@@ -102,6 +102,7 @@ const courses = () => {
       id: user.id
     })
       .then(function (response) {
+
         setCourses(response.data.courses)
         // console.log(response.data)
       })

@@ -14,9 +14,12 @@ const PaymentModal = ({ isOpen, onClose, card, wallet }) => {
         {loader ? <div className='w-full text-center'>
           <Spin size="large" />
         </div> : <div className="flex flex-col gap-4">
-          <button onClick={() => { setLoading(true); wallet() }} className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            Pay with Wallet
-          </button>
+          {
+            wallet && <button onClick={() => { setLoading(true); wallet() }} className="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              Pay with Wallet
+            </button>
+          }
+
           <button onClick={() => card()} className="py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600">
             Pay with Card
           </button>

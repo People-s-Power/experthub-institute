@@ -256,7 +256,7 @@ export default function Plans() {
             </div>
 
 
-            <PaymentModal isOpen={open} onClose={() => setOpen(false)} wallet={() => payWithWallet()} card={() => handleFlutterPayment({
+            <PaymentModal isOpen={open} onClose={() => setOpen(false)} wallet={null} card={() => handleFlutterPayment({
                 callback: (response) => {
                     updateUserStatus(response.transaction_id)
                     setOpen(false)

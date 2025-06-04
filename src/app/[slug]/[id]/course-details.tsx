@@ -410,6 +410,7 @@ export default function CourseDetail({ data, type }: CourseDetailProps) {
                                         className="p-6 duration-300 rounded-lg bg-white border border-zinc-100 shadow-sm"
                                     >
                                         <div className="flex flex-col md:flex-row gap-6">
+
                                             {/* Instructor Image/Avatar */}
                                             <div className="flex items-center  rounded-full">
                                                 {data.instructor?.profilePicture || data.instructor?.image ? (

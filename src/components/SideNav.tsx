@@ -560,6 +560,10 @@ const SideNav = () => {
     window.location.href = "/auth/login";
   };
   // filter((single: any) => single.ownerId?._id !== user.id)
+
+
+
+
   const filteredTeam = team && team.length >= 1
     ? team.filter((single: any) => single.ownerId?._id !== user.id && single.status === "accepted")
     : [];
@@ -671,11 +675,11 @@ const SideNav = () => {
           {filteredTeam.length >= 1 && <div className="mt-10">
             <p className="mb-3">Training Provider</p>
             {filteredTeam.map((single: any) => single.status === 'accepted' && <div onClick={() => toggleUser(single.ownerId, single.privileges)} className="flex my-2 cursor-pointer">
-              <img className="w-6 h-6 mr-2" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
+              <img className="w-6 h-6 mr-2 object-cover" src={single.ownerId?.profilePicture ? single.ownerId?.profilePicture : '/images/user.png'} alt="" />
               <p className="capitalize">{single.ownerId?.fullname}</p>
             </div>)}
           </div>}
-          {user?.mainUser && <p onClick={() => setMain()}>Login to Default Profile</p>}
+          {user?.mainUser && <p className="cursor-pointer" onClick={() => setMain()}>Login to Default Profile</p>}
           {/* <li className="my-3">
             <Link
               href={"#"}

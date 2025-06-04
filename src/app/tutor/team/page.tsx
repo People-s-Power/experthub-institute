@@ -208,7 +208,7 @@ const team = () => {
                   <img
                     src={e.profilePicture || '/images/user.png'}
                     alt={e.label}
-                    className="w-6 h-6 rounded-full mr-2"
+                    className="w-6 h-6 rounded-full object-cover mr-2"
                   />
                   <span>{e.label}</span>
                 </div>
@@ -240,10 +240,10 @@ const team = () => {
         <section className='lg:w-[48%] shadow-md p-4 rounded-md'>
           {filteredTeam.length >= 1 ? filteredTeam.map((single: any) => <div className='my-3 p-2 border-b border-[#808080] lg:flex justify-between' key={single._id}>
             <div className='flex cursor-pointer'>
-              <img className='h-14 w-14 mr-3 rounded-full my-auto' src={single.tutorId.profilePicture ? single.tutorId.profilePicture : '/images/user.png'} alt="" />
+              <img className='h-14 w-14 mr-3 rounded-full my-auto object-cover' src={user.id === single.ownerId?._id ? single.tutorId.profilePicture ? single.tutorId.profilePicture : '/images/user.png' : single.ownerId.profilePicture || '/images/user.png'} alt="" />
               <div>
-                <p className=' capitalize text-lg'>{single.tutorId.fullname}</p>
-                <p>{single.tutorId.email}</p>
+                <p className=' capitalize text-lg'>{user.id === single.ownerId?._id ? single.tutorId.fullname : single.ownerId.fullname}</p>
+                <p>{user.id === single.ownerId?._id ? single.tutorId.email : single.ownerId.email}</p>
               </div>
             </div>
             {

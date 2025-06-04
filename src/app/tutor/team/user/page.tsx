@@ -27,6 +27,8 @@ const UserPage = () => {
         const response = await apiService.get(`/user/team/${tutorId}/${ownerId}/${status}`);
         console.log(response);
       } catch (err) {
+        console.log(err);
+
         setError("Failed to fetch data. Please try again later.");
       } finally {
         setLoading(false);
