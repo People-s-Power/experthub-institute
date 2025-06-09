@@ -73,7 +73,7 @@ export function Navigation() {
                         </div>
 
                         {/* Desktop Navigation Links */}
-                        <div className="hidden md:flex items-center justify-center">
+                        <div className="hidden lg:flex items-center justify-center">
                             <div className="flex items-center space-x-4 lg:space-x-8 font-medium">
                                 {navLinks.map((link) => (
                                     <Link
@@ -88,7 +88,7 @@ export function Navigation() {
                         </div>
 
                         {/* Desktop Auth Buttons */}
-                        <div className="hidden md:flex items-center space-x-3">
+                        <div className="hidden lg:flex items-center space-x-3">
                             <Link href="/auth/login" className="font-medium text-gray-700 hover:text-primary transition-colors">
                                 Sign In
                             </Link>
@@ -107,7 +107,7 @@ export function Navigation() {
 
                             {/* Mobile Menu Button */}
                             <button
-                                className="md:hidden flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
+                                className="lg:hidden flex items-center p-2 rounded-md text-gray-700 hover:bg-gray-100"
                                 onClick={() => setIsOpen(!isOpen)}
                                 aria-label="Toggle menu"
                             >
@@ -146,7 +146,7 @@ export function Navigation() {
                 {isOpen && (
                     <>
                         <motion.div
-                            className="fixed inset-0 bg-black/20 z-40 md:hidden"
+                            className="fixed inset-0 bg-black/20 z-40 lg:hidden"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
@@ -154,7 +154,7 @@ export function Navigation() {
                         />
 
                         <motion.div
-                            className="fixed right-0 top-0 h-full w-[250px] bg-white z-50 md:hidden shadow-xl overflow-y-auto"
+                            className="fixed right-0 top-0 h-full w-[250px] bg-white z-50 lg:hidden shadow-xl overflow-y-auto"
                             initial={{ x: "100%" }}
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
