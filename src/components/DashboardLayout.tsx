@@ -34,8 +34,8 @@ const DashboardLayout = ({ children }: { children: any }) => {
       <ChatWidget />
       {
         toggle ? <div className='lg:w-[20%]'>
-          <SideNav />
-        </div> : <div className='lg:w-[20%] sm:hidden'>
+          <SideNav setToggle={() => setToggle(!toggle)} />
+        </div> : <div className='lg:w-[20%] hidden lg:block'>
           <SideNav />
         </div>
       }

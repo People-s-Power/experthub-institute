@@ -8,8 +8,9 @@ import apiService from "@/utils/apiService";
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/userSlice';
 import { isActionChecked } from "@/utils/checkPrivilege";
+import { XIcon } from "lucide-react";
 
-const SideNav = () => {
+const SideNav = ({ setToggle }: { setToggle?: () => void }) => {
   const [api, contextHolder] = notification.useNotification();
   const pathname = usePathname();
   const [active, setActive] = useState(false)
@@ -591,6 +592,10 @@ const SideNav = () => {
   return (
     <aside className="h-screen fixed lg:w-[20%] lg:z-0 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
+
+      <button className="absolute top-1 right-3" onClick={setToggle}>
+        <XIcon className="w-8 h-8" />
+      </button>
       <Link href={"/#courses"} className="font-bold uppercase text-lg text-[#DC9F08]"> {user.organizationName ? user.organizationName : 'EXPERTHUB INSTITUTE'} </Link>
       <div className="flex-1 flex flex-col h-full my-6 overflow-auto">
         <ol className="text-sm font-medium flex-1">
