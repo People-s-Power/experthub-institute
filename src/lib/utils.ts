@@ -1,4 +1,6 @@
 
+// export const trainingsBaseURL = 'https://seashell-app-nejbh.ondigitalocean.app';
+export const trainingsBaseURL = 'https://expert-trainings-api-unhmf.ondigitalocean.app';
 
 export const formatToNaira = (amount: string | number) => {
   return new Intl.NumberFormat('en-NG', {

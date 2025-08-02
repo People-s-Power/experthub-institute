@@ -32,13 +32,14 @@ interface SocketResponse {
   message: Message;
 }
 
-const socket = io('https://seashell-app-nejbh.ondigitalocean.app/');
+const socket = io(trainingsBaseURL + "/");
 import { useAppSelector } from '@/store/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { formatDate } from '../modals/Notification';
 import Link from 'next/link';
 import AppointmentModal from '../modals/AppointmentModal';
 import { isActionChecked } from '@/utils/checkPrivilege';
+import { trainingsBaseURL } from '@/lib/utils';
 
 const Message: React.FC = () => {
   const [message, setMessage] = useState<string>('');
