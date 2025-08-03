@@ -22,6 +22,7 @@ const profile = () => {
   const [editing, setEditing] = useState(false)
   const [file, setFile] = useState<FileList | null>()
   const [saving, setSaving] = useState(false)
+  const [fullname, setFullname] = useState("")
 
   const [category, setCategory] = useState("")
   const [categoryIndex, setCategoryIndex] = useState("")
@@ -78,6 +79,7 @@ const profile = () => {
         setState(response.data.user.state)
         setCountry(response.data.user.country)
         setProfilePicture(response.data.user.profilePicture)
+        setFullname(response.data.user.fullName)
 
         console.log(response.data)
       })
@@ -91,6 +93,7 @@ const profile = () => {
         gender,
         age,
         skillLevel: skill,
+        fullname,
         country,
         state
       })
@@ -154,6 +157,11 @@ const profile = () => {
             <p className='font-medium text-sm'>Highlights</p>
           </div>
           <div className='my-4 p-3 shadow-[0px_2px_4px_0px_#1E1E1E21] rounded-md'>
+
+            <div className='my-2'>
+              <label className='text-sm font-medium my-1'>Full Name</label>
+              <input onChange={e => setFullname(e.target.value)} value={fullname} className='bg-transparent border-b border-[#1E1E1E66] w-full' type="text" />
+            </div>
             <div className='my-2'>
               <label className='text-sm font-medium my-1'>Phone Number</label>
               <input onChange={e => setPhone(e.target.value)} value={phone} className='bg-transparent border-b border-[#1E1E1E66] w-full' type="number" />

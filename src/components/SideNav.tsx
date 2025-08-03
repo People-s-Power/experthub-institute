@@ -593,7 +593,7 @@ const SideNav = ({ setToggle }: { setToggle?: () => void }) => {
     <aside className="h-screen fixed lg:w-[20%] lg:z-0 z-100 w-full bg-[#F8F7F4] sm:mt-4 shadow-md p-6">
       {contextHolder}
 
-      <button className="absolute top-1 right-3" onClick={setToggle}>
+      <button className="lg:hidden absolute top-1 right-3" onClick={setToggle}>
         <XIcon className="w-8 h-8" />
       </button>
       <Link href={"/#courses"} className="font-bold uppercase text-lg text-[#DC9F08]"> {user.organizationName ? user.organizationName : 'EXPERTHUB INSTITUTE'} </Link>

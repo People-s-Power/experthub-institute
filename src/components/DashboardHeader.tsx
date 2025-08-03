@@ -1,72 +1,80 @@
-import { useAppSelector } from '@/store/hooks';
-import React, { useEffect, useState } from 'react';
-import type { MenuProps } from 'antd';
-import { Dropdown, notification } from 'antd';
-import Notification from "./modals/Notification"
-import { useAppDispatch } from '@/store/hooks';
-import { setUser } from '@/store/slices/userSlice'
-import { useRouter } from 'next/navigation';
-import { NoticeType } from '@/types/ResourceType';
-import ImageViewer from './ImageViewer';
-import apiService from '@/utils/apiService';
-import Link from 'next/link';
-import { isActionChecked } from '@/utils/checkPrivilege';
+import { useAppSelector } from "@/store/hooks";
+import React, { useEffect, useState } from "react";
+import type { MenuProps } from "antd";
+import { Dropdown, notification } from "antd";
+import Notification from "./modals/Notification";
+import { useAppDispatch } from "@/store/hooks";
+import { setUser } from "@/store/slices/userSlice";
+import { useRouter } from "next/navigation";
+import { NoticeType } from "@/types/ResourceType";
+import ImageViewer from "./ImageViewer";
+import apiService from "@/utils/apiService";
+import Link from "next/link";
+import { isActionChecked } from "@/utils/checkPrivilege";
 
 const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   const user = useAppSelector((state) => state.value);
-  const [dbUser, setDBUser] = useState<{ premiumPlan: string, profilePicture?: string } | undefined>()
+  const [dbUser, setDBUser] = useState<
+    { premiumPlan: string; profilePicture?: string } | undefined
+  >();
   const dispatch = useAppDispatch();
-  const [notice, setNotice] = useState<NoticeType | null>()
-  const [show, setShow] = useState(false)
-  const router = useRouter()
+  const [notice, setNotice] = useState<NoticeType | null>();
+  const [show, setShow] = useState(false);
+  const router = useRouter();
   const [api, contextHolder] = notification.useNotification();
 
   const getUser = () => {
-    apiService.get(`user/profile/${user.id}`)
-      .then(function (response) {
-        setDBUser(response.data.user)
-      })
-  }
+    apiService.get(`user/profile/${user.id}`).then(function (response) {
+      setDBUser(response.data.user);
+    });
+  };
 
   useEffect(() => {
     console.log(user);
-
-  }, [user])
+  }, [user]);
   const getNotice = () => {
-    apiService.get(`notice/${user.id}`).then(function (response) {
-      console.log(response.data)
-      setNotice(response.data.notice.reverse()[0])
-    }).catch(error => {
-      console.log(error)
-    })
-  }
-
-
+    apiService
+      .get(`notice/${user.id}`)
+      .then(function (response) {
+        console.log(response.data);
+        setNotice(response.data.notice.reverse()[0]);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
-    getNotice()
-    getUser()
-  }, [])
+    getNotice();
+    getUser();
+  }, []);
 
   const markRead = () => {
-    apiService.put(`notice/enroll/${notice?._id}`, {
-      id: user.id
-    }).then(function (response) {
-      console.log(response.data)
-    }).catch(error => {
-      console.log(error)
-    })
-  }
+    apiService
+      .put(`notice/enroll/${notice?._id}`, {
+        id: user.id,
+      })
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const takeAction = () => {
-    if (notice?.page === 'Survey') {
-      markRead()
-      router.push(`/auth/survey?user=${user.id}`)
+    if (notice?.page === "Survey") {
+      markRead();
+      router.push(`/auth/survey?user=${user.id}`);
     } else {
-      markRead()
-      router.push(`/${user.role === 'student' ? 'applicant' : 'tutor'}/${notice?.page.toLowerCase()}`)
+      markRead();
+      router.push(
+        `/${
+          user.role === "student" ? "applicant" : "tutor"
+        }/${notice?.page.toLowerCase()}`
+      );
     }
-  }
+  };
 
   const logout = async () => {
     localStorage.clear();
@@ -77,80 +85,135 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   };
 
   const changeRole = () => {
-    const person = { ...user, role: "student" }
+    const person = { ...user, role: "student" };
     // person.role = "tutor"
-    dispatch(setUser(person))
-    window.location.reload()
-  }
-  const items: MenuProps['items'] = [
+    dispatch(setUser(person));
+    window.location.reload();
+  };
+  const items: MenuProps["items"] = [
     ...[
-      user.role === 'tutor' ?
-        {
-          key: '1',
-          label: (
-            <p onClick={() => {
-              if (isActionChecked("Switch Roles to Student platform of the Training Provider", user.privileges)) {
-                changeRole()
-              }
-            }}>Switch Roles</p>
-          ),
-        } : null
+      user.role === "tutor"
+        ? {
+            key: "1",
+            label: (
+              <p
+                onClick={() => {
+                  if (
+                    isActionChecked(
+                      "Switch Roles to Student platform of the Training Provider",
+                      user.privileges
+                    )
+                  ) {
+                    changeRole();
+                  }
+                }}
+              >
+                Switch Roles
+              </p>
+            ),
+          }
+        : null,
     ],
     {
-      key: '2',
+      key: "2",
       label: (
-        <Link onClick={(e) => {
-          if (!isActionChecked("View Profile Details", user.privileges)) {
-            e.preventDefault(); // Prevent navigation if the user lacks permission
-            // alert("You do not have permission to view the profile.");
-          }
-        }} href={`/${user.role === 'student' ? 'applicant' : user.role}/profile`}>
+        <Link
+          onClick={(e) => {
+            if (!isActionChecked("View Profile Details", user.privileges)) {
+              e.preventDefault(); // Prevent navigation if the user lacks permission
+              // alert("You do not have permission to view the profile.");
+            }
+          }}
+          href={`/${user.role === "student" ? "applicant" : user.role}/profile`}
+        >
           <p>Settings</p>
         </Link>
       ),
     },
 
     ...[
-      user.role !== 'admin' ?
-        {
-          key: '3',
-          label: (
-            <Link onClick={(e) => {
-              if (!isActionChecked("View Wallet", user.privileges)) {
-                e.preventDefault(); // Prevent navigation if the user lacks permission
-                // alert("You do not have permission to View Wallet.");
-              }
-            }} href={`/${user.role === 'student' ? 'applicant' : user.role}/wallet`}><p>Wallet</p></Link>
-
-          ),
-        } : null
+      user.role !== "admin"
+        ? {
+            key: "3",
+            label: (
+              <Link
+                onClick={(e) => {
+                  if (!isActionChecked("View Wallet", user.privileges)) {
+                    e.preventDefault(); // Prevent navigation if the user lacks permission
+                    // alert("You do not have permission to View Wallet.");
+                  }
+                }}
+                href={`/${
+                  user.role === "student" ? "applicant" : user.role
+                }/wallet`}
+              >
+                <p>Wallet</p>
+              </Link>
+            ),
+          }
+        : null,
     ],
     ...[
-      user.role === 'tutor' ?
-        {
-          key: '4',
-          label: (
-            <Link href={`/tutor/plans`}><p>Your Plan</p></Link>
-          ),
-        } : null
+      user.role === "tutor"
+        ? {
+            key: "4",
+            label: (
+              <Link href={`/tutor/plans`}>
+                <p>Your Plan</p>
+              </Link>
+            ),
+          }
+        : null,
     ],
 
     {
-      key: '5',
-      label: (
-        <p onClick={() => logout()}>Logout</p>
-      ),
+      key: "5",
+      label: <p onClick={() => logout()}>Logout</p>,
     },
-
-  ]
+  ];
 
   return (
-    <section className='fixed lg:w-[80%] w-full bg-[#F8F7F4]'>
-      <div className='p-4 z-50 flex justify-between shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38]'>
-        <div className='lg:hidden block my-auto'>
-          <img onClick={() => setToggle()} src="/images/hamburger.png" className='w-8 h-8 my-auto' alt="" />
+    <section className="fixed lg:w-[80%] w-full bg-[#F8F7F4]">
+      <div className="p-4 z-50 flex justify-between shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38]">
+        <div className="lg:hidden block my-auto">
+          <img
+            onClick={() => setToggle()}
+            src="/images/hamburger.png"
+            className="w-8 h-8 my-auto"
+            alt=""
+          />
         </div>
-        <div className='flex'>
+        <div className={"lg:flex hidden lg:w-[45%]  my-auto justify-between"}>
+          {/* <Link href={"/#courses"}>
+            <p className="my-auto">Find Experts</p>
+          </Link> */}
+          <a
+            className="text-center flex items-center sm:my-auto flex-col gap-2"
+            href={`https://www.experthubllc.com/feeds?tid=${user.accessToken}`}
+          >
+            {/* <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-house"
+              viewBox="0 0 16 16"
+            >
+              <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
+            </svg> */}
+            <p className="sm:hidden">Home</p>
+          </a>
+          <Link className="my-auto" href={"https://www.experthubllc.com/home#workspace"}>
+            <p className="my-auto">Workspace</p>
+          </Link>
+          <Link className="my-auto" href={"https://www.experthubllc.com/home#training"}>
+            <p className="my-auto">Trainings</p>
+          </Link>
+          <Link className="my-auto" href={"https://www.experthubllc.com/home#events"}>
+            <p className="my-auto">Events</p>
+          </Link>
+        </div>
+        {/* <div className='flex'>
           <div className='mr-20 sm:hidden'>
             <p className='font-medium'>Welcome</p>
             <p className='font-bold capitalize'>{user.fullName}</p>
@@ -183,7 +246,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             </Link>
 
             <a className='text-center sm:my-auto flex items-center flex-col gap-2 ' href="https://project.experthubllc.com/" target='_blank'>
-              {/* <img src="/images/project.png" className='lg:w-5 sm:w-8 my-auto sm:h-8 mx-auto' alt="" /> */}
+              <img src="/images/project.png" className='lg:w-5 sm:w-8 my-auto sm:h-8 mx-auto' alt="" /> 
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi mx-autobi-journal-text" viewBox="0 0 16 16">
                 <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
                 <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2" />
@@ -200,14 +263,14 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
               </div>
             </Link> : null}
           </div>
-        </div>
+        </div> */}
 
         {/* <div className='sm:hidden w-[30%] relative'>
           <input type="text" className='pl-10 p-2 w-full rounded-md border border-[#1E1E1E8A] bg-transparent' placeholder='Search courses, trainer, test etc' />
           <img className='absolute top-2 w-6 left-2' src="/images/icons/search.svg" alt="" />
         </div> */}
 
-        <div className='flex lg:w-28 w-24 justify-between'>
+        <div className="flex lg:w-28 w-24 justify-between">
           {/* {user.role !== 'admin' && <Link href={`${user.role === 'student' ? '/applicant' : user.role}/wallet`}>
             <button className="text-[20px] shadow-md rounded-full p-4 relative">
               <svg
@@ -224,7 +287,15 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </Link>} */}
           <Notification />
           <Dropdown menu={{ items }} trigger={["click"]}>
-            <img className='h-10 w-10 rounded-full my-auto object-cover' src={dbUser?.profilePicture ? dbUser.profilePicture : '/images/user.png'} alt="" />
+            <img
+              className="h-10 w-10 rounded-full my-auto object-cover"
+              src={
+                dbUser?.profilePicture
+                  ? dbUser.profilePicture
+                  : "/images/user.png"
+              }
+              alt=""
+            />
           </Dropdown>
           {/* <button onClick={() => logout()} className="text-[20px] shadow-md rounded-full p-4 relative">
             <svg
@@ -247,25 +318,37 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </button> */}
         </div>
 
-        {notice && show && <div>
-          <div className='fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10'></div>
-          <div className='fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-20 bg-[#F8F7F4]'>
-            <div className='shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12'>
-              <p className='font-medium text-center'>{notice.title}</p>
-              {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
-            </div>
-            <div className='p-4'>
-              {notice.thumbnail && <ImageViewer image={notice.thumbnail} />}
-            </div>
-            <div className='lg:mx-12 mx-4 my-4'>
-              <p>{notice.body}</p>
-              <div className='text-center '>
-                <button onClick={() => takeAction()} className='bg-[#F7A607] text-white p-1 rounded-md my-3 px-6'>{notice.action}</button> <br />
-                {notice.cancel ? <button onClick={() => setShow(false)} className='p-1'>Cancel</button> : null}
+        {notice && show && (
+          <div>
+            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10"></div>
+            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-20 bg-[#F8F7F4]">
+              <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
+                <p className="font-medium text-center">{notice.title}</p>
+                {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
+              </div>
+              <div className="p-4">
+                {notice.thumbnail && <ImageViewer image={notice.thumbnail} />}
+              </div>
+              <div className="lg:mx-12 mx-4 my-4">
+                <p>{notice.body}</p>
+                <div className="text-center ">
+                  <button
+                    onClick={() => takeAction()}
+                    className="bg-[#F7A607] text-white p-1 rounded-md my-3 px-6"
+                  >
+                    {notice.action}
+                  </button>{" "}
+                  <br />
+                  {notice.cancel ? (
+                    <button onClick={() => setShow(false)} className="p-1">
+                      Cancel
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
-        </div>}
+        )}
       </div>
     </section>
   );
