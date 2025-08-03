@@ -183,7 +183,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             alt=""
           />
         </div>
-        <div className={"flex lg:w-[45%]  my-auto justify-between"}>
+        <div className={"flex lg:w-[45%] sm:gap-4 my-auto justify-between"}>
           {/* <Link href={"/#courses"}>
             <p className="my-auto">Find Experts</p>
           </Link> */}
