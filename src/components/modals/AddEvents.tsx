@@ -1,35 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { type ChangeEvent, type Dispatch, type SetStateAction, useEffect, useRef, useState } from "react"
-import { useAppSelector, useAppDispatch } from "@/store/hooks"
-import type { CategoryType, CourseType } from "@/types/CourseType"
-import { Spin, notification } from "antd"
-import Select from "react-select"
-import type { UserType } from "@/types/UserType"
-import apiService from "@/utils/apiService"
-import dayjs from "dayjs"
-import isBetween from "dayjs/plugin/isBetween"
-import advancedFormat from "dayjs/plugin/advancedFormat"
-import SelectCourseDate from "../date-time-pickers/SelectCourseDate"
-import Video from "../icons/video"
-import Bin from "../icons/bin"
-import Play from "../icons/play"
-import Pause from "../icons/pause"
-import Replace from "../icons/replace"
-import type { AxiosProgressEvent } from "axios"
-import ScheduledCourse from "../date-time-pickers/ScheduledCourse"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { jwtDecode } from "jwt-decode"
-import { setUser } from "@/store/slices/userSlice"
+import type React from "react";
+import {
+  type ChangeEvent,
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import type { CategoryType, CourseType } from "@/types/CourseType";
+import { Spin, notification } from "antd";
+import Select from "react-select";
+import type { UserType } from "@/types/UserType";
+import apiService from "@/utils/apiService";
+import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import SelectCourseDate from "../date-time-pickers/SelectCourseDate";
+import Video from "../icons/video";
+import Bin from "../icons/bin";
+import Play from "../icons/play";
+import Pause from "../icons/pause";
+import Replace from "../icons/replace";
+import type { AxiosProgressEvent } from "axios";
+import ScheduledCourse from "../date-time-pickers/ScheduledCourse";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+import { setUser } from "@/store/slices/userSlice";
 
-dayjs.extend(isBetween)
-dayjs.extend(advancedFormat)
+dayjs.extend(isBetween);
+dayjs.extend(advancedFormat);
 
 interface Layout {
-  title: string
-  videoUrl: string
-  video: File | null
+  title: string;
+  videoUrl: string;
+  video: File | null;
 }
 
 const AddEvents = ({
@@ -39,54 +46,58 @@ const AddEvents = ({
   course,
   setShowPremium,
 }: {
-  open: boolean
-  handleClick: any
-  setOpen: Dispatch<SetStateAction<boolean>>
-  course: CourseType | null
-  setShowPremium?: Dispatch<SetStateAction<boolean>>
+  open: boolean;
+  handleClick: any;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  course: CourseType | null;
+  setShowPremium?: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const user = useAppSelector((state) => state.value)
-  const dispatch = useAppDispatch()
-  const uploadRef = useRef<HTMLInputElement>(null)
-  const [api, contextHolder] = notification.useNotification()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const user = useAppSelector((state) => state.value);
+  const dispatch = useAppDispatch();
+  const uploadRef = useRef<HTMLInputElement>(null);
+  const [api, contextHolder] = notification.useNotification();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [active, setActive] = useState(0)
-  const [about, setAbout] = useState(course?.about || "")
-  const [startDate, setStartDate] = useState(course?.startDate || undefined)
-  const [endDate, setEndDate] = useState(course?.endDate || undefined)
-  const [startTime, setStartTime] = useState(course?.startTime || undefined)
-  const [endTime, setEndTime] = useState(course?.endTime || undefined)
-  const [striked, setStriked] = useState<number>(course?.strikedFee || 0)
-  const [fee, setFee] = useState<number>(course?.fee || 0)
-  const [duration, setDuration] = useState<number>(course?.timeframe?.value || course?.duration || 0)
-  const [timeframe, setTimeframe] = useState(course?.timeframe?.unit || "days")
+  const [active, setActive] = useState(0);
+  const [about, setAbout] = useState(course?.about || "");
+  const [startDate, setStartDate] = useState(course?.startDate || undefined);
+  const [endDate, setEndDate] = useState(course?.endDate || undefined);
+  const [startTime, setStartTime] = useState(course?.startTime || undefined);
+  const [endTime, setEndTime] = useState(course?.endTime || undefined);
+  const [striked, setStriked] = useState<number>(course?.strikedFee || 0);
+  const [fee, setFee] = useState<number>(course?.fee || 0);
+  const [duration, setDuration] = useState<number>(
+    course?.timeframe?.value || course?.duration || 0
+  );
+  const [timeframe, setTimeframe] = useState(course?.timeframe?.unit || "days");
 
-  const [category, setCategory] = useState(course?.category || "")
-  const [categoryIndex, setCategoryIndex] = useState("")
-  const [liveCourses, setLiveCourses] = useState([])
-  const [conflict, setConflict] = useState(false)
-  const [userProfile, setUserProfile] = useState<UserType>()
-  const [meetingPlatform, setMeetingPlatform] = useState("zoom")
-  const [type, setType] = useState(course?.type || "offline")
-  const [title, setTitle] = useState(course?.title || "")
-  const [image, setImage] = useState<any>(course?.thumbnail || null)
-  const [location, setLocation] = useState(course?.loaction || "")
-  const [target, setTarget] = useState(course?.target || 0)
-  const [room, setRoom] = useState(course?.room || "")
-  const [loading, setLoading] = useState(false)
-  const [scholarship, setScholarship] = useState([])
-  const [students, setStudents] = useState([])
-  const [courseColor, setCourseColor] = useState(course?.primaryColor || "#3B82F6")
+  const [category, setCategory] = useState(course?.category || "");
+  const [categoryIndex, setCategoryIndex] = useState("");
+  const [liveCourses, setLiveCourses] = useState([]);
+  const [conflict, setConflict] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserType>();
+  const [meetingPlatform, setMeetingPlatform] = useState("zoom");
+  const [type, setType] = useState(course?.type || "offline");
+  const [title, setTitle] = useState(course?.title || "");
+  const [image, setImage] = useState<any>(course?.thumbnail || null);
+  const [location, setLocation] = useState(course?.loaction || "");
+  const [target, setTarget] = useState(course?.target || 0);
+  const [room, setRoom] = useState(course?.room || "");
+  const [loading, setLoading] = useState(false);
+  const [scholarship, setScholarship] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [courseColor, setCourseColor] = useState(
+    course?.primaryColor || "#3B82F6"
+  );
 
-  const [mode, setMode] = useState("")
-  const pathname = usePathname()
+  const [mode, setMode] = useState("");
+  const pathname = usePathname();
   const layout = {
     title: "",
     videoUrl: "",
     video: null,
-  }
+  };
 
   const [days, setDays] = useState(
     course?.days || [
@@ -132,73 +143,75 @@ const AddEvents = ({
         endTime: "",
         checked: false,
       },
-    ],
-  )
-  const [video, setVideo] = useState<Layout>(course?.videoUrl ? { ...layout, videoUrl: course.videoUrl } : layout)
-  const [play, setPlay] = useState<boolean>(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [uploading, setUploading] = useState(false)
+    ]
+  );
+  const [video, setVideo] = useState<Layout>(
+    course?.videoUrl ? { ...layout, videoUrl: course.videoUrl } : layout
+  );
+  const [play, setPlay] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploading, setUploading] = useState(false);
 
   // Load saved event data from localStorage when component mounts or when open changes
   useEffect(() => {
     if (open) {
-      const storedData = localStorage.getItem("pendingEventData")
-      const open = localStorage.getItem("openCreateEvent")
+      const storedData = localStorage.getItem("pendingEventData");
+      const open = localStorage.getItem("openCreateEvent");
       if (open) {
-        setActive(1)
-        setMeetingPlatform("google")
-        setType("online")
-        localStorage.removeItem("openCreateEvent")
+        setActive(1);
+        setMeetingPlatform("google");
+        setType("online");
+        localStorage.removeItem("openCreateEvent");
       }
       if (storedData) {
         try {
-          const parsedData = JSON.parse(storedData)
+          const parsedData = JSON.parse(storedData);
 
           // Set all form fields from localStorage data
-          setTitle(parsedData.title || "")
-          setAbout(parsedData.about || "")
-          setCategory(parsedData.category || "")
-          setCategoryIndex(parsedData.categoryIndex || "")
-          setImage(parsedData.image || null)
-          setStartDate(parsedData.startDate || undefined)
-          setEndDate(parsedData.endDate || undefined)
-          setStartTime(parsedData.startTime || undefined)
-          setEndTime(parsedData.endTime || undefined)
-          setDays(parsedData.days || days)
-          setDuration(parsedData.duration || 0)
-          setType(parsedData.type || "offline")
-          setMode(parsedData.mode || "")
-          setFee(parsedData.fee || 0)
-          setStriked(parsedData.strikedFee || 0)
-          setRoom(parsedData.room || "")
-          setMeetingPlatform(parsedData.meetingType || "zoom")
+          setTitle(parsedData.title || "");
+          setAbout(parsedData.about || "");
+          setCategory(parsedData.category || "");
+          setCategoryIndex(parsedData.categoryIndex || "");
+          setImage(parsedData.image || null);
+          setStartDate(parsedData.startDate || undefined);
+          setEndDate(parsedData.endDate || undefined);
+          setStartTime(parsedData.startTime || undefined);
+          setEndTime(parsedData.endTime || undefined);
+          setDays(parsedData.days || days);
+          setDuration(parsedData.duration || 0);
+          setType(parsedData.type || "offline");
+          setMode(parsedData.mode || "");
+          setFee(parsedData.fee || 0);
+          setStriked(parsedData.strikedFee || 0);
+          setRoom(parsedData.room || "");
+          setMeetingPlatform(parsedData.meetingType || "zoom");
 
-          setLocation(parsedData.location || "")
-          setTimeframe(parsedData.timeframe || "days")
-          setTarget(parsedData.target || 0)
-          setVideo(parsedData.video || layout)
+          setLocation(parsedData.location || "");
+          setTimeframe(parsedData.timeframe || "days");
+          setTarget(parsedData.target || 0);
+          setVideo(parsedData.video || layout);
 
           // Set active tab to the last one (Fee)
-          setActive(2)
+          setActive(2);
         } catch (error) {
-          console.error("Error parsing pending event data", error)
+          console.error("Error parsing pending event data", error);
         }
       }
     }
-  }, [open])
+  }, [open]);
 
   // Handle Google authentication redirect
   useEffect(() => {
-    handleGoogleLink()
-  }, [searchParams])
+    handleGoogleLink();
+  }, [searchParams]);
 
   const handleGoogleLink = () => {
     // Handle auth redirect with JWT data
-    const encodedData = searchParams.get("data")
+    const encodedData = searchParams.get("data");
 
     if (encodedData) {
       try {
-        const decoded: any = jwtDecode(encodedData)
+        const decoded: any = jwtDecode(encodedData);
 
         if (decoded) {
           dispatch(
@@ -206,108 +219,112 @@ const AddEvents = ({
               ...decoded.user,
               accessToken: decoded.accessToken,
               isGoogleLinked: true, // Make sure this is set to true
-            }),
-          )
+            })
+          );
 
           // Clear the URL params without refreshing
-          const newUrl = window.location.pathname
-          window.history.replaceState({}, "", newUrl)
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, "", newUrl);
 
           // Check for pending event data and open modal if exists
-          const storedData = localStorage.getItem("pendingEventData") || localStorage.getItem("openCreateEvent")
+          const storedData =
+            localStorage.getItem("pendingEventData") ||
+            localStorage.getItem("openCreateEvent");
           if (storedData) {
-            setOpen(true)
+            setOpen(true);
           }
         }
       } catch (error) {
-        console.error("Invalid user data", error)
+        console.error("Invalid user data", error);
       }
     } else {
       // Check for pending event data on normal page load
-      const storedData = localStorage.getItem("pendingEventData")
+      const storedData = localStorage.getItem("pendingEventData");
       if (storedData && user.isGoogleLinked) {
-        setOpen(true)
+        setOpen(true);
       }
     }
-  }
+  };
 
   const getStudents = () => {
     apiService.get("user/students").then((response) => {
-      setStudents(response.data.students)
+      setStudents(response.data.students);
 
       // Load scholarship data after students are loaded
-      const storedData = localStorage.getItem("pendingEventData")
+      const storedData = localStorage.getItem("pendingEventData");
       if (storedData) {
         try {
-          const parsedData = JSON.parse(storedData)
-          const formattedOptions = response.data.students.map((option: UserType) => ({
-            value: option.studentId,
-            label: option.fullname,
-          }))
+          const parsedData = JSON.parse(storedData);
+          const formattedOptions = response.data.students.map(
+            (option: UserType) => ({
+              value: option.studentId,
+              label: option.fullname,
+            })
+          );
 
           // Set scholarship if available
           if (parsedData.scholarship && parsedData.scholarship.length > 0) {
             const scholarshipOptions = formattedOptions.filter((student: any) =>
-              parsedData.scholarship.includes(student.value),
-            )
-            setScholarship(scholarshipOptions)
+              parsedData.scholarship.includes(student.value)
+            );
+            setScholarship(scholarshipOptions);
           }
         } catch (error) {
-          console.error("Error setting scholarship data", error)
+          console.error("Error setting scholarship data", error);
         }
       }
-    })
-  }
+    });
+  };
 
   const handlePlayClick = () => {
-    const video = document.querySelector(`video.video`) as HTMLVideoElement
+    const video = document.querySelector(`video.video`) as HTMLVideoElement;
 
     if (video) {
       if (video.paused) {
-        video.play()
-        setPlay(true)
+        video.play();
+        setPlay(true);
       } else {
-        video.pause()
-        setPlay(false)
+        video.pause();
+        setPlay(false);
       }
     }
-  }
+  };
 
   const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const files = e.target.files;
     if (files && files.length > 0) {
-      let updatedVideo = video
+      let updatedVideo = video;
 
-      const videoUrl = URL.createObjectURL(files[0])
-      updatedVideo = { ...updatedVideo, video: files[0], videoUrl }
+      const videoUrl = URL.createObjectURL(files[0]);
+      updatedVideo = { ...updatedVideo, video: files[0], videoUrl };
 
-      const videoElement = document.createElement("video")
-      videoElement.src = videoUrl
+      const videoElement = document.createElement("video");
+      videoElement.src = videoUrl;
       videoElement.addEventListener("loadedmetadata", () => {
-        const durationInMinutes = Math.round(videoElement.duration / 60) // Duration in minutes
-        setDuration(durationInMinutes)
-      })
+        const durationInMinutes = Math.round(videoElement.duration / 60); // Duration in minutes
+        setDuration(durationInMinutes);
+      });
 
-      setVideo(updatedVideo)
+      setVideo(updatedVideo);
     }
-  }
+  };
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    const reader = new FileReader()
+    const files = e.target.files;
+    const reader = new FileReader();
     if (files && files.length > 0) {
-      reader.readAsDataURL(files[0])
+      reader.readAsDataURL(files[0]);
       reader.onloadend = () => {
         if (reader.result) {
-          const type = files[0].name.substr(files[0].name.length - 3)
+          const type = files[0].name.substr(files[0].name.length - 3);
           setImage({
             type: type === "mp4" ? "video" : "image",
             url: reader.result as string,
-          })
+          });
         }
-      }
+      };
     }
-  }
+  };
 
   const handleTypeChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (
@@ -316,16 +333,16 @@ const AddEvents = ({
       (!userProfile?.premiumPlan || userProfile?.premiumPlan === "basic") &&
       setShowPremium
     ) {
-      handleClick()
-      setShowPremium(true)
+      handleClick();
+      setShowPremium(true);
     } else {
-      setType(e.target.value)
+      setType(e.target.value);
     }
-  }
+  };
 
   const edit = () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       apiService
         .put(`events/edit/${course?._id}`, {
@@ -356,66 +373,74 @@ const AddEvents = ({
           // pdf
         })
         .then((response) => {
-          console.log(response.data)
-          setLoading(false)
-          handleClick()
-        })
+          console.log(response.data);
+          setLoading(false);
+          handleClick();
+        });
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  }
+  };
 
   const getScholarship = () => {
-    const arrayOfIds = scholarship.map((object: any) => object.value)
-    return arrayOfIds
-  }
+    const arrayOfIds = scholarship.map((object: any) => object.value);
+    return arrayOfIds;
+  };
 
   const uploadVideo = async () => {
     try {
-      const { video: videoFIle, videoUrl } = video
+      const { video: videoFIle, videoUrl } = video;
 
-      if (videoUrl.includes(`res.cloudinary.com`)) return
-      if (!videoFIle) return
-      const { data } = await apiService.get("courses/cloudinary/signed-url")
-      console.log(data)
+      if (videoUrl.includes(`res.cloudinary.com`)) return;
+      if (!videoFIle) return;
+      const { data } = await apiService.get("courses/cloudinary/signed-url");
+      console.log(data);
 
-      const formData = new FormData()
-      formData.append("file", videoFIle)
-      formData.append("api_key", data.apiKey)
-      formData.append("timestamp", data.timestamp)
-      formData.append("signature", data.signature)
+      const formData = new FormData();
+      formData.append("file", videoFIle);
+      formData.append("api_key", data.apiKey);
+      formData.append("timestamp", data.timestamp);
+      formData.append("signature", data.signature);
 
       const { data: dataCloud } = await apiService.post(
         `https://api.cloudinary.com/v1_1/${data.cloudname}/video/upload`,
         formData,
         {
           onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))
-            setUploadProgress(percentCompleted)
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / (progressEvent.total || 1)
+            );
+            setUploadProgress(percentCompleted);
           },
-        },
-      )
-      console.log(dataCloud)
+        }
+      );
+      console.log(dataCloud);
 
       setVideo({
         ...video,
         videoUrl: dataCloud.secure_url,
-      })
+      });
 
-      return dataCloud.secure_url
+      return dataCloud.secure_url;
     } catch (e) {
-      console.error(e, `\n from uploader`)
-      throw e
+      console.error(e, `\n from uploader`);
+      throw e;
     }
-  }
+  };
   const handleGoogleLogin = async () => {
-    localStorage.setItem("openCreateEvent", "true")
-    window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
-    return
-  }
+    localStorage.setItem("openCreateEvent", "true");
+    window.location.href = `${apiService.getUri()}auth/google?link=${
+      user.id
+    }&role=${user.role}&redirectUrl=${pathname}`;
+    return;
+  };
   const add = async () => {
     // Check if Google authentication is needed for online events
-    if (type === "online" && meetingPlatform === "google" && !user.isGoogleLinked) {
+    if (
+      type === "online" &&
+      meetingPlatform === "google" &&
+      !user.isGoogleLinked
+    ) {
       // Save form data to localStorage
       localStorage.setItem(
         "pendingEventData",
@@ -443,66 +468,73 @@ const AddEvents = ({
           video,
           scholarship: getScholarship(),
           courseColor,
-
-        }),
-      )
+        })
+      );
 
       // Redirect to Google sign-in
-      console.log(apiService.getUri())
-      window.location.href = `${apiService.getUri()}auth/google?link=${user.id}&role=${user.role}&redirectUrl=${pathname}`
-      return
+      console.log(apiService.getUri());
+      window.location.href = `${apiService.getUri()}auth/google?link=${
+        user.id
+      }&role=${user.role}&redirectUrl=${pathname}`;
+      return;
     }
 
     if (type === `online` && meetingPlatform !== "google" && conflict) {
-      setActive(1)
+      setActive(1);
       return api.open({
         message: "You have chosen a disabled time please check",
-      })
+      });
     }
 
     if (
       title &&
-        about &&
-        (type === "offline" || type === "online") &&
-        duration &&
-        category &&
-        image &&
-        mode &&
-        type === "offline"
+      about &&
+      (type === "offline" || type === "online") &&
+      duration &&
+      category &&
+      image &&
+      mode &&
+      type === "offline"
         ? startDate && endDate && startTime && endTime && room && location
         : type === "online"
-          ? startDate && endDate && startTime && endTime
-          : startDate && endDate && days.filter((day: any) => day.checked && day.startTime).length !== 0
+        ? startDate && endDate && startTime && endTime
+        : startDate &&
+          endDate &&
+          days.filter((day: any) => day.checked && day.startTime).length !== 0
     ) {
-      let videoUrl = null
+      let videoUrl = null;
       if (type === "webinar") {
         if (!video.video) {
           return api.open({
             message: `You must upload a video file to create this event`,
-          })
+          });
         }
-        setUploading(true)
+        setUploading(true);
         try {
-          videoUrl = await uploadVideo()
+          videoUrl = await uploadVideo();
         } catch (e) {
-          console.error(e)
-          setUploading(false)
+          console.error(e);
+          setUploading(false);
           return api.open({
             message: `Something went wrong during video upload`,
-          })
+          });
         }
 
-        setUploading(false)
+        setUploading(false);
       }
-      setLoading(true)
+      setLoading(true);
 
-      const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD")
-      const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD")
+      const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
+      const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD");
 
-      const startDateTime = dayjs.utc(`${formattedStartDate}T${startTime || "00:00"}:00`)
-      const endDateTime = dayjs.utc(`${formattedEndDate}T${endTime || "00:00"}:00`)
-      const startDateJS = startDateTime.toDate()
-      const endDateJS = endDateTime.toDate()
+      const startDateTime = dayjs.utc(
+        `${formattedStartDate}T${startTime || "00:00"}:00`
+      );
+      const endDateTime = dayjs.utc(
+        `${formattedEndDate}T${endTime || "00:00"}:00`
+      );
+      const startDateJS = startDateTime.toDate();
+      const endDateJS = endDateTime.toDate();
 
       apiService
         .post(`events/add-event/${user.id}`, {
@@ -531,91 +563,103 @@ const AddEvents = ({
           },
           meetingType: meetingPlatform,
           primaryColor: courseColor,
-
         })
         .then((response) => {
           // console.log(response.data)
           api.open({
             message: "Events Created Successfully!",
-          })
-          setLoading(false)
+          });
+          setLoading(false);
 
           // Clear localStorage after successful submission
-          localStorage.removeItem("pendingEventData")
+          localStorage.removeItem("pendingEventData");
 
-          router.push(`/events/${response.data.event._id}`)
+          router.push(`/events/${response.data.event._id}`);
 
-          handleClick()
+          handleClick();
         })
         .catch((error) => {
           api.open({
             message: error.response.data.message,
-          })
+          });
           if (error.response.data.showPop && setShowPremium) {
-            setShowPremium(true)
+            setShowPremium(true);
           }
-        })
+        });
     } else {
       api.open({
         message: "Please fill all fields!",
-      })
+      });
     }
-  }
+  };
 
   useEffect(() => {
     if (type === "online" && startTime) {
-      const [hours, minutes] = startTime.split(":")
-      const startDateIn = new Date(new Date(startDate || "").setHours(Number.parseInt(hours), Number.parseInt(minutes)))
-      const endDateIn = new Date()
-      endDateIn.setTime(startDateIn.getTime() + (duration || 1) * 60000)
-      const endTime = dayjs(endDateIn).format("HH:mm")
-      setEndTime(endTime)
-      setEndDate(dayjs(endDateIn).format("YYYY-MM-DD"))
+      const [hours, minutes] = startTime.split(":");
+      const startDateIn = new Date(
+        new Date(startDate || "").setHours(
+          Number.parseInt(hours),
+          Number.parseInt(minutes)
+        )
+      );
+      const endDateIn = new Date();
+      endDateIn.setTime(startDateIn.getTime() + (duration || 1) * 60000);
+      const endTime = dayjs(endDateIn).format("HH:mm");
+      setEndTime(endTime);
+      setEndDate(dayjs(endDateIn).format("YYYY-MM-DD"));
     }
-    if (duration > 40 && type !== "offline" && type !== "webinar" && meetingPlatform === "zoom") {
-      setDuration(40)
+    if (
+      duration > 40 &&
+      type !== "offline" &&
+      type !== "webinar" &&
+      meetingPlatform === "zoom"
+    ) {
+      setDuration(40);
     }
-  }, [type, startTime, duration])
+  }, [type, startTime, duration]);
 
-  const [categories, setCategories] = useState<CategoryType[]>([])
+  const [categories, setCategories] = useState<CategoryType[]>([]);
 
   const getCategories = () => {
     apiService
       .get("category/all")
       .then((response) => {
         // console.log(response.data)
-        setCategories(response.data.category)
+        setCategories(response.data.category);
       })
       .catch((error) => {
-        console.log(error)
-      })
-  }
+        console.log(error);
+      });
+  };
 
   const getUser = () => {
     apiService.get(`user/profile/${user.id}`).then((response) => {
-      setUserProfile(response.data.user)
-    })
-  }
+      setUserProfile(response.data.user);
+    });
+  };
 
   const getLiveCourses = () => {
     apiService
       .get("courses/live")
       .then((response) => {
-        setLiveCourses(response.data)
+        setLiveCourses(response.data);
       })
       .catch((e) => {
-        console.log(e)
-      })
-  }
+        console.log(e);
+      });
+  };
 
   useEffect(() => {
-    getStudents()
-    getCategories()
-    getLiveCourses()
-    getUser()
-  }, [])
+    getStudents();
+    getCategories();
+    getLiveCourses();
+    getUser();
+  }, []);
 
-  const formattedOptions = students.map((option: UserType) => ({ value: option.studentId, label: option.fullname }))
+  const formattedOptions = students.map((option: UserType) => ({
+    value: option.studentId,
+    label: option.fullname,
+  }));
 
   return (
     open && (
@@ -626,7 +670,11 @@ const AddEvents = ({
         ></div>
         <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[70%] w-[95%] mx-auto z-20 bg-[#F8F7F4]">
           <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12 flex justify-between">
-            {course === null ? <p className="font-medium">Add Event</p> : <p className="font-medium">Edit Event</p>}
+            {course === null ? (
+              <p className="font-medium">Add Event</p>
+            ) : (
+              <p className="font-medium">Edit Event</p>
+            )}
             <img
               onClick={() => handleClick()}
               className="w-6 h-6 cursor-pointer"
@@ -664,7 +712,11 @@ const AddEvents = ({
                     className="border border-[#1E1E1ED9] p-2 my-1 rounded-md font-medium w-full"
                     onClick={() => uploadRef.current?.click()}
                   >
-                    <img src="/images/icons/upload.svg" className="w-8 mx-auto" alt="" />
+                    <img
+                      src="/images/icons/upload.svg"
+                      className="w-8 mx-auto"
+                      alt=""
+                    />
                     <p> Add course</p>
                   </button>
                 )}
@@ -682,13 +734,31 @@ const AddEvents = ({
             </div>
             <div className="lg:w-[48%]">
               <div className="border-b font-medium flex justify-between border-[#1E1E1E12]">
-                <div className={active === 0 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
+                <div
+                  className={
+                    active === 0
+                      ? "border-b border-primary p-2"
+                      : "p-2 cursor-pointer"
+                  }
+                >
                   <p onClick={() => setActive(0)}>Event Descriptions</p>
                 </div>
-                <div className={active === 1 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
+                <div
+                  className={
+                    active === 1
+                      ? "border-b border-primary p-2"
+                      : "p-2 cursor-pointer"
+                  }
+                >
                   <p onClick={() => setActive(1)}>Event Details</p>
                 </div>
-                <div className={active === 2 ? "border-b border-primary p-2" : "p-2 cursor-pointer"}>
+                <div
+                  className={
+                    active === 2
+                      ? "border-b border-primary p-2"
+                      : "p-2 cursor-pointer"
+                  }
+                >
                   <p onClick={() => setActive(2)}>Fee</p>
                 </div>
               </div>
@@ -700,7 +770,9 @@ const AddEvents = ({
                         <div>
                           <div className="flex justify-between">
                             <div className="my-1 w-[48%]">
-                              <label className="text-sm font-medium my-1">Event Type</label>
+                              <label className="text-sm font-medium my-1">
+                                Event Type
+                              </label>
                               <select
                                 onChange={(e) => setMode(e.target.value)}
                                 value={mode}
@@ -709,10 +781,13 @@ const AddEvents = ({
                                 <option value="conference">Conference</option>
                                 <option value="seminar">Seminar</option>
                                 <option value="workshop">Workshop</option>
+                                <option value="webinar">Webinar</option>
                               </select>
                             </div>
                             <div className="my-1 w-[48%]">
-                              <label className="text-sm font-medium my-1">Event Mode</label>
+                              <label className="text-sm font-medium my-1">
+                                Event Mode
+                              </label>
                               <select
                                 onChange={handleTypeChange}
                                 value={type}
@@ -720,15 +795,18 @@ const AddEvents = ({
                               >
                                 <option value="online">Online</option>
                                 <option value="offline">Offline</option>
-                                <option value="webinar">Webinar</option>
                               </select>
                             </div>
                           </div>
                           <div className="flex justify-between my-1">
                             <div className="w-full">
-                              <label className="text-sm font-medium my-1">Event Category</label>
+                              <label className="text-sm font-medium my-1">
+                                Event Category
+                              </label>
                               <select
-                                onChange={(e) => setCategoryIndex(e.target.value)}
+                                onChange={(e) =>
+                                  setCategoryIndex(e.target.value)
+                                }
                                 value={categoryIndex}
                                 className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                               >
@@ -747,9 +825,13 @@ const AddEvents = ({
                                 single.category === categoryIndex &&
                                 single.subCategory.length >= 1 && (
                                   <div key={single._id} className="w-full ml-3">
-                                    <label className="text-sm font-medium my-1">Sub Category</label>
+                                    <label className="text-sm font-medium my-1">
+                                      Sub Category
+                                    </label>
                                     <select
-                                      onChange={(e) => setCategory(e.target.value)}
+                                      onChange={(e) =>
+                                        setCategory(e.target.value)
+                                      }
                                       value={category}
                                       className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                                     >
@@ -763,11 +845,13 @@ const AddEvents = ({
                                       ))}
                                     </select>
                                   </div>
-                                ),
+                                )
                             )}
                           </div>
                           <div className="my-1">
-                            <label className="text-sm font-medium my-1">Available Seats</label>
+                            <label className="text-sm font-medium my-1">
+                              Available Seats
+                            </label>
                             <input
                               onChange={(e) => setTarget(e.target.value)}
                               value={target}
@@ -776,7 +860,9 @@ const AddEvents = ({
                             />
                           </div>
                           <div className="my-1">
-                            <label className="text-sm font-medium my-1">Event title</label>
+                            <label className="text-sm font-medium my-1">
+                              Event title
+                            </label>
                             <input
                               onChange={(e) => setTitle(e.target.value)}
                               value={title}
@@ -785,7 +871,9 @@ const AddEvents = ({
                             />
                           </div>
                           <div className="my-1">
-                            <label className="text-sm font-medium my-1">Event Primary Colour</label>
+                            <label className="text-sm font-medium my-1">
+                              Event Primary Colour
+                            </label>
                             <div className="flex items-center gap-2">
                               <input
                                 type="color"
@@ -805,7 +893,9 @@ const AddEvents = ({
                             </div>
                           </div>
                           <div className="my-1">
-                            <label className="text-sm font-medium my-1">About event</label>
+                            <label className="text-sm font-medium my-1">
+                              About event
+                            </label>
                             <textarea
                               onChange={(e) => setAbout(e.target.value)}
                               value={about}
@@ -813,23 +903,28 @@ const AddEvents = ({
                             ></textarea>
                           </div>
                         </div>
-                      )
+                      );
                     case 1:
                       return (
                         <div>
                           <div className="flex justify-between">
                             <div className="w-[48%]">
-                              <label className="text-sm font-medium my-1">Event Duration</label>
+                              <label className="text-sm font-medium my-1">
+                                Event Duration
+                              </label>
                               <input
                                 defaultChecked
                                 onChange={(e) => {
-                                  e.preventDefault()
-                                  console.log(e.target.value)
-                                  setDuration(Number.parseInt(e.target.value))
+                                  e.preventDefault();
+                                  console.log(e.target.value);
+                                  setDuration(Number.parseInt(e.target.value));
                                 }}
                                 max={
                                   type === "online"
-                                    ? Number.parseFloat(process.env.NEXT_PUBLIC_MEETING_DURATION as string)
+                                    ? Number.parseFloat(
+                                        process.env
+                                          .NEXT_PUBLIC_MEETING_DURATION as string
+                                      )
                                     : undefined
                                 }
                                 value={duration}
@@ -838,7 +933,10 @@ const AddEvents = ({
                               />
                             </div>
                             <div className="w-[48%]">
-                              <label className="text-sm font-medium my-1"> *</label>
+                              <label className="text-sm font-medium my-1">
+                                {" "}
+                                *
+                              </label>
                               <select
                                 onChange={(e) => setTimeframe(e.target.value)}
                                 value={timeframe}
@@ -855,33 +953,47 @@ const AddEvents = ({
                           {type === "online" ? (
                             <>
                               <div className="w-full my-4">
-                                <label className="text-sm font-medium my-1">Meeting Platform</label>
+                                <label className="text-sm font-medium my-1">
+                                  Meeting Platform
+                                </label>
                                 <select
-                                  onChange={(e) => setMeetingPlatform(e.target.value)}
+                                  onChange={(e) =>
+                                    setMeetingPlatform(e.target.value)
+                                  }
                                   value={meetingPlatform}
                                   className="border rounded-md w-full border-[#1E1E1ED9] p-2.5 bg-transparent"
                                 >
                                   <option value="zoom">Zoom</option>
                                   <option value="google">Google Meet</option>
                                 </select>
-                                {
-                                  meetingPlatform === "google" && (!user.isGoogleLinked ? (
+                                {meetingPlatform === "google" &&
+                                  (!user.isGoogleLinked ? (
                                     <p className="text-sm flex items-center gap-2 text-red-500">
-                                      You need to sign in with Google to create a live course.
-                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                      You need to sign in with Google to create
+                                      a live course.
+                                      <button
+                                        onClick={handleGoogleLogin}
+                                        className="text-blue-600 underline"
+                                      >
                                         Sign in with Google
                                       </button>
                                     </p>
                                   ) : (
                                     <p className="flex items-center  gap-2">
-                                      <span >Email : <span className="font-medium">{userProfile?.gMail || "Connected"}</span></span>
-                                      <button onClick={handleGoogleLogin} className="text-blue-600 underline">
+                                      <span>
+                                        Email :{" "}
+                                        <span className="font-medium">
+                                          {userProfile?.gMail || "Connected"}
+                                        </span>
+                                      </span>
+                                      <button
+                                        onClick={handleGoogleLogin}
+                                        className="text-blue-600 underline"
+                                      >
                                         Change account
                                       </button>
                                     </p>
-
-                                  ))
-                                }
+                                  ))}
                               </div>
                               <SelectCourseDate
                                 setEndDate={setEndDate}
@@ -893,7 +1005,11 @@ const AddEvents = ({
                                 setStartDate={setStartDate}
                                 setStartTime={setStartTime}
                                 setEndTime={setEndTime}
-                                courses={meetingPlatform === "google" ? [] : liveCourses}
+                                courses={
+                                  meetingPlatform === "google"
+                                    ? []
+                                    : liveCourses
+                                }
                               />
                             </>
                           ) : null}
@@ -901,16 +1017,22 @@ const AddEvents = ({
                             <>
                               <div className="flex justify-between my-1">
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">Start date</label>
+                                  <label className="text-sm font-medium my-1">
+                                    Start date
+                                  </label>
                                   <input
-                                    onChange={(e) => setStartDate(e.target.value)}
+                                    onChange={(e) =>
+                                      setStartDate(e.target.value)
+                                    }
                                     value={startDate}
                                     type="date"
                                     className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                                   />
                                 </div>
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">End date</label>
+                                  <label className="text-sm font-medium my-1">
+                                    End date
+                                  </label>
                                   <input
                                     onChange={(e) => setEndDate(e.target.value)}
                                     value={endDate}
@@ -921,16 +1043,22 @@ const AddEvents = ({
                               </div>
                               <div className="flex justify-between my-1">
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">Start time</label>
+                                  <label className="text-sm font-medium my-1">
+                                    Start time
+                                  </label>
                                   <input
-                                    onChange={(e) => setStartTime(e.target.value)}
+                                    onChange={(e) =>
+                                      setStartTime(e.target.value)
+                                    }
                                     value={startTime}
                                     type="time"
                                     className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                                   />
                                 </div>
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">End time</label>
+                                  <label className="text-sm font-medium my-1">
+                                    End time
+                                  </label>
                                   <input
                                     onChange={(e) => setEndTime(e.target.value)}
                                     value={endTime}
@@ -941,17 +1069,23 @@ const AddEvents = ({
                               </div>
                               <div className="flex justify-between my-1">
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">Event Location</label>
+                                  <label className="text-sm font-medium my-1">
+                                    Event Location
+                                  </label>
                                   <input
                                     placeholder="Place where this event will hold"
-                                    onChange={(e) => setLocation(e.target.value)}
+                                    onChange={(e) =>
+                                      setLocation(e.target.value)
+                                    }
                                     value={location}
                                     type="text"
                                     className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                                   />
                                 </div>
                                 <div className="w-[48%]">
-                                  <label className="text-sm font-medium my-1">Event Room</label>
+                                  <label className="text-sm font-medium my-1">
+                                    Event Room
+                                  </label>
                                   <input
                                     placeholder="Room No."
                                     onChange={(e) => setRoom(e.target.value)}
@@ -979,26 +1113,38 @@ const AddEvents = ({
                                 hidden
                                 multiple={false}
                               />
-                              <label className="flex cursor-pointer h-full   " htmlFor={`video`}>
+                              <label
+                                className="flex cursor-pointer h-full   "
+                                htmlFor={`video`}
+                              >
                                 {video.videoUrl === "" ? (
                                   <div className="w-fit flex items-center bg-primary hover:bg-opacity-70 duration-300 rounded-md px-5 py-2 gap-2 ">
                                     <span className=" text-[20px]">
                                       <Video />
                                     </span>
-                                    <span className="text-sm">Add your Recorded webinar </span>
+                                    <span className="text-sm">
+                                      Add your Recorded webinar{" "}
+                                    </span>
                                   </div>
                                 ) : (
                                   <div className="relative w-full group border overflow-hidden border-[#d9d9d9]  h-full">
-                                    <video key={video.videoUrl} className={`rounded-lg w-full video`} width="250">
-                                      <source src={video.videoUrl} type="video/mp4" />
+                                    <video
+                                      key={video.videoUrl}
+                                      className={`rounded-lg w-full video`}
+                                      width="250"
+                                    >
+                                      <source
+                                        src={video.videoUrl}
+                                        type="video/mp4"
+                                      />
                                     </video>
                                     <div className="absolute inset-0 bg-[rgb(0,0,0,0.3)] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100 flex justify-center gap-2 items-center">
                                       <button
                                         className="text-primary text-[70px] transform scale-75 group-hover:scale-100 transition-transform duration-300"
                                         onClick={(e) => {
-                                          e.stopPropagation()
-                                          e.preventDefault()
-                                          handlePlayClick()
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          handlePlayClick();
                                         }}
                                       >
                                         {play ? <Pause /> : <Play />}
@@ -1017,9 +1163,9 @@ const AddEvents = ({
                                           className="text-white hover:text-red-400 text-[18px]"
                                           title="remove video"
                                           onClick={(e) => {
-                                            e.stopPropagation()
-                                            e.preventDefault()
-                                            setVideo(layout)
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            setVideo(layout);
                                           }}
                                         >
                                           <Bin />
@@ -1039,7 +1185,11 @@ const AddEvents = ({
                                   allowedEdit={true}
                                   setConflict={setConflict}
                                   duration={duration}
-                                  courses={meetingPlatform === "google" ? [] : liveCourses}
+                                  courses={
+                                    meetingPlatform === "google"
+                                      ? []
+                                      : liveCourses
+                                  }
                                   days={days}
                                   endDate={endDate}
                                   setDays={setDays}
@@ -1051,19 +1201,25 @@ const AddEvents = ({
                             </div>
                           )}
                         </div>
-                      )
+                      );
                     case 2:
                       return (
                         <div>
                           <div className="my-1">
-                            <label className="text-sm font-medium my-1">Event Fee</label>
+                            <label className="text-sm font-medium my-1">
+                              Event Fee
+                            </label>
                             <input
-                              onChange={(e) => setFee(Number.parseInt(e.target.value))}
+                              onChange={(e) =>
+                                setFee(Number.parseInt(e.target.value))
+                              }
                               value={fee}
                               type="number"
                               className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                             />
-                            <p className="text-xs">Set event fee to 0 for a free course</p>
+                            <p className="text-xs">
+                              Set event fee to 0 for a free course
+                            </p>
                           </div>
                           <div className="my-1">
                             <label className="text-sm font-medium my-1">
@@ -1075,23 +1231,27 @@ const AddEvents = ({
                               className="basic-multi-select"
                               classNamePrefix="select"
                               onChange={(e: any) => {
-                                setScholarship(e)
+                                setScholarship(e);
                               }}
                             />
                           </div>
                           <div className="my-5">
-                            <label className="text-sm font-medium my-1">Show striked out original cost fee</label>
+                            <label className="text-sm font-medium my-1">
+                              Show striked out original cost fee
+                            </label>
                             <input
                               type="number"
-                              onChange={(e) => setStriked(Number.parseInt(e.target.value))}
+                              onChange={(e) =>
+                                setStriked(Number.parseInt(e.target.value))
+                              }
                               value={striked}
                               className="border rounded-md border-[#1E1E1ED9] w-full h-20 p-2 bg-transparent"
                             />
                           </div>
                         </div>
-                      )
+                      );
                     default:
-                      return null
+                      return null;
                   }
                 })()}
 
@@ -1100,20 +1260,27 @@ const AddEvents = ({
                     <h3>Video Upload</h3>
                     <div className="mt-3">
                       <div className="w-full bg-gray p-0.5 rounded-md">
-                        <div style={{ width: `${uploadProgress}%` }} className="bg-primary h-2 rounded-md"></div>
+                        <div
+                          style={{ width: `${uploadProgress}%` }}
+                          className="bg-primary h-2 rounded-md"
+                        ></div>
                       </div>
                     </div>
                   </div>
                 )}
                 <div>
                   <p className="text-sm my-4">
-                    By uploading you agree that this event is a product of you and not being forged
+                    By uploading you agree that this event is a product of you
+                    and not being forged
                     <input className="ml-2" type="checkbox" />
                   </p>
                   <div className="flex">
                     {course === null ? (
                       active === 2 ? (
-                        <button onClick={() => add()} className="p-2 bg-primary font-medium w-40 rounded-md text-sm">
+                        <button
+                          onClick={() => add()}
+                          className="p-2 bg-primary font-medium w-40 rounded-md text-sm"
+                        >
                           {loading ? <Spin /> : "Create Event"}
                         </button>
                       ) : (
@@ -1125,7 +1292,10 @@ const AddEvents = ({
                         </button>
                       )
                     ) : active === 2 ? (
-                      <button onClick={() => edit()} className="p-2 bg-primary font-medium w-40 rounded-md text-sm">
+                      <button
+                        onClick={() => edit()}
+                        className="p-2 bg-primary font-medium w-40 rounded-md text-sm"
+                      >
                         {loading ? <Spin /> : "Edit Event"}
                       </button>
                     ) : (
@@ -1147,7 +1317,7 @@ const AddEvents = ({
         </div>
       </div>
     )
-  )
-}
+  );
+};
 
-export default AddEvents
+export default AddEvents;

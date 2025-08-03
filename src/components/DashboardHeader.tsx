@@ -183,7 +183,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             alt=""
           />
         </div>
-        <div className={"lg:flex hidden lg:w-[45%]  my-auto justify-between"}>
+        <div className={"flex lg:w-[45%]  my-auto justify-between"}>
           {/* <Link href={"/#courses"}>
             <p className="my-auto">Find Experts</p>
           </Link> */}
@@ -191,7 +191,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
             className="text-center flex items-center sm:my-auto flex-col gap-2"
             href={`https://www.experthubllc.com/feeds?tid=${user.accessToken}`}
           >
-            {/* <svg
+            <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
@@ -200,18 +200,82 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
               viewBox="0 0 16 16"
             >
               <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z" />
-            </svg> */}
+            </svg>
             <p className="sm:hidden">Home</p>
           </a>
-          <Link className="my-auto" href={"https://www.experthubllc.com/home#workspace"}>
-            <p className="my-auto">Workspace</p>
+          <Link
+            className="text-center sm:my-auto flex items-center flex-col gap-2"
+            href={"https://www.experthubllc.com/home#workspace"}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-briefcase"
+              viewBox="0 0 16 16"
+            >
+              <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5" />
+            </svg>
+            <p className="sm:hidden my-auto">Workspace</p>
           </Link>
-          <Link className="my-auto" href={"https://www.experthubllc.com/home#training"}>
-            <p className="my-auto">Trainings</p>
+          <Link
+            className="text-center sm:my-auto flex items-center flex-col gap-2"
+            href={`/${user.role === "student" ? "applicant" : user.role}`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-book"
+              viewBox="0 0 16 16"
+            >
+              <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783" />
+            </svg>
+            <p className="sm:hidden my-auto">Trainings</p>
           </Link>
-          <Link className="my-auto" href={"https://www.experthubllc.com/home#events"}>
-            <p className="my-auto">Events</p>
+          <Link
+            className="text-center sm:my-auto flex items-center flex-col gap-2"
+            href={`/${user.role === "student" ? "applicant" : user.role}/events`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi bi-calendar-event"
+              viewBox="0 0 16 16"
+            >
+              <path d="M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5z" />
+              <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z" />
+            </svg>
+            <p className="sm:hidden my-auto">Events</p>
           </Link>
+          <a
+            className="text-center sm:my-auto flex items-center flex-col gap-2 "
+            href="https://project.experthubllc.com/"
+            target="_blank"
+          >
+            {/* <img
+              src="/images/project.png"
+              className="lg:w-5 sm:w-8 my-auto sm:h-8 mx-auto"
+              alt=""
+            /> */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              className="bi mx-autobi-journal-text"
+              viewBox="0 0 16 16"
+            >
+              <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5" />
+              <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2" />
+              <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z" />
+            </svg>
+            <p className="sm:hidden text-[15px]">Project Manager</p>
+          </a>
         </div>
         {/* <div className='flex'>
           <div className='mr-20 sm:hidden'>
