@@ -39,7 +39,7 @@ const Events = () => {
       setFilteredEvents(allEvents)
     } else {
       const filtered = allEvents.filter((event: CourseType) => 
-        event.type?.toLowerCase() === typeName.toLowerCase()
+        event.mode?.toLowerCase() === typeName.toLowerCase()
       )
       setFilteredEvents(filtered)
     }

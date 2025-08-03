@@ -794,7 +794,11 @@ const AddEvents = ({
                                 className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
                               >
                                 <option value="online">Online</option>
-                                <option value="offline">Offline</option>
+                                {mode === "webinar" ? (
+                                  <option value="video">Video</option>
+                                ) : (
+                                  <option value="offline">Offline</option>
+                                )}
                               </select>
                             </div>
                           </div>
