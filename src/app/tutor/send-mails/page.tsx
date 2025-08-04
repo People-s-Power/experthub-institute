@@ -37,8 +37,8 @@ const SendMail = () => {
       .catch((error) => {
         console.log(error);
         api.open({
-          message: "Failed to fetch students",
-          type: "error",
+          message: "Tutor does not have any students enrolled",
+          type: "warning",
         });
       });
   };
