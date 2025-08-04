@@ -1102,7 +1102,7 @@ const AddEvents = ({
                             </>
                           )}
 
-                          {(mode === "webinar" ||
+                          {(mode === "webinar" &&
                             type === "video") && (
                               <div className=" mt-4">
                                 {/* <div className='my-1'>
