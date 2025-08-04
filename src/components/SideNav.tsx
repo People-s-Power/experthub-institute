@@ -759,7 +759,7 @@ const SideNav = ({ setToggle }: { setToggle?: () => void }) => {
                       d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
                     />
                   </svg>
-                  <p className="sm:hidden text-[15px]">Add Team</p>
+                  <p className="text-[15px]">Add Team</p>
                 </div>
               </Link>
             </li>

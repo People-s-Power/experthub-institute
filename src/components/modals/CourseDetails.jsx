@@ -591,10 +591,10 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                       </div>
 
                       {/* Webinar/Online Details */}
-                      {(course.type === "webinar" || course.type === "online") && (
+                      {(course.mode === "webinar" || course.type === "online") && (
                         <div className='bg-gray-50 rounded-lg p-5 mb-6 border border-gray-200'>
                           <h3 className='text-lg font-medium text-gray-900 mb-3'>
-                            {course.type === "webinar" ? "Event Details" : "Course Schedule"}
+                            {course.mode === "webinar" ? "Event Details" : "Course Schedule"}
                           </h3>
 
                           <div className='flex items-center mb-4'>
@@ -630,12 +630,12 @@ const CourseDetails = ({ open, handleClick, course, type, call, action }) => {
                             </div>
                           </div>
 
-                          {isOn().on && course.type === "webinar" && (
+                          {isOn().on && course.mode === "webinar" && (
                             <div className="w-full mt-4">
                               <WebinarVideo
                                 videoUrl={course.videoUrl}
                                 courseId={course._id}
-                                isWebinar={course.type === "webinar"}
+                                isWebinar={course.mode === "webinar"}
                                 isEnrolled={Boolean(course.enrolledStudents.find((userIn) => userIn._id === user.id))}
                                 autoPlay={isOn().on}
                                 onClose={handleClick}
