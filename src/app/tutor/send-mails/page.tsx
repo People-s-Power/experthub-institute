@@ -159,7 +159,7 @@ const SendMail = () => {
                     type="checkbox"
                     checked={selectedUsers.includes(user._id)}
                     onChange={() => handleUserSelection(user._id)}
-                    className="mr-3"
+                    className="mr-3 cursor-pointer"
                   />
                   <div className="flex-1">
                     <div className="font-medium text-sm">{user.fullName}</div>
