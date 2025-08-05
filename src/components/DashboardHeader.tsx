@@ -205,7 +205,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </a>
           <Link
             className="text-center sm:my-auto flex items-center flex-col gap-2"
-            href={"https://www.experthubllc.com/home#workspace"}
+            href={"#"}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +274,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
               <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2" />
               <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z" />
             </svg>
-            <p className="sm:hidden text-[15px]">Project Manager</p>
+            <p className="sm:hidden">Project Manager</p>
           </a>
         </div>
         {/* <div className='flex'>

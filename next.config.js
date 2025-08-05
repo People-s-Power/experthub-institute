@@ -30,6 +30,10 @@ const nextConfig = {
         hostname: "localhost",
 
       },
+      {
+        protocol: "https",
+        hostname: "static.vecteezy.com",
+      },
     ],
   },
 

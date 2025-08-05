@@ -436,6 +436,8 @@ const AddEvents = ({
   };
   const add = async () => {
     // Check if Google authentication is needed for online events
+    setLoading(true);
+
     if (
       type === "online" &&
       meetingPlatform === "google" &&
@@ -503,8 +505,9 @@ const AddEvents = ({
           days.filter((day: any) => day.checked && day.startTime).length !== 0
     ) {
       let videoUrl = null;
-      if (mode === "webinar") {
+      if (mode === "webinar" && type === 'video') {
         if (!video.video) {
+          setLoading(false);
           return api.open({
             message: `You must upload a video file to create this event`,
           });
@@ -515,6 +518,7 @@ const AddEvents = ({
         } catch (e) {
           console.error(e);
           setUploading(false);
+          setLoading(false);
           return api.open({
             message: `Something went wrong during video upload`,
           });
@@ -522,7 +526,6 @@ const AddEvents = ({
 
         setUploading(false);
       }
-      setLoading(true);
 
       const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
       const formattedEndDate = dayjs(endDate).format("YYYY-MM-DD");
@@ -1102,112 +1105,109 @@ const AddEvents = ({
                             </>
                           )}
 
-                          {(mode === "webinar" &&
-                            type === "video") && (
-                              <div className=" mt-4">
-                                {/* <div className='my-1'>
+                          {mode === "webinar" && type === "video" && (
+                            <div className=" mt-4">
+                              {/* <div className='my-1'>
                             <label className='text-sm font-medium my-1'>Sub Title</label>
                             <input onChange={e => handleInputChange(index, 'title', e.target.value)} value={video.title} type="text" className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent' />
                             </div> 
                            */}
-                                <input
-                                  onChange={handleVideoChange}
-                                  type="file"
-                                  name="identification"
-                                  accept="video/*"
-                                  id={`video`}
-                                  hidden
-                                  multiple={false}
-                                />
-                                <label
-                                  className="flex cursor-pointer h-full   "
-                                  htmlFor={`video`}
-                                >
-                                  {video.videoUrl === "" ? (
-                                    <div className="w-fit flex items-center bg-primary hover:bg-opacity-70 duration-300 rounded-md px-5 py-2 gap-2 ">
-                                      <span className=" text-[20px]">
-                                        <Video />
-                                      </span>
-                                      <span className="text-sm">
-                                        Add your Recorded webinar{" "}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <div className="relative w-full group border overflow-hidden border-[#d9d9d9]  h-full">
-                                      <video
-                                        key={video.videoUrl}
-                                        className={`rounded-lg w-full video`}
-                                        width="250"
+                              <input
+                                onChange={handleVideoChange}
+                                type="file"
+                                name="identification"
+                                accept="video/*"
+                                id={`video`}
+                                hidden
+                                multiple={false}
+                              />
+                              <label
+                                className="flex cursor-pointer h-full   "
+                                htmlFor={`video`}
+                              >
+                                {video.videoUrl === "" ? (
+                                  <div className="w-fit flex items-center bg-primary hover:bg-opacity-70 duration-300 rounded-md px-5 py-2 gap-2 ">
+                                    <span className=" text-[20px]">
+                                      <Video />
+                                    </span>
+                                    <span className="text-sm">
+                                      Add your Recorded webinar{" "}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="relative w-full group border overflow-hidden border-[#d9d9d9]  h-full">
+                                    <video
+                                      key={video.videoUrl}
+                                      className={`rounded-lg w-full video`}
+                                      width="250"
+                                    >
+                                      <source
+                                        src={video.videoUrl}
+                                        type="video/mp4"
+                                      />
+                                    </video>
+                                    <div className="absolute inset-0 bg-[rgb(0,0,0,0.3)] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100 flex justify-center gap-2 items-center">
+                                      <button
+                                        className="text-primary text-[70px] transform scale-75 group-hover:scale-100 transition-transform duration-300"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          e.preventDefault();
+                                          handlePlayClick();
+                                        }}
                                       >
-                                        <source
-                                          src={video.videoUrl}
-                                          type="video/mp4"
-                                        />
-                                      </video>
-                                      <div className="absolute inset-0 bg-[rgb(0,0,0,0.3)] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-90 group-hover:scale-100 flex justify-center gap-2 items-center">
+                                        {play ? <Pause /> : <Play />}
+                                      </button>
+                                    </div>
+                                    <div className="absolute  bottom-1 w-full transform translate-y-full  group-hover:translate-y-0 transition-transform duration-300">
+                                      <div className="px-3 py-1.5 flex items-center gap-3">
+                                        <label
+                                          title="Change Video"
+                                          htmlFor={`video`}
+                                          className="cursor-pointer text-white hover:text-gray text-[18px]"
+                                        >
+                                          <Replace />
+                                        </label>
                                         <button
-                                          className="text-primary text-[70px] transform scale-75 group-hover:scale-100 transition-transform duration-300"
+                                          className="text-white hover:text-red-400 text-[18px]"
+                                          title="remove video"
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             e.preventDefault();
-                                            handlePlayClick();
+                                            setVideo(layout);
                                           }}
                                         >
-                                          {play ? <Pause /> : <Play />}
+                                          <Bin />
                                         </button>
                                       </div>
-                                      <div className="absolute  bottom-1 w-full transform translate-y-full  group-hover:translate-y-0 transition-transform duration-300">
-                                        <div className="px-3 py-1.5 flex items-center gap-3">
-                                          <label
-                                            title="Change Video"
-                                            htmlFor={`video`}
-                                            className="cursor-pointer text-white hover:text-gray text-[18px]"
-                                          >
-                                            <Replace />
-                                          </label>
-                                          <button
-                                            className="text-white hover:text-red-400 text-[18px]"
-                                            title="remove video"
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              e.preventDefault();
-                                              setVideo(layout);
-                                            }}
-                                          >
-                                            <Bin />
-                                          </button>
-                                        </div>
-                                      </div>
                                     </div>
-                                  )}
+                                  </div>
+                                )}
 
-                                  {/* <p className='text-sm'>{video.videoUrl === "" ?  : video.videoUrl.slice(0, 20)}</p> */}
-                                </label>
+                                {/* <p className='text-sm'>{video.videoUrl === "" ?  : video.videoUrl.slice(0, 20)}</p> */}
+                              </label>
 
-                                <div className="flex flex-col mt-6 gap-2">
-                                  <p className="font-medium">
-                                    Webinar Schedule
-                                  </p>
-                                  <ScheduledCourse
-                                    conflict={conflict}
-                                    allowedEdit={true}
-                                    setConflict={setConflict}
-                                    duration={duration}
-                                    courses={
-                                      meetingPlatform === "google"
-                                        ? []
-                                        : liveCourses
-                                    }
-                                    days={days}
-                                    endDate={endDate}
-                                    setDays={setDays}
-                                    setEndDate={setEndDate}
-                                    startDate={startDate}
-                                    setStartDate={setStartDate}
-                                  />
-                                </div>
+                              <div className="flex flex-col mt-6 gap-2">
+                                <p className="font-medium">Webinar Schedule</p>
+                                <ScheduledCourse
+                                  conflict={conflict}
+                                  allowedEdit={true}
+                                  setConflict={setConflict}
+                                  duration={duration}
+                                  courses={
+                                    meetingPlatform === "google"
+                                      ? []
+                                      : liveCourses
+                                  }
+                                  days={days}
+                                  endDate={endDate}
+                                  setDays={setDays}
+                                  setEndDate={setEndDate}
+                                  startDate={startDate}
+                                  setStartDate={setStartDate}
+                                />
                               </div>
-                            )}
+                            </div>
+                          )}
                         </div>
                       );
                     case 2:
