@@ -19,7 +19,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   >();
   const dispatch = useAppDispatch();
   const [notice, setNotice] = useState<NoticeType | null>();
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const router = useRouter();
   const [api, contextHolder] = notification.useNotification();
 
@@ -237,7 +237,9 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </Link>
           <Link
             className="text-center sm:my-auto flex items-center flex-col gap-2"
-            href={`/${user.role === "student" ? "applicant" : user.role}/events`}
+            href={`/${
+              user.role === "student" ? "applicant" : user.role
+            }/events`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
