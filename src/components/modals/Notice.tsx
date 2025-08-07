@@ -4,10 +4,38 @@ import category from '@/app/admin/category/page';
 import { CategoryType, ThumbnailType } from '@/types/CourseType';
 import apiService from '@/utils/apiService';
 
-const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: any, recipient?: String }) => {
+interface NoticeData {
+  _id?: string;
+  title?: string;
+  body?: string;
+  role?: string;
+  country?: string;
+  category?: string;
+  state?: string;
+  link?: string;
+  page?: string;
+  asset?: ThumbnailType;
+  cancel?: boolean;
+  action?: string;
+  recipient?: String;
+}
+
+const Notice = ({ 
+  open, 
+  handleClick, 
+  recipient, 
+  editMode = false, 
+  noticeData 
+}: { 
+  open: boolean, 
+  handleClick: any, 
+  recipient?: String,
+  editMode?: boolean,
+  noticeData?: NoticeData 
+}) => {
   const [api, contextHolder] = notification.useNotification();
   const [categories, setCategories] = useState<CategoryType[]>([])
-  const [category, setCategory] = useState("")
+  const [category, setCategory] = useState(noticeData?.category || "")
   const [loading, setLoading] = useState(false)
   const [categoryIndex, setCategoryIndex] = useState("")
   const states_in_nigeria = [
@@ -50,20 +78,28 @@ const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: 
     "Federal Capital Territory"
   ]
 
-  const [role, setRole] = useState("student")
-  const [state, setState] = useState("")
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [link, setLink] = useState("")
-  const [referreed, setRefered] = useState("")
-  const [cancel, setCancel] = useState("")
-  const [action, setAction] = useState("")
-  const [image, setImage] = useState<ThumbnailType>()
+  const [role, setRole] = useState(noticeData?.role || "student")
+  const [state, setState] = useState(noticeData?.state || "")
+  const [title, setTitle] = useState(noticeData?.title || "")
+  const [description, setDescription] = useState(noticeData?.body || "")
+  const [link, setLink] = useState(noticeData?.link || "")
+  const [referreed, setRefered] = useState(noticeData?.page || "")
+  const [cancel, setCancel] = useState(noticeData?.cancel ? "yes" : "")
+  const [action, setAction] = useState(noticeData?.action || "")
+  const [image, setImage] = useState<ThumbnailType | undefined>(noticeData?.asset)
+  const [noticeId, setNoticeId] = useState(noticeData?._id || "")
   const uploadRef = useRef<HTMLInputElement>(null)
 
-  const createNotice = () => {
-    setLoading(true)
-    apiService.post('notice/new', {
+  const handleNotice = () => {
+    if (!title || !description) {
+      return api.open({
+        message: "Title and description are required!",
+        type: "warning"
+      });
+    }
+
+    setLoading(true);
+    const noticePayload = {
       title,
       body: description,
       role,
@@ -76,20 +112,49 @@ const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: 
       cancel: cancel === 'yes' ? true : false,
       action,
       recipient
-    }).then(function (response) {
-      console.log(response.data)
-      setLoading(false)
-      api.open({
-        message: "Notice sent out successfully!"
-      });
-      handleClick()
-    }).catch(error => {
-      console.log(error)
-      setLoading(false)
-      api.open({
-        message: error.response.data.message
-      });
-    })
+    };
+
+    if (editMode && noticeId) {
+      // Update existing notice
+      apiService.put(`notice/${noticeId}`, noticePayload)
+        .then(function (response) {
+          console.log(response.data);
+          setLoading(false);
+          api.open({
+            message: "Notice updated successfully!",
+            type: "success"
+          });
+          handleClick();
+        })
+        .catch(error => {
+          console.log(error);
+          setLoading(false);
+          api.open({
+            message: error.response?.data?.message || "Failed to update notice",
+            type: "error"
+          });
+        });
+    } else {
+      // Create new notice
+      apiService.post('notice/new', noticePayload)
+        .then(function (response) {
+          console.log(response.data);
+          setLoading(false);
+          api.open({
+            message: "Notice sent out successfully!",
+            type: "success"
+          });
+          handleClick();
+        })
+        .catch(error => {
+          console.log(error);
+          setLoading(false);
+          api.open({
+            message: error.response?.data?.message || "Failed to create notice",
+            type: "error"
+          });
+        });
+    }
   }
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,8 +188,20 @@ const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: 
   }
 
   useEffect(() => {
-    getCategories()
-  }, [])
+    getCategories();
+    
+    // If in edit mode and we have notice data, initialize category index
+    if (editMode && noticeData && noticeData.category) {
+      // Find the correct category index for the selected category
+      const categoryItem = categories.find(cat => 
+        cat.subCategory && cat.subCategory.includes(noticeData.category || "")
+      );
+      
+      if (categoryItem) {
+        setCategoryIndex(categoryItem.category);
+      }
+    }
+  }, [categories.length]);
 
 
   return (
@@ -132,7 +209,7 @@ const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: 
       <div onClick={() => handleClick()} className='fixed cursor-pointer bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10'></div>
       <div className='fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] w-[95%] mx-auto z-20 bg-[#F8F7F4]'>
         <div className='shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12 flex justify-between'>
-          <p className='font-medium'>Send Notice</p>
+          <p className='font-medium'>{editMode ? 'Edit Notice' : 'Send Notice'}</p>
           <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" />
         </div>
         {contextHolder}
@@ -237,7 +314,9 @@ const Notice = ({ open, handleClick, recipient }: { open: boolean, handleClick: 
             </select>
           </div>
           <div className='my-3'>
-            <button onClick={() => createNotice()} className='p-3 bg-primary px-6 rounded-md'>{loading ? <Spin /> : 'Send'}</button>
+            <button onClick={() => handleNotice()} className='p-3 bg-primary px-6 rounded-md text-white'>
+              {loading ? <Spin /> : editMode ? 'Update' : 'Send'}
+            </button>
           </div>
         </div>
       </div>
