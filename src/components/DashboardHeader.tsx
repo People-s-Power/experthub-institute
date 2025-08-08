@@ -386,8 +386,8 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
 
         {notice && show && (
           <div>
-            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-10"></div>
-            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-20 bg-[#F8F7F4]">
+            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
+            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">
               <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
                 <p className="font-medium text-center">{notice.title}</p>
                 {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
