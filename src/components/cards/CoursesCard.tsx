@@ -16,6 +16,7 @@ import AppointmentModal from "../modals/AppointmentModal";
 import { useRouter } from "next/navigation";
 import AddResources from "../modals/AddResources";
 import { isActionChecked } from "@/utils/checkPrivilege";
+import GiveScholarship from "../modals/GiveScholarship";
 
 const CoursesCard = ({
   course,
@@ -33,6 +34,8 @@ const CoursesCard = ({
   const [enroll, setEnroll] = useState(false);
   const user = useAppSelector((state) => state.value);
   const [assign, setAssign] = useState(false);
+  const [scholarship, setScholarship] = useState(false);
+
   const [participants, setParticipants] = useState(false);
   const [appointment, setAppointment] = useState(false);
   const router = useRouter();
@@ -134,7 +137,7 @@ const CoursesCard = ({
           },
           {
             key: "8",
-            label: <p onClick={() => setEdit(true)}>Give Scholarship</p>,
+            label: <p onClick={() => setScholarship(true)}>Give Scholarship</p>,
           },
         ]
       : []),
@@ -264,6 +267,13 @@ const CoursesCard = ({
         handleClick={() => setAssign(false)}
         course={course}
         getCourse={() => getCourse()}
+      />
+
+      <GiveScholarship
+        open={scholarship}
+        handleClick={() => setScholarship(false)}
+        courseId={course._id}
+        selectedCourse={course}
       />
       {deletec && (
         <div>
