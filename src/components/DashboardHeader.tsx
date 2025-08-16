@@ -35,6 +35,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   useEffect(() => {
     console.log(user);
   }, [user]);
+
   const getNotice = () => {
     apiService
       .get(`notice/${user.id}`)
@@ -406,7 +407,12 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
           </button> */}
         </div>
 
-        {notice && show && (
+        {/* Show notice modal only on the page specified in notice.page */}
+        {notice && show && typeof window !== 'undefined' &&
+          (
+            notice.triggerPage?.toLowerCase() === 'all' ||
+            window.location.pathname.toLowerCase().includes(notice.triggerPage?.toLowerCase())
+          ) && (
           <div>
             <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
             <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">

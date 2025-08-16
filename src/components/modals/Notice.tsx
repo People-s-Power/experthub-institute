@@ -16,6 +16,7 @@ interface NoticeData {
   page?: string;
   asset?: ThumbnailType;
   cancel?: boolean;
+  triggerPage?: string;
   action?: string;
   recipient?: String;
 }
@@ -84,6 +85,7 @@ const Notice = ({
   const [description, setDescription] = useState(noticeData?.body || "");
   const [link, setLink] = useState(noticeData?.link || "");
   const [referreed, setRefered] = useState(noticeData?.page || "");
+  const [triggerPage, setTriggerPage] = useState(noticeData?.triggerPage || "");
   const [cancel, setCancel] = useState(noticeData?.cancel ? "yes" : "");
   const [action, setAction] = useState(noticeData?.action || "");
   const [image, setImage] = useState<ThumbnailType | undefined>(
@@ -157,6 +159,7 @@ const Notice = ({
         state,
         link,
         page: referreed,
+        triggerPage,
         asset: finalAsset,
         cancel: cancel === "yes" ? true : false,
         action,
@@ -165,7 +168,10 @@ const Notice = ({
 
       if (editMode && noticeId) {
         // Update existing notice
-        const response = await apiService.put(`notice/${noticeId}`, noticePayload);
+        const response = await apiService.put(
+          `notice/${noticeId}`,
+          noticePayload
+        );
         console.log(response.data);
         setLoading(false);
         api.open({
@@ -199,21 +205,36 @@ const Notice = ({
 
     if (files && files.length > 0) {
       const file = files[0];
-      
+
       // Get file extension from the file name
       const fileName = file.name.toLowerCase();
-      const fileExtension = fileName.split('.').pop() || '';
-      
+      const fileExtension = fileName.split(".").pop() || "";
+
       // List of supported video formats
       const videoFormats = [
-        'mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 
-        '3gp', 'ogv', 'asf', 'f4v', 'm4v', 'rm', 'rmvb', 
-        'vob', 'ts', 'mts', 'm2ts'
+        "mp4",
+        "avi",
+        "mov",
+        "wmv",
+        "flv",
+        "webm",
+        "mkv",
+        "3gp",
+        "ogv",
+        "asf",
+        "f4v",
+        "m4v",
+        "rm",
+        "rmvb",
+        "vob",
+        "ts",
+        "mts",
+        "m2ts",
       ];
-      
+
       // Check if the file is a video or image
       const isVideo = videoFormats.includes(fileExtension);
-      
+
       if (isVideo) {
         // For videos, store the file and create object URL for preview
         setSelectedFile(file);
@@ -269,7 +290,7 @@ const Notice = ({
 
     // Cleanup object URLs on unmount
     return () => {
-      if (image && image.url.startsWith('blob:')) {
+      if (image && image.url.startsWith("blob:")) {
         URL.revokeObjectURL(image.url);
       }
     };
@@ -314,26 +335,28 @@ const Notice = ({
                       controls
                       muted
                       className="w-full object-cover h-52 rounded-md"
-                      style={{ maxHeight: '208px' }}
+                      style={{ maxHeight: "208px" }}
                     >
                       Your browser does not support the video tag.
                     </video>
                   )}
                   {/* Show upload progress for videos */}
-                  {uploadProgress > 0 && uploadProgress < 100 && image.type === "video" && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md">
-                      <div className="text-white text-center">
-                        <div className="mb-2">Uploading video...</div>
-                        <div className="w-48 bg-gray-200 rounded-full h-2.5">
-                          <div 
-                            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
-                            style={{ width: `${uploadProgress}%` }}
-                          ></div>
+                  {uploadProgress > 0 &&
+                    uploadProgress < 100 &&
+                    image.type === "video" && (
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-md">
+                        <div className="text-white text-center">
+                          <div className="mb-2">Uploading video...</div>
+                          <div className="w-48 bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                              style={{ width: `${uploadProgress}%` }}
+                            ></div>
+                          </div>
+                          <div className="mt-1 text-sm">{uploadProgress}%</div>
                         </div>
-                        <div className="mt-1 text-sm">{uploadProgress}%</div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               ) : (
                 <button
@@ -476,6 +499,24 @@ const Notice = ({
                 <option value="Survey">Survey</option>
               </select>
             </div>
+
+            <div className="my-2">
+              <select
+                onChange={(e) => setTriggerPage(e.target.value)}
+                className="border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent"
+              >
+                <option value="" className="hidden">
+                  Page to display Notice
+                </option>
+                <option value="all">All</option>
+                <option value="Courses">Courses</option>
+                <option value="Events">Events</option>
+                <option value="Admissions">Admissions</option>
+                <option value="Assessment">Assessment</option>
+                <option value="Profile">Profile</option>
+              </select>
+            </div>
+
             <div className="my-2">
               <select
                 onChange={(e) => setCancel(e.target.value)}

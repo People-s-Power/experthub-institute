@@ -15,7 +15,8 @@ export interface NoticeType {
   action: string;
   page: string;
   cancel: Boolean;
-  thumbnail: ThumbnailType
+  thumbnail: ThumbnailType;
+  [key: string]: any;
 }
 export interface ThumbnailType {
   type: string;
