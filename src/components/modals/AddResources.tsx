@@ -72,7 +72,7 @@ const AddResources = ({ open, handleClick, material, course }: { open: boolean, 
 
 
   const add = () => {
-    if (title && about && websiteUrl) {
+    if (title && about) {
       setLoading(true)
       // const formData = new FormData()
       // file && formData.append("image", file[0])
@@ -241,9 +241,9 @@ const AddResources = ({ open, handleClick, material, course }: { open: boolean, 
           />
           {
             type === 'video' && <>
-              <div onClick={() => uploadRef.current?.click()} className='w-full gap-1 my-3 flex items-center'>
+              <div onClick={() => videoRef.current?.click()} className='w-full gap-1 my-3 flex items-center'>
                 <span className='text-primary text-[18px]'><Video /></span>
-                <span className='text-sm'>Add Video to Sub-title</span>
+                <span className='text-sm'>Add Video</span>
               </div>
               {video && <video key={video} controls className={`rounded-lg w-full video`} width="250" >
                 <source src={video} type="video/mp4" />

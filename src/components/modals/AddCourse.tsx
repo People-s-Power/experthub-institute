@@ -936,7 +936,7 @@ const AddCourse = ({
           value: option.studentId,
           label: option.fullname,
         }))
-        console.log(formattedStudents)
+        // console.log(formattedStudents)
         setStudents([{ label: "My Students", value: "students" }, ...formattedStudents])
 
         // Load scholarship and audience data after students are loaded
