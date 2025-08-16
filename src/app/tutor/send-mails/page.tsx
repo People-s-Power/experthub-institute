@@ -5,9 +5,11 @@ import { useAppSelector } from "@/store/hooks";
 import apiService from "@/utils/apiService";
 import { notification } from "antd";
 import React, { useEffect, useState } from "react";
-import MDEditor from '@uiw/react-md-editor';
-import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
+import MDEditor from "@uiw/react-md-editor";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import { UserType } from "@/types/UserType";
+import GoPremuim from "@/components/modals/GoPremuium";
 
 interface User {
   _id: string;
@@ -24,6 +26,14 @@ const SendMail = () => {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+  const [userProfile, setUserProfile] = useState<UserType>();
+  const [showPremuim, setShowPremuim] = useState(false);
+
+  const getUser = () => {
+    apiService.get(`user/profile/${user.id}`).then((response) => {
+      setUserProfile(response.data.user);
+    });
+  };
 
   const getUsers = () => {
     apiService
@@ -45,6 +55,7 @@ const SendMail = () => {
 
   useEffect(() => {
     getUsers();
+    getUser();
   }, []);
 
   const handleUserSelection = (userId: string) => {
@@ -64,6 +75,10 @@ const SendMail = () => {
   };
 
   const sendMail = () => {
+    if (userProfile?.premiumPlan !== "enterprise") {
+      setShowPremuim(true);
+      return;
+    }
     if (!subject.trim()) {
       api.open({
         message: "Please enter a subject",
@@ -200,8 +215,14 @@ const SendMail = () => {
                     hideToolbar={false}
                     // visibleDragBar={false}
                     textareaProps={{
-                      placeholder: "Enter your message here...\n\nYou can use markdown formatting:\n# Heading 1\n## Heading 2\n**Bold text**\n*Italic text*\n- Bullet point\n1. Numbered list\n[Link text](https://example.com)\n```code block```",
-                      style: { fontSize: 14, lineHeight: 1.5, fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }
+                      placeholder:
+                        "Enter your message here...\n\nYou can use markdown formatting:\n# Heading 1\n## Heading 2\n**Bold text**\n*Italic text*\n- Bullet point\n1. Numbered list\n[Link text](https://example.com)\n```code block```",
+                      style: {
+                        fontSize: 14,
+                        lineHeight: 1.5,
+                        fontFamily:
+                          'ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                      },
                     }}
                     height={400}
                   />
@@ -257,6 +278,7 @@ const SendMail = () => {
             </div>
           </div>
         </div>
+        <GoPremuim show={showPremuim} setShow={setShowPremuim} />
       </div>
     </DashboardLayout>
   );

@@ -22,7 +22,9 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   const [show, setShow] = useState(true);
   const router = useRouter();
   const [api, contextHolder] = notification.useNotification();
-  const [team, setTeam] = useState<{ ownerId?: { fullname?: string } } | null>(null);
+  const [team, setTeam] = useState<{ ownerId?: { fullname?: string } } | null>(
+    null
+  );
 
   const getUser = () => {
     apiService.get(`user/profile/${user.id}`).then(function (response) {
@@ -51,7 +53,9 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
       if (response.data.teamMembers) {
         response.data.teamMembers.map((member: any) => {
           if (user.id === member.ownerId?._id) {
-          } else {
+          } else if (
+            member.status !== "accepted"
+          ) {
             setTeam(member);
           }
         });
