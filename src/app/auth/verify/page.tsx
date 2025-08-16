@@ -29,9 +29,6 @@ const verify = () => {
         }
         localStorage.removeItem("id")
         router.push(`/auth/survey?user=${user}`)
-
-
-
         // setSuccess(true)
       })
       .catch(e => {
