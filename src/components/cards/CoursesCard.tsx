@@ -47,7 +47,7 @@ const CoursesCard = ({
       key: "1",
       label: <Share course={course} />,
     },
-    ...(pathname.includes("admin")
+    ...(pathname.includes("admin") || pathname.includes("tutor")
       ? [
           {
             key: "2",
