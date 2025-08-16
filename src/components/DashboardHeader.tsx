@@ -22,6 +22,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   const [show, setShow] = useState(true);
   const router = useRouter();
   const [api, contextHolder] = notification.useNotification();
+  const [team, setTeam] = useState<{ ownerId?: { fullname?: string } } | null>(null);
 
   const getUser = () => {
     apiService.get(`user/profile/${user.id}`).then(function (response) {
@@ -44,9 +45,26 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
       });
   };
 
+  const getTeam = () => {
+    apiService.get(`/user/team/${user.id}`).then(function (response) {
+      console.log(response.data.teamMembers);
+      if (response.data.teamMembers) {
+        response.data.teamMembers.map((member: any) => {
+          if (user.id === member.ownerId?._id) {
+          } else {
+            setTeam(member);
+          }
+        });
+        // ownerId.fullname
+        // setTeam(response.data.teamMembers);
+      }
+    });
+  };
+
   useEffect(() => {
     getNotice();
     getUser();
+    getTeam();
   }, []);
 
   const markRead = () => {
@@ -410,6 +428,37 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
                       Cancel
                     </button>
                   ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {team && (
+          <div>
+            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
+            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[40vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">
+              <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
+                <p className="font-medium text-center">Team Member Invite</p>
+                {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
+              </div>
+
+              <div className="lg:mx-12 text-center mx-4 my-4">
+                <p>
+                  {team?.ownerId?.fullname} Has invited you to be a team member.{" "}
+                  <br />
+                  Check your email for details for the next steps.
+                </p>
+                <div className="text-center">
+                  <Link href={"/tutor/team"}>
+                    <button className="bg-[#F7A607] text-white p-1 rounded-md my-3 px-6">
+                      Manage
+                    </button>
+                  </Link>
+                  <br />
+                  <button onClick={() => setTeam(null)} className="p-1">
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>
