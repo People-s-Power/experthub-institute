@@ -421,7 +421,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
                 {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
               </div>
               <div className="p-4">
-                {notice.thumbnail && <ImageViewer image={notice.thumbnail} />}
+                {notice.thumbnail && <ImageViewer image={notice.thumbnail} control={true} />}
               </div>
               <div className="lg:mx-12 mx-4 my-4">
                 <p>{notice.body}</p>

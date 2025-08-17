@@ -510,6 +510,9 @@ const Notice = ({
                 </option>
                 <option value="all">All</option>
                 <option value="Courses">Courses</option>
+                <option value="Dashboard">Dashboard</option>
+                <option value="Appointment">Appointment</option>
+                <option value="Calendar">Calendar</option>
                 <option value="Events">Events</option>
                 <option value="Admissions">Admissions</option>
                 <option value="Assessment">Assessment</option>
