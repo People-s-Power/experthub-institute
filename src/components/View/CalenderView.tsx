@@ -114,7 +114,64 @@ const CalendarComponent: React.FC = () => {
       return splitEventIntoDays(event); // Multi-day events are split
     });
   };
+  function generateCourseEvents(course: any) {
+    if (!course.days || !Array.isArray(course.days)) {
+      return [
+        {
+          id: course._id,
+          title: course.title,
+          start: new Date(course.startDate),
+          end: new Date(course.endDate),
+          description: course.about,
+          type: "course",
+        },
+      ];
+    }
+    const events: any[] = [];
+    const startDate = new Date(course.startDate);
+    const endDate = new Date(course.endDate);
 
+    // Iterate through each day between startDate and endDate
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dayName = d.toLocaleDateString("en-US", { weekday: "long" });
+      const dayObj = course.days.find(
+        (day: any) => day.checked && day.day === dayName
+      );
+      if (dayObj) {
+        // Create event for this day
+        const startTimeParts = dayObj.startTime.split(":");
+        const endTimeParts = dayObj.endTime.split(":");
+        const eventStart = new Date(d);
+        eventStart.setHours(
+          Number(startTimeParts[0]),
+          Number(startTimeParts[1]),
+          0,
+          0
+        );
+        const eventEnd = new Date(d);
+        eventEnd.setHours(
+          Number(endTimeParts[0]),
+          Number(endTimeParts[1]),
+          0,
+          0
+        );
+
+        events.push({
+          id: course._id,
+          title: course.title,
+          start: eventStart,
+          end: eventEnd,
+          description: course.about,
+          type: "course",
+        });
+      }
+    }
+    return events;
+  }
   useEffect(() => {
     const fetchEvents = async () => {
       let formattedEvents: any[] = [];
@@ -160,35 +217,34 @@ const CalendarComponent: React.FC = () => {
         );
 
         // Process enrolled courses
-        let enrolledCourses: any;
+        // Helper to get day index from string
+        const dayNameToIndex = {
+          Sunday: 0,
+          Monday: 1,
+          Tuesday: 2,
+          Wednesday: 3,
+          Thursday: 4,
+          Friday: 5,
+          Saturday: 6,
+        };
+
+        // Helper function to generate course events based on days and times
+
+        let enrolledCourses: any = [];
         if (pathname.includes("applicant")) {
           enrolledCourses = coursesResponse.data.enrolledCourses
             .filter(
               (event: any) =>
                 event.type === "online" || event.type === "offline"
             )
-            .map((event: any) => ({
-              id: event._id,
-              title: event.title,
-              start: new Date(event.startDate),
-              end: new Date(event.endDate),
-              description: event.about,
-              type: "course",
-            }));
+            .flatMap((event: any) => generateCourseEvents(event));
         } else {
           enrolledCourses = tutorResponse.data.courses
             .filter(
               (event: any) =>
                 event.type === "online" || event.type === "offline"
             )
-            .map((event: any) => ({
-              id: event._id,
-              title: event.title,
-              start: new Date(event.startDate),
-              end: new Date(event.endDate),
-              description: event.about,
-              type: "course",
-            }));
+            .flatMap((event: any) => generateCourseEvents(event));
         }
         const enrolledevents = events.data.enrolledCourses
           .filter(
