@@ -54,9 +54,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
       if (response.data.teamMembers) {
         response.data.teamMembers.map((member: any) => {
           if (user.id === member.ownerId?._id) {
-          } else if (
-            member.status !== "accepted"
-          ) {
+          } else if (member.status !== "accepted") {
             setTeam(member);
           }
         });
@@ -86,16 +84,9 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
   };
 
   const takeAction = () => {
-    if (notice?.page === "Survey") {
-      markRead();
-      router.push(`/auth/survey?user=${user.id}`);
-    } else {
-      markRead();
-      router.push(
-        `/${
-          user.role === "student" ? "applicant" : "tutor"
-        }/${notice?.page.toLowerCase()}`
-      );
+    markRead();
+    if (notice?.link) {
+      window.open(notice.link, "_blank");
     }
   };
 
@@ -408,46 +399,50 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
         </div>
 
         {/* Show notice modal only on the page specified in notice.page */}
-        {notice && show && typeof window !== 'undefined' &&
-          (
-            notice.triggerPage?.toLowerCase() === 'all' ||
-            window.location.pathname.toLowerCase().includes(notice.triggerPage?.toLowerCase())
-          ) && (
-          <div>
-            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
-            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">
-              <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
-                <p className="font-medium text-center">{notice.title}</p>
-                {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
-              </div>
-              <div className="p-4">
-                {notice.thumbnail && <ImageViewer image={notice.thumbnail} control={true} />}
-              </div>
-              <div className="lg:mx-12 mx-4 my-4">
-                <p>{notice.body}</p>
-                <div className="text-center ">
-                  <button
-                    onClick={() => takeAction()}
-                    className="bg-[#F7A607] text-white p-1 rounded-md my-3 px-6"
-                  >
-                    {notice.action}
-                  </button>{" "}
-                  <br />
-                  {notice.cancel ? (
-                    <button onClick={() => setShow(false)} className="p-1">
-                      Cancel
-                    </button>
-                  ) : null}
+        {notice &&
+          show &&
+          typeof window !== "undefined" &&
+          (notice.triggerPage?.toLowerCase() === "all" ||
+            window.location.pathname
+              .toLowerCase()
+              .includes(notice.triggerPage?.toLowerCase())) && (
+            <div>
+              <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
+              <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[70vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">
+                <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
+                  <p className="font-medium text-center">{notice.title}</p>
+                  {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
+                </div>
+                <div className="p-4">
+                  {notice.thumbnail && (
+                    <ImageViewer image={notice.thumbnail} control={true} />
+                  )}
+                </div>
+                <div className="lg:mx-12 mx-4 my-4">
+                  <p>{notice.body}</p>
+                  <div className="text-center ">
+                    <button
+                      onClick={() => takeAction()}
+                      className="bg-[#F7A607] text-white p-1 rounded-md my-3 px-6"
+                    >
+                      {notice.action}
+                    </button>{" "}
+                    <br />
+                    {notice.cancel ? (
+                      <button onClick={() => setShow(false)} className="p-1">
+                        Cancel
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {team && (
+        {team && typeof window !== "undefined" && !window.location.pathname.toLowerCase().includes("/tutor/team") && (
           <div>
-            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-50"></div>
-            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[40vh] w-[95%] mx-auto z-100 bg-[#F8F7F4]">
+            <div className="fixed bg-[#000000] opacity-50 top-0 left-0 right-0 w-full h-[100vh] z-[9999999]"></div>
+            <div className="fixed top-10 bottom-10 left-0 overflow-y-auto rounded-md right-0 lg:w-[40%] h-[40vh] w-[95%] mx-auto z-[9999999] bg-[#F8F7F4]">
               <div className="shadow-[0px_1px_2.799999952316284px_0px_#1E1E1E38] p-4 lg:px-12">
                 <p className="font-medium text-center">Team Member Invite</p>
                 {/* <img onClick={() => handleClick()} className='w-6 h-6 cursor-pointer' src="/images/icons/material-symbols_cancel-outline.svg" alt="" /> */}
@@ -460,7 +455,7 @@ const DashboardHeader = ({ setToggle }: { setToggle: () => void }) => {
                   Check your email for details for the next steps.
                 </p>
                 <div className="text-center">
-                  <Link href={"/tutor/team"}>
+                  <Link onClick={() => setTeam(null)} href={"/tutor/team"}>
                     <button className="bg-[#F7A607] text-white p-1 rounded-md my-3 px-6">
                       Manage
                     </button>

@@ -290,6 +290,12 @@ const team = () => {
                         : single.ownerId.email}
                     </p>
                   </div>
+                  <p className="mt-auto ml-2">
+                    {user.id === single.ownerId?._id &&
+                      single.status !== "accepted" && (
+                        <span className="text-red-500 text-sm">Pending</span>
+                      )}
+                  </p>
                 </div>
                 {open && (
                   <div>
