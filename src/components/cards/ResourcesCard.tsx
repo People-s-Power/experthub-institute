@@ -33,10 +33,18 @@ const ResourcesCard = ({ material, getAll }: { material: ResourceType, getAll: a
         getAll()
       })
   }
+  const formatUrl = (url: string) => {
+    if (!url) return '#';
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
   return (
     <div className='p-1 lg:w-[32%] w-full'>
       <div className=''>
-        <a href={material.websiteUrl} target='_blank'>
+        <a href={formatUrl(material.websiteUrl)} target='_blank'>
           <div className='p-3 rounded-md bg-white'>
             <img className='rounded-md h-44 object-cover w-full' src={material.image} alt="" />
           </div>

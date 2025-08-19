@@ -14,6 +14,8 @@ const AddResources = ({ open, handleClick, material, course }: { open: boolean, 
   const [image, setImage] = useState(material?.image || "")
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState<FileList | null>()
+  const [pdfFile, setPdfFile] = useState<FileList | null>()
+  const [videoFile, setVideoFile] = useState<FileList | null>()
   const [title, setTitle] = useState(material?.title || "")
   const [about, setAbout] = useState(material?.aboutCourse || "")
   const [privacy, setPrivacy] = useState("")
@@ -74,33 +76,33 @@ const AddResources = ({ open, handleClick, material, course }: { open: boolean, 
   const add = () => {
     if (title && about) {
       setLoading(true)
-      // const formData = new FormData()
-      // file && formData.append("image", file[0])
-      // formData.append("title", title)
-      // formData.append("aboutCourse", about)
-      // formData.append("assignedCourse", course)
-      // formData.append("type", type)
+      const formData = new FormData()
+      
+      // Add image file if available
+      if (file && file[0]) {
+        formData.append("image", file[0])
+      }
+      
+      // Add basic fields
+      formData.append("title", title)
+      formData.append("aboutCourse", about)
+      formData.append("assignedCourse", course)
+      formData.append("type", type)
 
-      // if (type === 'link') {
-      //   formData.append("websiteUrl", websiteUrl)
-      // } else if (type === 'video') {
-      //   formData.append("websiteUrl", video)
-      // } else if (type === 'pdf') {
-      //   formData.append("websiteUrl", pdf)
-      // }
+      // Add type-specific data
+      if (type === 'link') {
+        formData.append("websiteUrl", websiteUrl)
+      } else if (type === 'video' && videoFile && videoFile[0]) {
+        formData.append("video", videoFile[0])
+      } else if (type === 'pdf' && pdfFile && pdfFile[0]) {
+        formData.append("pdf", pdfFile[0])
+      }
 
-      apiService.post(`resources/add-new`,
-        {
-          image,
-          title,
-          type,
-          assignedCourse: course,
-          aboutCourse: about,
-          video,
-          pdf,
-          websiteUrl
-        }
-      )
+      apiService.post(`resources/add-new`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
         .then(function (response) {
           console.log(response.data)
           setLoading(false)
@@ -120,33 +122,30 @@ const AddResources = ({ open, handleClick, material, course }: { open: boolean, 
 
   const handlePdf = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
+    setPdfFile(files)
 
-    const reader = new FileReader()
     if (files && files.length > 0) {
       setFileName(files[0].name)
-
+      
+      const reader = new FileReader()
       reader.readAsDataURL(files[0])
       reader.onloadend = () => {
         if (reader.result) {
           setPdf(reader.result as string)
-          // setImage(reader.result as string)
         }
       }
     }
   }
 
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     const files = e.target.files
-    // setFile(e.target.files)
+    setVideoFile(files)
 
-    const reader = new FileReader()
     if (files && files.length > 0) {
-
+      const reader = new FileReader()
       reader.readAsDataURL(files[0])
       reader.onloadend = () => {
         if (reader.result) {
-          const type = files[0].name.substr(files[0].name.length - 3)
           setVideo(reader.result as string)
         }
       }
