@@ -13,7 +13,7 @@ const resources = () => {
 
   const getAll = () => {
     apiService.get(`resources/tutor/${user.id}`).then(function (response) {
-      setResources(response.data.resource.reverse());
+      setResources(response.data.resources.reverse());
       console.log(response.data);
     });
   };
@@ -39,11 +39,11 @@ const resources = () => {
           </div>
         ) : (
           <div className="text-center mt-10">
-            <img
+            {/* <img
               src="/images/unread.jpg"
               alt="No resources"
               className="mx-auto mb-4"
-            />
+            /> */}
             <p className="text-gray-500">No resources found!</p>
             <p className="text-sm text-gray-400 mt-2">
               Start by adding your first resource.
