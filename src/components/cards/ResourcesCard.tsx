@@ -42,26 +42,29 @@ const ResourcesCard = ({ material, getAll }: { material: ResourceType, getAll: a
   };
 
   return (
-    <div className='p-1 lg:w-[32%] w-full'>
-      <div className=''>
-        <a href={formatUrl(material.websiteUrl)} target='_blank'>
-          <div className='p-3 rounded-md bg-white'>
-            <img className='rounded-md h-44 object-cover w-full' src={material.image} alt="" />
+    <div className="p-2 lg:w-[32%] w-full">
+      <div className="transition-shadow duration-200 shadow-md hover:shadow-xl rounded-lg bg-white">
+        <a href={formatUrl(material.websiteUrl)} target="_blank" rel="noopener noreferrer">
+          <div className="rounded-t-lg overflow-hidden h-44 flex items-center justify-center bg-gray-100">
+            <img className="object-cover w-full h-full" src={material.image} alt={material.title} />
           </div>
         </a>
-        <div className='p-1 flex justify-between'>
-          {/* <p className='text-[#DC9F08] font-medium text-sm'>Course by Peoples power</p> */}
-          <div>
-            <h4 className='text-xl my-3'>{material.title}</h4>
-            <p className='text-sm'>{material.aboutCourse}</p>
-          </div>
-          <div>
-            {user.role === 'admin' || user.role === 'tutor' ? <Dropdown menu={{ items }} trigger={["click"]}>
-              <button className='bg-transparent'>
-                <img className='w-4 h-4' src="/images/icons/edit.svg" alt="" />
-              </button>
-            </Dropdown> : null}
-
+        <div className="p-4 flex flex-col gap-2">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <h4 className="text-lg font-semibold text-primary mb-1 truncate" title={material.title}>{material.title}</h4>
+              <p className="text-sm text-gray-700 mb-2 line-clamp-2">{material.aboutCourse}</p>
+              {(user.role === 'admin' || user.role === 'tutor') && material.assignedCourseTitle && (
+                <p className="text-xs text-gray-500 font-medium mt-1">Course: <span className="text-gray-800">{material.assignedCourseTitle}</span></p>
+              )}
+            </div>
+            {(user.role === 'admin' || user.role === 'tutor') && (
+              <Dropdown menu={{ items }} trigger={["click"]}>
+                <button className="bg-transparent p-1 rounded hover:bg-gray-100">
+                  <img className="w-5 h-5" src="/images/icons/edit.svg" alt="Edit" />
+                </button>
+              </Dropdown>
+            )}
           </div>
         </div>
       </div>
