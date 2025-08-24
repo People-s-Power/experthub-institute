@@ -8,6 +8,7 @@ import React, { useEffect, useState } from "react";
 
 const resources = () => {
   const [resources, setResources] = useState<ResourceType[]>([]);
+  const [search, setSearch] = useState("");
 
   const getAll = () => {
     apiService.get("resources/all").then(function (response) {
@@ -20,16 +21,46 @@ const resources = () => {
     getAll();
   }, []);
 
+  const filteredResources = resources.filter((material) =>
+    material.assignedCourseTitle?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <DashboardLayout>
       <div className="p-6">
         <p className="text-xl font-medium">Resources</p>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by course title..."
+          className="border rounded-md p-2 w-full max-w-md mb-6"
+        />
 
-        <div className="flex justify-between flex-wrap">
+        {/* <div className="flex justify-between flex-wrap">
           {resources.map((material) => (
             <ResourcesCard material={material} getAll={() => getAll()} />
           ))}
-        </div>
+        </div> */}
+
+        {filteredResources.length > 0 ? (
+          <div className="flex justify-between flex-wrap">
+            {filteredResources.map((material) => (
+              <ResourcesCard
+                key={material._id}
+                material={material}
+                getAll={() => getAll()}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center mt-10">
+            <p className="text-gray-500">No resources found!</p>
+            <p className="text-sm text-gray-400 mt-2">
+              Start by adding your first resource.
+            </p>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

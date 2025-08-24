@@ -5,6 +5,7 @@ import { UserType } from '@/types/UserType';
 import { notification } from 'antd';
 import { useFlutterwave, closePaymentModal } from 'flutterwave-react-v3';
 import apiService from '@/utils/apiService';
+import Select from "react-select";
 
 const EnrollStudent = ({ open, handleClick, course }) => {
   const user = useAppSelector((state) => state.value);
@@ -74,9 +75,21 @@ const EnrollStudent = ({ open, handleClick, course }) => {
           <div className='flex justify-between my-3'>
             <div className='w-full'>
               <label className='text-sm font-medium my-2'>Select Student</label>
-              <select onChange={e => setEnrollStudent(e.target.value)} value={enrollStudent} className='border rounded-md w-full border-[#1E1E1ED9] p-2 bg-transparent'>
-                {students.map(student => <option key={student.studentId} value={student.studentId}>{student.fullname}</option>)}
-              </select>
+              {/* React Select for searchable student selection */}
+              <Select
+                options={students.map(student => ({
+                  value: student.studentId,
+                  label: student.fullname,
+                }))}
+                onChange={selected => setEnrollStudent(selected ? selected.value : "")}
+                value={students
+                  .map(student => ({ value: student.studentId, label: student.fullname }))
+                  .find(option => option.value === enrollStudent) || null}
+                placeholder="Search and select student"
+                isSearchable
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
             </div>
           </div>
           <div>

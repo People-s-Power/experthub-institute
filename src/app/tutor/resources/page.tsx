@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 
 const resources = () => {
   const [resources, setResources] = useState<ResourceType[]>([]);
+  const [search, setSearch] = useState("");
   const user = useAppSelector((state) => state.value);
 
   const getAll = () => {
@@ -22,14 +23,26 @@ const resources = () => {
     getAll();
   }, []);
 
+  // Filter resources by assignedCourse.title
+  const filteredResources = resources.filter((material) =>
+    material.assignedCourseTitle?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <DashboardLayout>
       <div className="p-6">
         <p className="text-xl font-medium">Tutor Resources</p>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by course title..."
+          className="border rounded-md p-2 w-full max-w-md mb-6"
+        />
 
-        {resources.length > 0 ? (
+        {filteredResources.length > 0 ? (
           <div className="flex justify-between flex-wrap">
-            {resources.map((material) => (
+            {filteredResources.map((material) => (
               <ResourcesCard
                 key={material._id}
                 material={material}
@@ -39,11 +52,6 @@ const resources = () => {
           </div>
         ) : (
           <div className="text-center mt-10">
-            {/* <img
-              src="/images/unread.jpg"
-              alt="No resources"
-              className="mx-auto mb-4"
-            /> */}
             <p className="text-gray-500">No resources found!</p>
             <p className="text-sm text-gray-400 mt-2">
               Start by adding your first resource.
